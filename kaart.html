@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kroeg &amp; Karaf op de kaart</title>
+<meta name="description" content="Alle zaken uit de gids Kroeg &amp; Karaf op een kaart van Vlaanderen, met zoeken en filters.">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Black&family=Petrona:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/vendor/leaflet.css">
+<link rel="stylesheet" href="assets/vendor/MarkerCluster.css">
+<link rel="stylesheet" href="assets/stijl.css">
+<link rel="stylesheet" href="assets/kaart.css">
+</head>
+<body>
+
+<header>
+ <div class="wrap">
+  <div class="mast">
+   <div class="brand">
+    <h1>Kroeg &amp; Karaf op de kaart</h1>
+    <img class="logo" src="assets/logo.png"
+     alt="Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen" width="760" height="575">
+   </div>
+   <div class="mastside">
+    <a class="naarkaart" href="index.html">
+     <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 6h16M4 12h16M4 18h16"/></svg>
+     Terug naar de lijst</a>
+    <div class="tally" id="tally"></div>
+   </div>
+  </div>
+ </div>
+</header>
+
+<div class="bar"><div class="wrap">
+  <div class="controls">
+   <div class="searchbar">
+    <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M12.8 12.8 17 17"/></svg>
+    <input type="search" id="q" placeholder="Zoek op naam, gemeente, adres of beschrijving…" autocomplete="off" aria-label="Zoeken">
+   </div>
+   <button class="filtoggle" id="filtoggle" type="button" aria-expanded="false" aria-controls="filters">
+    <span id="filtoggle-lbl">Filters</span><span class="arw" aria-hidden="true">▾</span></button>
+   <div class="filters" id="filters">
+    <div class="grp"><span class="lbl">Provincie</span><div class="chips" id="f-p"></div></div>
+    <div class="grp"><span class="lbl">Soort</span><div class="chips" id="f-t"></div></div>
+    <div class="grp"><span class="lbl">Status</span><div class="chips" id="f-s"></div>
+     <button class="clr" id="clr" hidden>Alles wissen</button></div>
+   </div>
+  </div>
+ </div></div>
+
+<main class="wrap">
+ <div class="laadfout" id="laadfout" hidden>
+  <b>De zaken kwamen niet binnen.</b> Ververs de pagina. Blijft het mislopen, dan is
+  <code>data/zaken.json</code> niet mee gepubliceerd.</div>
+ <div class="veld">
+  <div id="kaart"></div>
+  <button class="heel" id="heel" type="button">Hele kaart</button>
+  <div class="legenda">
+   <span><i style="background:#2f6b43"></i>geverifieerd</span>
+   <span><i style="background:#cf4521"></i>te checken</span>
+   <span><i style="background:#8d8378"></i>gesloten</span>
+  </div>
+ </div>
+</main>
+
+<footer class="wrap">
+ <div id="foot"></div>
+</footer>
+
+<script>const BIJGEWERKT = "8 september 2026";</script>
+<script src="assets/vendor/leaflet.js"></script>
+<script src="assets/vendor/leaflet.markercluster.js"></script>
+<script src="assets/gemeen.js"></script>
+<script src="assets/kaart.js"></script>
+</body>
+</html>
