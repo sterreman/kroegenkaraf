@@ -5,6 +5,10 @@
  margin-bottom:10px}
 #kaart{height:min(72vh,720px);background:var(--paper2)}
 
+/* De tegels van OpenStreetMap zijn kleurrijk. Een filter haalt er wat kleur uit
+   en trekt ze naar het warme van de rest, zodat de spelden bovenaan blijven. */
+.leaflet-tile-pane{filter:grayscale(.5) sepia(.16) brightness(1.04) contrast(.92)}
+
 /* Leaflet brengt zijn eigen schreefloze stapel mee; die overrulen we. */
 .leaflet-container{font-family:var(--ui);font-size:13px;background:var(--paper2)}
 .leaflet-control-zoom a{color:var(--ink2);background:var(--paper);

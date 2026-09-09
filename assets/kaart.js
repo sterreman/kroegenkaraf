@@ -1,4 +1,4 @@
-/* De kaart. Leaflet met tegels van Carto op OpenStreetMap-gegevens, de zaken
+/* De kaart. Leaflet met de tegels van OpenStreetMap, de zaken
    geclusterd zodat tweeduizend spelden geen brij worden. */
 
 const START = [51.03, 4.35];   /* ergens tussen Gent, Brussel en Antwerpen */
@@ -9,13 +9,14 @@ const kaart = L.map('kaart', {
   zoomControl: true, scrollWheelZoom: true
 });
 
-/* Positron is rustig en lichtgrijs, dus de spelden blijven het luidst op de
-   pagina. Wil je het gewone OpenStreetMap-beeld, vervang de url door
-   https://tile.openstreetmap.org/{z}/{x}/{y}.png en pas de bronvermelding aan. */
-L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    + ' &copy; <a href="https://carto.com/attributions">CARTO</a>',
-  subdomains: 'abcd', maxZoom: 20
+/* De gewone tegels van OpenStreetMap. Die mogen zonder sleutel voor een site
+   van deze omvang, zolang de bronvermelding zichtbaar blijft staan. Carto viel af:
+   dat is enkel voor hun eigen klanten en zet anders "API KEY REQUIRED" over de
+   kaart. De tegels worden in css wat ontkleurd zodat ze niet vechten met het
+   cremekleurige palet en de spelden het luidst blijven. */
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  maxZoom: 19
 }).addTo(kaart);
 
 const KLEUR = {'Geverifieerd': '#2f6b43', 'Te checken': '#cf4521', 'Gesloten': '#8d8378'};
