@@ -50,7 +50,7 @@ function ballon(d) {
     + `<div class="acts">`
       + `<a class="btn map" href="${mapsUrl(d)}" target="_blank" rel="noopener"`
       + ` title="${esc(d.n)} op Google Maps" aria-label="${esc(d.n)} op Google Maps">${SPELD}</a>`
-      + `<a class="btn" href="index.html">In de lijst</a>`
+      + `<a class="btn" href="index.html#${d._i}">In de lijst</a>`
       + socKnop(d, d.fb, 'fb', 'Facebook') + socKnop(d, d.ig, 'ig', 'Instagram')
     + `</div></div>`;
 }

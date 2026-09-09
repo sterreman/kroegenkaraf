@@ -107,6 +107,27 @@ function toonFoto(card) {
   body.insertBefore(img, body.firstChild);
 }
 
+/* index.html#123 klapt die ene zaak open, zodat de kaart ernaar kan doorlinken.
+   Valt de zaak buiten de huidige filters, bijvoorbeeld omdat ze gesloten is, dan
+   gaan de filters open. Anders stuur je iemand naar een lege pagina. */
+function naarAnker() {
+  const i = parseInt(location.hash.slice(1), 10);
+  if (isNaN(i) || !DATA[i]) return;
+  if (!match(DATA[i])) {
+    f.p = f.t = f.q = ''; f.s = '';
+    document.getElementById('q').value = '';
+    renderChips(); render();
+  }
+  const card = document.querySelector(`.card[data-i="${i}"]`);
+  if (!card) return;
+  card.classList.add('open', 'gevonden');
+  card.querySelector('.row').setAttribute('aria-expanded', 'true');
+  toonFoto(card);
+  card.scrollIntoView({block: 'center', behavior: 'smooth'});
+  setTimeout(() => card.classList.remove('gevonden'), 2600);
+}
+addEventListener('hashchange', naarAnker);
+
 document.addEventListener('click', e => {
   const row = e.target.closest('.row');
   if (row) {
@@ -123,5 +144,6 @@ laadData(() => {
     DATA.length + ' zaken in de lijst · bijgewerkt ' + BIJGEWERKT;
   renderChips();
   render();
+  naarAnker();
   opnieuw = () => { render(); window.scrollTo({top: 0}); };
 });
