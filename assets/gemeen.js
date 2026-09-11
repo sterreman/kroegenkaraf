@@ -128,6 +128,13 @@ function laadData(dan) {
     .then(r => { if (!r.ok) throw new Error(r.status + ' ' + r.statusText); return r.json(); })
     .then(rijen => {
       DATA = rijen;
+      const alfabetisch = (a, b) => (a || '').localeCompare(
+        b || '', 'nl', {sensitivity: 'base'});
+      DATA.sort((a, b) =>
+        alfabetisch(a.p, b.p)
+        || Number(!a.g) - Number(!b.g)
+        || alfabetisch(a.g, b.g)
+        || alfabetisch(a.n, b.n));
       DATA.forEach((d, i) => {
         d._k = norm([d.n, d.g, d.p, d.a, d.i, d.t].join(' '));
         d._i = i;
