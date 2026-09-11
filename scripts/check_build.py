@@ -19,7 +19,9 @@ def main():
         page = Path('site', name).read_text(encoding='utf-8')
         if '__DATUM__' in page or '__AANTAL__' in page:
             raise SystemExit(f'STOP: oningevulde placeholder in {name}.')
-    print('Extra controles geslaagd. Vergelijking met de vorige publicatiedag is nog niet ingericht.')
+    print('Extra controles geslaagd.')
+    from compare_publication import main as compare_publication
+    compare_publication()
 
 if __name__ == '__main__':
     main()
