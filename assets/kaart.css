@@ -5,16 +5,16 @@
  margin-bottom:10px}
 #kaart{height:min(72vh,720px);background:var(--paper2)}
 
-/* De tegels van OpenStreetMap zijn kleurrijk. Een filter haalt er wat kleur uit
-   en trekt ze naar het warme van de rest, zodat de spelden bovenaan blijven. */
-.leaflet-tile-pane{filter:grayscale(.5) sepia(.16) brightness(1.04) contrast(.92)}
+/* De tegels van OpenStreetMap zijn kleurrijk. Een filter haalt er wat kleur uit,
+   zodat ze rustig naast het wit en blauw staan en de spelden bovenaan blijven. */
+.leaflet-tile-pane{filter:grayscale(.6) brightness(1.03) contrast(.94)}
 
 /* Leaflet brengt zijn eigen schreefloze stapel mee; die overrulen we. */
 .leaflet-container{font-family:var(--ui);font-size:13px;background:var(--paper2)}
 .leaflet-control-zoom a{color:var(--ink2);background:var(--paper);
  border-color:var(--line2);font-family:var(--ui)}
 .leaflet-control-zoom a:hover{color:var(--wine);background:var(--paper)}
-.leaflet-control-attribution{background:rgba(253,248,238,.86);color:var(--ink3);
+.leaflet-control-attribution{background:rgba(255,255,255,.86);color:var(--ink3);
  font-size:10.5px}
 .leaflet-control-attribution a{color:var(--ink2)}
 
@@ -49,11 +49,34 @@
  box-shadow:none;border-radius:2px}
 .leaflet-tooltip-top:before{border-top-color:var(--ink)}
 
-.heel{position:absolute;top:10px;right:10px;z-index:600;
- border:1px solid var(--line2);background:var(--paper);color:var(--ink2);
+/* De twee knoppen op de kaart. De houder zelf laat kliks door, anders kun je de
+   kaart onder die strook niet meer verslepen. */
+.kaartknoppen{position:absolute;top:10px;right:10px;z-index:600;display:flex;gap:6px;
+ align-items:stretch;pointer-events:none}
+.kaartknoppen button{pointer-events:auto}
+.heel{border:1px solid var(--line2);background:var(--paper);color:var(--ink2);
  font-family:var(--ui);font-size:9.5px;letter-spacing:.05em;font-weight:700;
- text-transform:uppercase;padding:7px 10px;cursor:pointer;border-radius:2px}
+ text-transform:uppercase;padding:7px 10px;cursor:pointer;border-radius:2px;
+ box-shadow:0 1px 4px rgba(19,39,56,.14)}
 .heel:hover{color:var(--wine);border-color:var(--wine)}
+.buurt{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--wine);
+ background:var(--wine);color:var(--wine-ink);font-family:var(--ui);font-size:12.5px;
+ font-weight:700;padding:7px 12px;cursor:pointer;border-radius:2px;
+ box-shadow:0 1px 4px rgba(19,39,56,.22)}
+.buurt:hover{background:#b83b1b;border-color:#b83b1b}
+.buurt svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;
+ stroke-linecap:round}
+.buurt[aria-busy="true"]{opacity:.7;cursor:progress}
+.buurt[aria-busy="true"] svg{animation:zoeken 1s linear infinite}
+@keyframes zoeken{to{transform:rotate(360deg)}}
+.heel:focus-visible,.buurt:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+/* Korte melding bovenaan de kaart: geen toestemming, te ver weg, ... */
+.melding{position:absolute;left:50%;top:54px;transform:translateX(-50%);z-index:650;
+ width:max-content;max-width:calc(100% - 24px);background:var(--ink);color:#fff;
+ font-size:12.5px;line-height:1.45;padding:8px 12px;border-radius:2px;
+ box-shadow:0 3px 14px rgba(19,39,56,.25)}
+.ballon .afst{display:block;font-size:11.5px;font-weight:700;color:var(--wine);margin-top:4px}
 .legenda{display:flex;gap:14px;flex-wrap:wrap;align-items:center;
  padding:8px 11px;border-top:1px solid var(--line);font-size:11px;color:var(--ink2)}
 .legenda span{display:flex;align-items:center;gap:6px;white-space:nowrap}
@@ -61,7 +84,14 @@
 
 @media(max-width:760px){
   #kaart{height:min(64vh,520px)}
-  .heel{top:auto;bottom:10px;right:10px}
+  /* Op de gsm onderaan, waar de duim zit: In de buurt links, Hele kaart rechts.
+     De houder staat in .veld, en daar zit de legenda nog onder de kaart. Vandaar
+     58px: de legenda plus de bronvermelding van OpenStreetMap, die anders over
+     de knop Hele kaart valt. */
+  .kaartknoppen{top:auto;bottom:58px;left:10px;right:10px;justify-content:space-between}
+  .buurt{font-size:13.5px;padding:10px 14px}
+  .heel{padding:10px 11px}
+  .melding{top:auto;bottom:112px}
 }
 
 /* Op de kaartpagina mag de kop kleiner: hoe hoger de kaart begint, hoe meer

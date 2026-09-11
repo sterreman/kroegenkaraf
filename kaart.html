@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#132738">
 <title>Kroeg &amp; Karaf op de kaart</title>
 <meta name="description" content="Alle zaken uit de gids Kroeg &amp; Karaf op een kaart van Vlaanderen, met zoeken en filters.">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
@@ -58,11 +59,17 @@
   <code>data/zaken.json</code> niet mee gepubliceerd.</div>
  <div class="veld">
   <div id="kaart"></div>
-  <button class="heel" id="heel" type="button">Hele kaart</button>
+  <div class="kaartknoppen">
+   <button class="buurt" id="buurt" type="button">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/>
+     <circle cx="12" cy="12" r="2.6"/><path d="M12 2.5v2.8M12 18.7v2.8M2.5 12h2.8M18.7 12h2.8"/></svg>
+    In de buurt</button>
+   <button class="heel" id="heel" type="button">Hele kaart</button>
+  </div>
+  <div class="melding" id="melding" role="status" hidden></div>
   <div class="legenda">
    <span><i style="background:#2f6b43"></i>geverifieerd</span>
    <span><i style="background:#cf4521"></i>te checken</span>
-   <span><i style="background:#8d8378"></i>gesloten</span>
   </div>
  </div>
 </main>
@@ -71,7 +78,7 @@
  <div id="foot"></div>
 </footer>
 
-<script>const BIJGEWERKT = "8 september 2026";</script>
+<script>const BIJGEWERKT = "11 september 2026";</script>
 <script src="assets/vendor/leaflet.js"></script>
 <script src="assets/vendor/leaflet.markercluster.js"></script>
 <script src="assets/gemeen.js"></script>

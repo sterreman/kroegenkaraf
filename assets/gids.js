@@ -84,7 +84,7 @@ function render() {
         + `<div class="acts">`
           + `<a class="btn map" href="${mapsUrl(d)}" target="_blank" rel="noopener"`
           + ` title="${esc(d.n)} op Google Maps" aria-label="${esc(d.n)} op Google Maps">${SPELD}</a>`
-          + (d.lat ? `<a class="btn" href="kaart.html#${d._i}">Op de kaart</a>` : '')
+          + (d.lat && !dead ? `<a class="btn" href="kaart.html#${d._i}">Op de kaart</a>` : '')
           + socKnop(d, d.fb, 'fb', 'Facebook') + socKnop(d, d.ig, 'ig', 'Instagram')
         + `</div>`
       + `</div></div>`;

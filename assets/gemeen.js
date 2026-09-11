@@ -6,15 +6,21 @@ const SOORT_ORDER = ['Volkscafé', 'Bruine kroeg', 'Biercafé', 'Herberg',
 const PROV_ORDER = [];
 
 /* De statusfilter begint op '_open': gesloten zaken staan standaard niet in beeld.
-   Ze blijven bereikbaar via de chip Gesloten of via Alles. */
+   In de lijst blijven ze bereikbaar via de chip Gesloten of via Alles. */
 const f = {q: '', p: '', t: '', s: '_open'};
+
+/* De kaartpagina zet dit op false. Een zaak die dicht is hoort niet meer op de
+   kaart: ze staat op hetzelfde adres als haar opvolger en die twee spelden
+   vallen dan samen. In de lijst blijft ze wel gewoon op te vragen. */
+let TOON_GESLOTEN = true;
 
 let DATA = [];
 
 const norm = s => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 const esc = s => (s || '').replace(/[&<>"]/g, c =>
   ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
-const count = fn => DATA.filter(fn).length;
+const telbaar = d => TOON_GESLOTEN || d.s !== 'Gesloten';
+const count = fn => DATA.filter(d => telbaar(d) && fn(d)).length;
 
 /* Facebook en Instagram als gevuld glyph. Bewust geen lijntekening zoals de
    soortpictogrammen: deze twee zijn merken en worden alleen herkend in hun
@@ -53,19 +59,26 @@ function chipRow(el, items, key) {
     + `${esc(lab)}${c != null ? `<span class="c">${c}</span>` : ''}</button>`).join('');
 }
 function renderChips() {
+  const totaal = count(() => true);
   chipRow(document.getElementById('f-p'),
-    [['', 'Alle', DATA.length], ...PROV_ORDER.map(p => [p, p, count(d => d.p === p)])], 'p');
+    [['', 'Alle', totaal], ...PROV_ORDER.map(p => [p, p, count(d => d.p === p)])], 'p');
   const soorten = SOORT_ORDER.filter(s => count(d => d.t === s) > 0)
     .map(s => [s, s, count(d => d.t === s)]);
   const leeg = count(d => !d.t);
   chipRow(document.getElementById('f-t'),
     [['', 'Alle'], ...soorten, ...(leeg ? [['_geen', 'Nog te bepalen', leeg]] : [])], 't');
-  chipRow(document.getElementById('f-s'),
-    [['_open', 'Open', count(d => d.s !== 'Gesloten')],
-     ['Geverifieerd', 'Geverifieerd', count(d => d.s === 'Geverifieerd')],
-     ['Te checken', 'Te checken', count(d => d.s === 'Te checken')],
-     ['Gesloten', 'Gesloten', count(d => d.s === 'Gesloten')],
-     ['', 'Alles', DATA.length]], 's');
+  /* Zonder gesloten zaken zijn Gesloten en Alles zinloze chips: de eerste geeft
+     niets, de tweede hetzelfde als Open. Die vallen dan weg. */
+  const status = TOON_GESLOTEN
+    ? [['_open', 'Open', count(d => d.s !== 'Gesloten')],
+       ['Geverifieerd', 'Geverifieerd', count(d => d.s === 'Geverifieerd')],
+       ['Te checken', 'Te checken', count(d => d.s === 'Te checken')],
+       ['Gesloten', 'Gesloten', count(d => d.s === 'Gesloten')],
+       ['', 'Alles', totaal]]
+    : [['_open', 'Alle', totaal],
+       ['Geverifieerd', 'Geverifieerd', count(d => d.s === 'Geverifieerd')],
+       ['Te checken', 'Te checken', count(d => d.s === 'Te checken')]];
+  chipRow(document.getElementById('f-s'), status, 's');
   const STATUS_LBL = {'_open': '', '': 'ook gesloten'};
   const actief = [f.p, f.t === '_geen' ? 'Nog te bepalen' : f.t,
                   f.s in STATUS_LBL ? STATUS_LBL[f.s] : f.s].filter(Boolean);

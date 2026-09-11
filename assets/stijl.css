@@ -1,10 +1,11 @@
 :root{
-  /* palet rechtstreeks uit het logo: crème #f7eedf, marineblauw, vermiljoen */
-  --ground:#f7eedf; --paper:#fdf8ee; --paper2:#efe3d0;
-  --line:#e2d5bf; --line2:#c9b795;
-  --ink:#132738; --ink2:#5f6772; --ink3:#909494;
-  --wine:#cf4521; --wine-ink:#fdf8ee; --brass:#b8871f;
-  --ok:#2f6b43; --todo:#bd8410; --dead:#8d8378;
+  /* palet uit het logo: marineblauwe kop met het crème logo, de lijst op wit,
+     vermiljoen als enige accent. De kop zet zijn eigen donkere tokens, zie header. */
+  --ground:#ffffff; --paper:#ffffff; --paper2:#f3f4f6;
+  --line:#e3e6ea; --line2:#c8ced6;
+  --ink:#132738; --ink2:#55606c; --ink3:#7d8792;
+  --wine:#cf4521; --wine-ink:#ffffff; --brass:#b8871f;
+  --ok:#2f6b43; --todo:#bd8410; --dead:#8a939c;
   --display:"Archivo Black","Archivo",-apple-system,BlinkMacSystemFont,sans-serif;
   --read:"Petrona",Georgia,"Times New Roman",serif;
   --ui:"Archivo",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
@@ -15,12 +16,16 @@ body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--ui);
  font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
 .wrap{max-width:1080px;margin:0 auto;padding:0 var(--sp)}
 
-/* masthead */
-header{background:var(--ground)}
+/* masthead: marineblauw, de kleur van de letters in het logo. De kop herdefinieert
+   de tokens, zodat de knop naar de kaart en de telstrook vanzelf meekleuren. Het
+   vermiljoen is hier lichter gezet, anders is het op het blauw niet leesbaar. */
+header{--ground:#132738; --paper:#1a334b; --line:#2b4863; --line2:#3d5b77;
+ --ink:#f7eedf; --ink2:#c5ccd3; --ink3:#9aa9b6; --wine:#ef6a40; --wine-ink:#132738;
+ background:var(--ground);color:var(--ink);padding-bottom:4px}
 .bar{position:sticky;top:0;z-index:30;background:var(--ground);
  border-bottom:1px solid var(--line2);box-shadow:0 1px 0 var(--line)}
 .mast{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
- flex-wrap:wrap;padding:18px 0 12px;border-bottom:1px solid var(--line);margin-bottom:12px}
+ flex-wrap:wrap;padding:18px 0 12px}
 .brand{min-width:0;display:flex}
 .logo{display:block;width:clamp(258px,33vw,376px);height:auto}
 h1{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
@@ -92,7 +97,7 @@ main{padding:6px 0 90px}
 .row{display:flex;align-items:flex-start;gap:11px;padding:10px 13px;cursor:pointer;
  width:100%;text-align:left;background:none;border:0;font:inherit;color:inherit}
 .row:hover{background:var(--paper2)}
-.card.dead .row:hover{background:#e7dac5}
+.card.dead .row:hover{background:#eceef1}
 .row:focus-visible{outline:2px solid var(--wine);outline-offset:-2px}
 .dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto;margin-top:9px;background:var(--todo)}
 .dot.ok{background:var(--ok)}
@@ -110,7 +115,7 @@ main{padding:6px 0 90px}
  background:var(--paper2);object-fit:cover;display:block;margin-top:1px}
 .thumb.leeg{border-color:var(--line);background:transparent;
  display:flex;align-items:center;justify-content:center}
-.thumb.leeg svg{width:23px;height:23px;display:block;fill:none;stroke:#c0a878;
+.thumb.leeg svg{width:23px;height:23px;display:block;fill:none;stroke:#a9b2bc;
  stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .card.dead .thumb.leeg svg{stroke:var(--dead);opacity:.55}
 .shot{display:block;max-width:min(100%,560px);height:auto;margin:12px 0 2px;
@@ -172,10 +177,15 @@ footer{border-top:1px solid var(--line2);margin-top:40px;padding:16px 0 40px;
   .lbl{min-width:100%;padding-top:0}
   .side{display:none}
   .mast{align-items:flex-start;padding-bottom:10px}
+  /* op de gsm staat alles onder elkaar, dan hoort het logo in het midden */
+  .brand{width:100%;justify-content:center}
   .mastside{align-items:stretch;width:100%}
   .naarkaart{justify-content:center}
-  .tally{overflow-x:auto;flex-wrap:nowrap;width:100%}
-  .tally div{min-width:0;flex:1 0 auto}
+  /* vier gelijke kolommen die altijd passen, ook op een smal scherm */
+  .tally{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%}
+  .tally div{min-width:0;padding:6px 4px;text-align:center}
+  .tally b{font-size:17px}
+  .tally span{font-size:8px;letter-spacing:.04em}
   .filtoggle{display:flex}
   .filters{display:none}
   .filters.open{display:flex;max-height:56vh;overflow-y:auto;padding-bottom:4px}
