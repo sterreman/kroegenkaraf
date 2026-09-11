@@ -77,3 +77,4 @@ jobs:
           path: .publication/*.log
           retention-days: 7
           if-no-files-found: ignore
+          include-hidden-files: true
