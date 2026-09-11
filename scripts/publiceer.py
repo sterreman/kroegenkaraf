@@ -91,12 +91,19 @@ for pagina in ('index.html', 'kaart.html'):
 shutil.rmtree(f'{SITE}/.git', ignore_errors=True)   # nooit meepubliceren
 
 with open(CSV, encoding='utf-8-sig', newline='') as fp:
-    rows = list(csv.DictReader(fp, strict=True))
+    reader = csv.DictReader(fp, strict=True)
+    required = {'Naam', 'Gemeente', 'Provincie', 'Status', 'Soort'}
+    missing = required - set(reader.fieldnames or [])
+    if missing:
+        sys.exit('STOP: csv mist verplichte kolommen: ' + ', '.join(sorted(missing)))
+    rows = list(reader)
 for number, row in enumerate(rows, 2):
     if None in row or any(v is None for v in row.values()):
         sys.exit(f'STOP: csv-rij {number} heeft een verkeerd aantal velden.')
-    if not all((row.get(k) or '').strip() for k in ('Naam', 'Gemeente', 'Provincie')):
-        sys.exit(f'STOP: csv-rij {number} mist Naam, Gemeente of Provincie.')
+    if not all((row.get(k) or '').strip() for k in ('Naam', 'Provincie')):
+        sys.exit(f'STOP: csv-rij {number} mist Naam of Provincie.')
+    if not (row.get('Gemeente') or '').strip() and row['Status'].strip() != 'Te checken':
+        sys.exit(f'STOP: csv-rij {number} mist Gemeente en staat niet op Te checken.')
     la, lo = (row.get('Latitude') or '').strip(), (row.get('Longitude') or '').strip()
     if bool(la) != bool(lo):
         sys.exit(f'STOP: csv-rij {number} heeft een onvolledig coordinatenpaar.')
@@ -131,21 +138,21 @@ for k in kolommen:
     if k and k not in VERWACHT and k != 'Notitie':
         print(f'  LET OP: onbekende kolom {k} in de csv, die gaat niet mee')
 
-SOORTEN = {'Volkscafé', 'Bruine kroeg', 'Biercafé', 'Herberg',
-           'Bistro of brasserie', 'Cocktailbar', 'Wijnbar', ''}
+# Soorten komen uit de CSV; lijst en kaart tonen elke aanwezige categorie.
+# Interne filterwaarden en onbruikbare labels blijven geblokkeerd.
+soorten = {(r.get('Soort') or '').strip() for r in rows}
+ongeldig = sorted(s for s in soorten if s.startswith('_') or len(s) > 120
+                  or any(ord(c) < 32 or ord(c) == 127 for c in s))
+if ongeldig:
+    sys.exit(f'STOP: ongeldige categorielabels: {ongeldig}.')
 STATUSSEN = {'Geverifieerd', 'Te checken', 'Gesloten'}
-vreemd_soort = sorted({(r.get('Soort') or '').strip() for r in rows} - SOORTEN)
 vreemd_status = sorted({(r.get('Status') or '').strip() for r in rows} - STATUSSEN)
-if vreemd_soort or vreemd_status:
-    sys.exit(f'STOP: ongeldige Soort {vreemd_soort} of Status {vreemd_status}.')
-for v in vreemd_soort:
-    n = sum(1 for r in rows if (r.get('Soort') or '').strip() == v)
-    print(f'  LET OP: Soort "{v}" ({n}x) valt buiten de zeven toegelaten waarden '
-          'en verdwijnt uit alle filters')
-for v in vreemd_status:
-    n = sum(1 for r in rows if (r.get('Status') or '').strip() == v)
-    print(f'  LET OP: Status "{v}" ({n}x) is geen Geverifieerd, Te checken of '
-          'Gesloten; die zaken vallen buiten de statusfilters')
+if vreemd_status:
+    sys.exit(f'STOP: ongeldige Status {vreemd_status}.')
+zonder_gemeente = sum(not (r.get('Gemeente') or '').strip() for r in rows)
+if zonder_gemeente:
+    print(f'  LET OP: {zonder_gemeente} zaken met status Te checken hebben nog geen gemeente.')
+print(f'{len(soorten - {""})} categorieën uit de CSV beschikbaar in lijst en kaart.')
 
 # ---- controle op de coordinaten ----------------------------------------------
 # Coordinaten worden ook door andere hulpmiddelen ingevuld. Een verkeerd getal

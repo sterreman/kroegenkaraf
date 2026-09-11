@@ -62,7 +62,10 @@ function renderChips() {
   const totaal = count(() => true);
   chipRow(document.getElementById('f-p'),
     [['', 'Alle', totaal], ...PROV_ORDER.map(p => [p, p, count(d => d.p === p)])], 'p');
-  const soorten = SOORT_ORDER.filter(s => count(d => d.t === s) > 0)
+  const aanwezig = new Set(DATA.filter(telbaar).map(d => d.t).filter(Boolean));
+  const extra = [...aanwezig].filter(s => !SOORT_ORDER.includes(s))
+    .sort((a, b) => a.localeCompare(b, 'nl'));
+  const soorten = [...SOORT_ORDER, ...extra].filter(s => aanwezig.has(s))
     .map(s => [s, s, count(d => d.t === s)]);
   const leeg = count(d => !d.t);
   chipRow(document.getElementById('f-t'),

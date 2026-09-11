@@ -36,7 +36,7 @@ function render() {
   const res = DATA.filter(match);
   const gv = res.filter(d => d.s === 'Geverifieerd').length;
   const gs = res.filter(d => d.s === 'Gesloten').length;
-  const plaatsen = new Set(res.map(d => d.p + '|' + d.g)).size;
+  const plaatsen = new Set(res.filter(d => d.g).map(d => d.p + '|' + d.g)).size;
   document.getElementById('tally').innerHTML =
     `<div><b>${res.length}</b><span>in beeld</span></div>`
     + `<div><b>${gv}</b><span>geverifieerd</span></div>`
@@ -54,7 +54,7 @@ function render() {
   for (const d of res) {
     const k = d.p + '|' + d.g;
     if (k !== last) {
-      html += `<div class="ghead"><span class="pl">${esc(d.g)}</span>`
+      html += `<div class="ghead"><span class="pl">${esc(d.g || 'Gemeente nog te bepalen')}</span>`
         + `<span class="pr">${esc(d.p)}</span><span class="rule"></span>`
         + `<span class="n">${perGroup[k]}</span></div>`;
       last = k;
