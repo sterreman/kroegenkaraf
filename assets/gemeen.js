@@ -128,8 +128,9 @@ function laadData(dan) {
     .then(r => { if (!r.ok) throw new Error(r.status + ' ' + r.statusText); return r.json(); })
     .then(rijen => {
       DATA = rijen;
-      const alfabetisch = (a, b) => (a || '').localeCompare(
-        b || '', 'nl', {sensitivity: 'base'});
+      const sorteerwoord = s => norm(s).replace(/^[^a-z0-9]+/, '');
+      const alfabetisch = (a, b) => sorteerwoord(a).localeCompare(
+        sorteerwoord(b), 'nl', {sensitivity: 'base'});
       DATA.sort((a, b) =>
         alfabetisch(a.p, b.p)
         || Number(!a.g) - Number(!b.g)
