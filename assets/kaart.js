@@ -127,6 +127,7 @@ function ballon(d) {
     + `<span class="st">${esc(d.t || 'soort nog te bepalen')} · ${esc(d.s)}`
     + `${d.z ? ' ' + esc(d.z) : ''}</span>`
     + (d.i ? `<p>${esc(d.i)}</p>` : '')
+    + tagLabels(d)
     + `<div class="acts">`
       + `<a class="btn map" href="${mapsUrl(d)}" target="_blank" rel="noopener"`
       + ` title="${esc(d.n)} op Google Maps" aria-label="${esc(d.n)} op Google Maps">${SPELD}</a>`
@@ -168,6 +169,11 @@ function naarAnker() {
   const i = parseInt(location.hash.slice(1), 10);
   if (isNaN(i) || !DATA[i] || !DATA[i].lat || DATA[i].s === 'Gesloten') return;
   const d = DATA[i];
+  if (!match(d)) {
+    f.p = f.t = f.q = ''; f.s = '_open'; f.tags = [];
+    document.getElementById('q').value = '';
+    renderChips(); teken();
+  }
   kaart.setView([d.lat, d.lon], 17);
   const m = spelden.get(i);
   if (m) cluster.zoomToShowLayer(m, () => m.openPopup());

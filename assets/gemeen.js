@@ -1,13 +1,13 @@
 /* Wat de lijst en de kaart delen: het laden van de data, de filters en de chips.
    Alles wat maar op een van beide pagina's thuishoort staat in gids.js of kaart.js. */
 
-const SOORT_ORDER = ['Volkscafé', 'Bruine kroeg', 'Biercafé', 'Herberg',
-                     'Bistro of brasserie', 'Cocktailbar', 'Wijnbar'];
+const SOORT_ORDER = ['Volkscafé', 'Bruin café', 'Biercafé', 'Eetcafé', 'Muziekcafé',
+  'Sportcafé', 'Dans- & feestcafé', 'Stadscafé / Grand Café', 'Cocktail- & wijnbar'];
 const PROV_ORDER = [];
 
 /* De statusfilter begint op '_open': gesloten zaken staan standaard niet in beeld.
    In de lijst blijven ze bereikbaar via de chip Gesloten of via Alles. */
-const f = {q: '', p: '', t: '', s: '_open'};
+const f = {q: '', p: '', t: '', s: '_open', tags: []};
 
 /* De kaartpagina zet dit op false. Een zaak die dicht is hoort niet meer op de
    kaart: ze staat op hetzelfde adres als haar opvolger en die twee spelden
@@ -49,8 +49,27 @@ function match(d) {
   if (f.p && d.p !== f.p) return false;
   if (f.t === '_geen' ? d.t : (f.t && d.t !== f.t)) return false;
   if (f.s === '_open' ? d.s === 'Gesloten' : (f.s && d.s !== f.s)) return false;
+  if (f.tags.some(tag => !(d.tags || []).includes(tag))) return false;
   if (f.q && !d._k.includes(f.q)) return false;
   return true;
+}
+
+function tagLabels(d) {
+  return d.tags && d.tags.length ? '<div class="zaak-tags" aria-label="Kenmerken">'
+    + d.tags.map(tag => `<span class="zaak-tag">${esc(tag)}</span>`).join('') + '</div>' : '';
+}
+
+function renderTags() {
+  const box = document.getElementById('f-tags');
+  const focusTag = box.contains(document.activeElement) ? document.activeElement.value : null;
+  const tags = [...new Set(DATA.filter(telbaar).flatMap(d => d.tags || []))]
+    .sort((a, b) => a.localeCompare(b, 'nl'));
+  document.getElementById('tags-summary').textContent = f.tags.length
+    ? 'Tags: ' + f.tags.join(', ') : 'Tags kiezen';
+  box.innerHTML = tags.map(tag => `<label class="tag-keuze">`
+    + `<input type="checkbox" name="tag" value="${esc(tag)}"${f.tags.includes(tag) ? ' checked' : ''}>`
+    + `<span>${esc(tag)} <small>${count(d => (d.tags || []).includes(tag))}</small></span></label>`).join('');
+  if (focusTag) [...box.querySelectorAll('input')].find(el => el.value === focusTag)?.focus({preventScroll: true});
 }
 
 function chipRow(el, items, key) {
@@ -63,9 +82,7 @@ function renderChips() {
   chipRow(document.getElementById('f-p'),
     [['', 'Alle', totaal], ...PROV_ORDER.map(p => [p, p, count(d => d.p === p)])], 'p');
   const aanwezig = new Set(DATA.filter(telbaar).map(d => d.t).filter(Boolean));
-  const extra = [...aanwezig].filter(s => !SOORT_ORDER.includes(s))
-    .sort((a, b) => a.localeCompare(b, 'nl'));
-  const soorten = [...SOORT_ORDER, ...extra].filter(s => aanwezig.has(s))
+  const soorten = SOORT_ORDER.filter(s => aanwezig.has(s))
     .map(s => [s, s, count(d => d.t === s)]);
   const leeg = count(d => !d.t);
   chipRow(document.getElementById('f-t'),
@@ -84,16 +101,23 @@ function renderChips() {
   chipRow(document.getElementById('f-s'), status, 's');
   const STATUS_LBL = {'_open': '', '': 'ook gesloten'};
   const actief = [f.p, f.t === '_geen' ? 'Nog te bepalen' : f.t,
-                  f.s in STATUS_LBL ? STATUS_LBL[f.s] : f.s].filter(Boolean);
-  document.getElementById('clr').hidden = !(f.p || f.t || f.s !== '_open' || f.q);
+                  f.s in STATUS_LBL ? STATUS_LBL[f.s] : f.s, ...f.tags].filter(Boolean);
+  document.getElementById('clr').hidden = !(f.p || f.t || f.s !== '_open' || f.q || f.tags.length);
   document.getElementById('filtoggle-lbl').textContent =
     actief.length ? 'Filters: ' + actief.join(', ') : 'Filters';
+  renderTags();
 }
 
 /* De pagina zegt zelf wat er moet gebeuren als de filters wijzigen. */
 let opnieuw = () => {};
 
 function koppelFilters() {
+  document.getElementById('f-tags').addEventListener('change', e => {
+    if (e.target.name !== 'tag') return;
+    const tag = e.target.value;
+    f.tags = e.target.checked ? [...f.tags, tag] : f.tags.filter(t => t !== tag);
+    renderChips(); opnieuw();
+  });
   document.addEventListener('click', e => {
     const chip = e.target.closest('.chip');
     if (chip) {
@@ -102,7 +126,7 @@ function koppelFilters() {
       renderChips(); opnieuw(); return;
     }
     if (e.target.closest('#clr')) {
-      f.p = f.t = f.q = ''; f.s = '_open';
+      f.p = f.t = f.q = ''; f.s = '_open'; f.tags = [];
       document.getElementById('q').value = '';
       renderChips(); opnieuw();
     }
@@ -137,7 +161,8 @@ function laadData(dan) {
         || alfabetisch(a.g, b.g)
         || alfabetisch(a.n, b.n));
       DATA.forEach((d, i) => {
-        d._k = norm([d.n, d.g, d.p, d.a, d.i, d.t].join(' '));
+        d.tags = Array.isArray(d.tags) ? [...new Set(d.tags.filter(t => typeof t === 'string' && t))] : [];
+        d._k = norm([d.n, d.g, d.p, d.a, d.i, d.t, ...d.tags].join(' '));
         d._i = i;
         if (!PROV_ORDER.includes(d.p)) PROV_ORDER.push(d.p);
       });

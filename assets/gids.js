@@ -10,7 +10,7 @@ const ICOON = {
                  'M14.4 10.9H9.7a3.1 3.1 0 0 0-3.1 3.1v.7', 'M6.6 14.6 5.1 16.3',
                  '<ellipse cx="9.8" cy="4.9" rx="2" ry="2.7"/>', 'M9.8 7.6v3.3'),
   /* pot met oor */
-  'Bruine kroeg': P('M6.6 4.4h8.3l-.8 14.8a1 1 0 0 1-1 .9H8.4a1 1 0 0 1-1-.9z',
+  'Bruin café': P('M6.6 4.4h8.3l-.8 14.8a1 1 0 0 1-1 .9H8.4a1 1 0 0 1-1-.9z',
                     'M15 7.6h2.1a1.8 1.8 0 0 1 1.8 1.8v3.2a1.8 1.8 0 0 1-1.8 1.8h-2.4',
                     'M7.3 8.4h7.4'),
   /* tulpglas met schuimkraag */
@@ -19,10 +19,10 @@ const ICOON = {
   /* huis met dak */
   'Herberg': P('M3.6 10.6 12 4.2l8.4 6.4', 'M5.6 9.6V20h12.8V9.6', 'M10 20v-4.8h4V20'),
   /* vork en mes */
-  'Bistro of brasserie': P('M7.2 4v4.2a1.7 1.7 0 0 0 3.4 0V4', 'M8.9 8.4V20',
+  'Eetcafé': P('M7.2 4v4.2a1.7 1.7 0 0 0 3.4 0V4', 'M8.9 8.4V20',
                            'M16.4 4c1.6 1.4 2 3.4 1.6 5.4-.2 1-.7 1.6-1.6 1.8', 'M16.4 11.2V20'),
   /* martiniglas met olijf */
-  'Cocktailbar': P('M4.6 5.4h14.8L12 13.4z', 'M12 13.4V19.6', 'M8.6 20h6.8',
+  'Cocktail- & wijnbar': P('M4.6 5.4h14.8L12 13.4z', 'M12 13.4V19.6', 'M8.6 20h6.8',
                    'M14.6 8.4a.9.9 0 1 0 0-.1'),
   /* wijnglas */
   'Wijnbar': P('M8 3.8h8l-.7 5.6a3.3 3.3 0 0 1-6.6 0z', 'M12 12.6V19.6', 'M8.6 20h6.8'),
@@ -77,6 +77,7 @@ function render() {
       + `</button>`
       + `<div class="body">`
         + (d.i ? `<p>${esc(d.i)}</p>` : '<p class="empty">Nog geen beschrijving.</p>')
+        + tagLabels(d)
         + `<div class="kv"><span>Toegevoegd <b>${esc(d.d) || '—'}</b></span>`
         + `<span>Geverifieerd <b>${esc(d.v) || '—'}</b></span>`
         + (d.z ? `<span>Gesloten <b>${esc(d.z)}</b></span>` : '')
@@ -114,7 +115,7 @@ function naarAnker() {
   const i = parseInt(location.hash.slice(1), 10);
   if (isNaN(i) || !DATA[i]) return;
   if (!match(DATA[i])) {
-    f.p = f.t = f.q = ''; f.s = '';
+    f.p = f.t = f.q = ''; f.s = ''; f.tags = [];
     document.getElementById('q').value = '';
     renderChips(); render();
   }

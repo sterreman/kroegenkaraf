@@ -124,7 +124,7 @@ if len(rows) < 100:
 KERN = ('Naam', 'Gemeente', 'Provincie')
 VERWACHT = KERN + ('Adres', 'Facebook', 'Instagram', 'Soort', 'Info', 'Status',
                    'Gesloten op', 'Datum toegevoegd', 'Geverifieerd op',
-                   'Latitude', 'Longitude')
+                   'Latitude', 'Longitude', 'Tags')
 kolommen = list(rows[0].keys())
 ontbreekt = [k for k in KERN if k not in kolommen]
 if ontbreekt:
@@ -138,13 +138,17 @@ for k in kolommen:
     if k and k not in VERWACHT and k != 'Notitie':
         print(f'  LET OP: onbekende kolom {k} in de csv, die gaat niet mee')
 
-# Soorten komen uit de CSV; lijst en kaart tonen elke aanwezige categorie.
-# Interne filterwaarden en onbruikbare labels blijven geblokkeerd.
+# Alleen de afgesproken categorieën; onbekende labels stoppen de publicatie.
+from taxonomy import CATEGORIES, parse_tags
 soorten = {(r.get('Soort') or '').strip() for r in rows}
-ongeldig = sorted(s for s in soorten if s.startswith('_') or len(s) > 120
-                  or any(ord(c) < 32 or ord(c) == 127 for c in s))
+ongeldig = sorted(soorten - set(CATEGORIES))
 if ongeldig:
     sys.exit(f'STOP: ongeldige categorielabels: {ongeldig}.')
+for number, row in enumerate(rows, 2):
+    try:
+        parse_tags(row.get('Tags', ''))
+    except ValueError as error:
+        sys.exit(f'STOP: tags op csv-rij {number}: {error}')
 STATUSSEN = {'Geverifieerd', 'Te checken', 'Gesloten'}
 vreemd_status = sorted({(r.get('Status') or '').strip() for r in rows} - STATUSSEN)
 if vreemd_status:
@@ -233,6 +237,7 @@ for r in rows:
     v_ = lambda k: (r.get(k) or '').strip()
     d = {'n': v_('Naam'), 'g': v_('Gemeente'), 'p': v_('Provincie'),
          'a': v_('Adres'), 't': v_('Soort'), 'i': v_('Info'),
+         'tags': parse_tags(r.get('Tags', '')),
          's': v_('Status'), 'z': v_('Gesloten op'),
          'd': v_('Datum toegevoegd'), 'v': v_('Geverifieerd op'),
          'fb': sociaal(r.get('Facebook'), 'www.facebook.com'),
