@@ -49,11 +49,9 @@
  box-shadow:none;border-radius:2px}
 .leaflet-tooltip-top:before{border-top-color:var(--ink)}
 
-/* De twee knoppen op de kaart. De houder zelf laat kliks door, anders kun je de
-   kaart onder die strook niet meer verslepen. */
-.kaartknoppen{position:absolute;top:10px;right:10px;z-index:600;display:flex;gap:6px;
- align-items:stretch;pointer-events:none}
-.kaartknoppen button{pointer-events:auto}
+/* Altijd zichtbare bediening boven de kaart, ook bij het openen op mobiel. */
+.kaartknoppen{display:flex;gap:8px;align-items:stretch;justify-content:space-between;
+ padding:10px;border-bottom:1px solid var(--line2)}
 .heel{border:1px solid var(--line2);background:var(--paper);color:var(--ink2);
  font-family:var(--ui);font-size:9.5px;letter-spacing:.05em;font-weight:700;
  text-transform:uppercase;padding:7px 10px;cursor:pointer;border-radius:2px;
@@ -84,14 +82,9 @@
 
 @media(max-width:760px){
   #kaart{height:min(64vh,520px)}
-  /* Op de gsm onderaan, waar de duim zit: In de buurt links, Hele kaart rechts.
-     De houder staat in .veld, en daar zit de legenda nog onder de kaart. Vandaar
-     58px: de legenda plus de bronvermelding van OpenStreetMap, die anders over
-     de knop Hele kaart valt. */
-  .kaartknoppen{top:auto;bottom:58px;left:10px;right:10px;justify-content:space-between}
   .buurt{font-size:13.5px;padding:10px 14px}
   .heel{padding:10px 11px}
-  .melding{top:auto;bottom:112px}
+  .melding{top:72px}
 }
 
 /* Op de kaartpagina mag de kop kleiner: hoe hoger de kaart begint, hoe meer
