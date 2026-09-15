@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="assets/vendor/leaflet.css">
 <link rel="stylesheet" href="assets/vendor/MarkerCluster.css">
 <link rel="stylesheet" href="assets/stijl.css?v=tags-20260912">
-<link rel="stylesheet" href="assets/kaart.css">
+<link rel="stylesheet" href="assets/kaart.css?v=buurt-20260915">
 </head>
 <body>
 
@@ -63,7 +63,6 @@
   <b>De zaken kwamen niet binnen.</b> Ververs de pagina. Blijft het mislopen, dan is
   <code>data/zaken.json</code> niet mee gepubliceerd.</div>
  <div class="veld">
-  <div id="kaart"></div>
   <div class="kaartknoppen">
    <button class="buurt" id="buurt" type="button">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/>
@@ -71,6 +70,7 @@
     In de buurt</button>
    <button class="heel" id="heel" type="button">Hele kaart</button>
   </div>
+  <div id="kaart"></div>
   <div class="melding" id="melding" role="status" hidden></div>
   <div class="legenda">
    <span><i style="background:#2f6b43"></i>geverifieerd</span>
