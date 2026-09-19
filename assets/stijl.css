@@ -247,3 +247,10 @@ footer{border-top:1px solid var(--line2);margin-top:40px;padding:16px 0 40px;
   0%,55%{box-shadow:inset 0 0 0 2px var(--wine)}
   100%{box-shadow:inset 0 0 0 2px rgba(207,69,33,0)}
 }
+
+/* Uitleg blijft ook op mobiel bereikbaar buiten de ingeklapte filters. */
+.status-uitleg{font-size:13px;line-height:1.55;color:var(--ink2);padding:8px 0}
+.status-uitleg summary{cursor:pointer;font-weight:600;color:var(--ink)}
+.status-uitleg p{max-width:80ch;margin:10px 0}
+.status-notitie{font-size:12px;line-height:1.5;border-left:2px solid var(--line2);padding-left:10px;color:var(--ink2)}
+.tally span{white-space:normal}

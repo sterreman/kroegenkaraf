@@ -39,8 +39,8 @@ function render() {
   const plaatsen = new Set(res.filter(d => d.g).map(d => d.p + '|' + d.g)).size;
   document.getElementById('tally').innerHTML =
     `<div><b>${res.length}</b><span>in beeld</span></div>`
-    + `<div><b>${gv}</b><span>geverifieerd</span></div>`
-    + `<div><b>${res.length - gv - gs}</b><span>te checken</span></div>`
+    + `<div><b>${gv}</b><span>online gecontroleerd</span></div>`
+    + `<div><b>${res.length - gv - gs}</b><span>te bevestigen</span></div>`
     + `<div><b>${plaatsen}</b><span>plaatsen</span></div>`;
   const L = document.getElementById('list');
   if (!res.length) {
@@ -62,7 +62,7 @@ function render() {
     const dead = d.s === 'Gesloten';
     html += `<div class="card${dead ? ' dead' : ''}" data-i="${d._i}">`
       + `<button class="row" type="button" aria-expanded="false">`
-        + `<span class="dot ${d.s === 'Geverifieerd' ? 'ok' : dead ? 'cl' : ''}"></span>`
+        + `<span role="img" aria-label="${statusLabel(d)}" title="${statusLabel(d)}" class="dot ${d.s === 'Geverifieerd' ? 'ok' : dead ? 'cl' : ''}"></span>`
         + (FOTOS ? (d.foto
             ? `<img class="thumb" src="fotos/${esc(d.foto)}-klein.avif" alt=""`
               + ` width="46" height="46" loading="lazy" decoding="async">`
@@ -72,7 +72,7 @@ function render() {
         + `<span class="side">`
           + `<span class="soort${d.t ? '' : ' none'}">${esc(d.t || 'soort onbekend')}</span>`
           + (dead ? `<span class="flag dead">gesloten${d.z ? ' ' + esc(d.z) : ''}</span>`
-                  : d.s === 'Te checken' ? '<span class="flag">te checken</span>' : '')
+                  : d.s === 'Te checken' ? '<span class="flag">status te bevestigen</span>' : '')
         + `</span>`
       + `</button>`
       + `<div class="body">`
@@ -80,9 +80,9 @@ function render() {
            zodat de css ze als een blok naast de foto kan zetten. */
         + `<div class="tekst">`
         + (d.i ? `<p>${esc(d.i)}</p>` : '<p class="empty">Nog geen beschrijving.</p>')
+        + statusUitleg(d)
         + tagLabels(d)
         + `<div class="kv"><span>Toegevoegd <b>${esc(d.d) || '—'}</b></span>`
-        + `<span>Geverifieerd <b>${esc(d.v) || '—'}</b></span>`
         + (d.z ? `<span>Gesloten <b>${esc(d.z)}</b></span>` : '')
         + `<span>Soort <b>${esc(d.t || 'nog te bepalen')}</b></span></div>`
         + `<div class="acts">`

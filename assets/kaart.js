@@ -124,9 +124,10 @@ function ballon(d) {
     + `<span class="nm">${esc(d.n)}</span>`
     + `<span class="ad">${esc([d.a, d.g].filter(Boolean).join(', ') || 'adres nog aan te vullen')}</span>`
     + (mijnPlek ? `<span class="afst">op ${km(afstand(mijnPlek, [d.lat, d.lon]))} van jou</span>` : '')
-    + `<span class="st">${esc(d.t || 'soort nog te bepalen')} · ${esc(d.s)}`
+    + `<span class="st">${esc(d.t || 'soort nog te bepalen')} · ${statusLabel(d)}`
     + `${d.z ? ' ' + esc(d.z) : ''}</span>`
     + (d.i ? `<p>${esc(d.i)}</p>` : '')
+    + statusUitleg(d)
     + tagLabels(d)
     + `<div class="acts">`
       + `<a class="btn map" href="${mapsUrl(d)}" target="_blank" rel="noopener"`
@@ -157,8 +158,8 @@ function teken() {
   const plaatsen = new Set(res.map(d => d.p + '|' + d.g)).size;
   document.getElementById('tally').innerHTML =
     `<div><b>${res.length}</b><span>op de kaart</span></div>`
-    + `<div><b>${gv}</b><span>geverifieerd</span></div>`
-    + `<div><b>${res.length - gv}</b><span>te checken</span></div>`
+    + `<div><b>${gv}</b><span>online gecontroleerd</span></div>`
+    + `<div><b>${res.length - gv}</b><span>te bevestigen</span></div>`
     + `<div><b>${plaatsen}</b><span>plaatsen</span></div>`;
 }
 

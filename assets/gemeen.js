@@ -90,16 +90,16 @@ function renderChips() {
   /* Zonder gesloten zaken zijn Gesloten en Alles zinloze chips: de eerste geeft
      niets, de tweede hetzelfde als Open. Die vallen dan weg. */
   const status = TOON_GESLOTEN
-    ? [['_open', 'Open', count(d => d.s !== 'Gesloten')],
-       ['Geverifieerd', 'Geverifieerd', count(d => d.s === 'Geverifieerd')],
-       ['Te checken', 'Te checken', count(d => d.s === 'Te checken')],
+    ? [['_open', 'Zonder gesloten zaken', count(d => d.s !== 'Gesloten')],
+       ['Geverifieerd', 'Online gecontroleerd', count(d => d.s === 'Geverifieerd')],
+       ['Te checken', 'Status te bevestigen', count(d => d.s === 'Te checken')],
        ['Gesloten', 'Gesloten', count(d => d.s === 'Gesloten')],
        ['', 'Alles', totaal]]
-    : [['_open', 'Alle', totaal],
-       ['Geverifieerd', 'Geverifieerd', count(d => d.s === 'Geverifieerd')],
-       ['Te checken', 'Te checken', count(d => d.s === 'Te checken')]];
+    : [['_open', 'Zonder gesloten zaken', totaal],
+       ['Geverifieerd', 'Online gecontroleerd', count(d => d.s === 'Geverifieerd')],
+       ['Te checken', 'Status te bevestigen', count(d => d.s === 'Te checken')]];
   chipRow(document.getElementById('f-s'), status, 's');
-  const STATUS_LBL = {'_open': '', '': 'ook gesloten'};
+  const STATUS_LBL = {'_open': '', '': 'ook gesloten', 'Geverifieerd': 'Online gecontroleerd', 'Te checken': 'Status te bevestigen'};
   const actief = [f.p, f.t === '_geen' ? 'Nog te bepalen' : f.t,
                   f.s in STATUS_LBL ? STATUS_LBL[f.s] : f.s, ...f.tags].filter(Boolean);
   document.getElementById('clr').hidden = !(f.p || f.t || f.s !== '_open' || f.q || f.tags.length);
@@ -173,4 +173,17 @@ function laadData(dan) {
       document.getElementById('laadfout').hidden = false;
       console.error('zaken.json kwam niet binnen:', err);
     });
+}
+
+/* Publieke labels staan los van de bestaande bronstatussen. */
+function statusLabel(d) {
+  return d.s === 'Geverifieerd' ? 'Online gecontroleerd'
+    : d.s === 'Gesloten' ? 'Gesloten' : 'Status te bevestigen';
+}
+function statusUitleg(d) {
+  const tekst = d.s === 'Geverifieerd'
+    ? 'Online gecontroleerd' + (d.v ? ' op ' + esc(d.v) : ' · controledatum niet vermeld') + '. Dit zegt niets over de openingsuren van vandaag.'
+    : d.s === 'Gesloten' ? 'Deze zaak staat als gesloten in onze gids.'
+    : 'Actuele status nog te bevestigen. Controleer vóór je bezoek of de zaak nog actief is en wanneer ze open is.';
+  return '<p class="status-notitie">' + tekst + '</p>';
 }
