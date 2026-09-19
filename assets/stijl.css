@@ -134,8 +134,16 @@ main{padding:6px 0 90px}
 .thumb.leeg svg{width:23px;height:23px;display:block;fill:none;stroke:#a9b2bc;
  stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .card.dead .thumb.leeg svg{stroke:var(--dead);opacity:.55}
-.shot{display:block;max-width:min(100%,560px);height:auto;margin:12px 0 2px;
- border:1px solid var(--line2)}
+/* Het grote beeld staat naast de beschrijving in een vast kader van 4:3. Het wordt
+   bijgesneden en niet uitgerekt, zodat elk kaartje even hoog openklapt wat de vorm
+   van de foto ook is: liggend, staand of klein. De tekst zit in .tekst, anders zou
+   het raster de beschrijving, de tags, de datums en de knoppen elk een eigen rij
+   geven en zouden die uit elkaar getrokken worden om de foto te vullen. */
+.card.open .body:has(.shot){display:grid;grid-template-columns:248px minmax(0,1fr);
+ gap:18px;align-items:start;padding-top:14px}
+.shot{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;
+ border:1px solid var(--line2);background:var(--paper2)}
+.body:has(.shot) .tekst > p:first-child{margin-top:0}
 .side{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex:0 0 auto;
  padding-top:2px}
 .soort{font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;font-weight:700;
@@ -206,6 +214,14 @@ footer{border-top:1px solid var(--line2);margin-top:40px;padding:16px 0 40px;
   .filters{display:none}
   .filters.open{display:flex;max-height:56vh;overflow-y:auto;padding-bottom:4px}
   .logo{width:min(292px,80vw)}
+  /* Op de gsm is er geen ruimte voor twee kolommen: de foto gaat weer boven de
+     tekst, randloos van kaartrand tot kaartrand en iets breder dan 4:3. */
+  .card.open .body:has(.shot){grid-template-columns:minmax(0,1fr);gap:0;padding-top:0}
+  /* Een img rekt niet mee met zijn cel, die neemt bij width:auto zijn eigen
+     breedte. Vandaar de breedte uitgerekend: de kolom plus de twee insprongen
+     van .body, zodat de foto precies van kaartrand tot kaartrand loopt. */
+  .shot{aspect-ratio:3/2;width:calc(100% + 44px);margin:0 -13px 12px -31px;
+   border-left:0;border-right:0}
   .thumb{width:40px;height:40px}
   .thumb.leeg svg{width:20px;height:20px}
   .btn{padding:7px 12px;font-size:12.5px}

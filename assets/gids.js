@@ -76,6 +76,9 @@ function render() {
         + `</span>`
       + `</button>`
       + `<div class="body">`
+        /* .tekst houdt de beschrijving, de tags, de datums en de knoppen bij elkaar,
+           zodat de css ze als een blok naast de foto kan zetten. */
+        + `<div class="tekst">`
         + (d.i ? `<p>${esc(d.i)}</p>` : '<p class="empty">Nog geen beschrijving.</p>')
         + tagLabels(d)
         + `<div class="kv"><span>Toegevoegd <b>${esc(d.d) || '—'}</b></span>`
@@ -88,6 +91,7 @@ function render() {
           + (d.lat && !dead ? `<a class="btn" href="kaart.html#${d._i}">Op de kaart</a>` : '')
           + socKnop(d, d.fb, 'fb', 'Facebook') + socKnop(d, d.ig, 'ig', 'Instagram')
         + `</div>`
+      + `</div>`
       + `</div></div>`;
   }
   L.innerHTML = html;
