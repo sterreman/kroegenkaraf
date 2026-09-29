@@ -34,6 +34,28 @@ const ICOON = {
 
 let FOTOS = false;
 
+/* Wie op naam zoekt, wil de zaak ook vinden als ze dicht is. De statusfilter
+   verbergt gesloten zaken standaard, dus zeggen we hier hoeveel er buiten beeld
+   bleven, met een knop om ze erbij te nemen. */
+function geslotenTreffers() {
+  if (f.s !== '_open' || !f.q) return 0;
+  f.s = 'Gesloten';
+  const n = DATA.filter(match).length;
+  f.s = '_open';
+  return n;
+}
+
+function geslotenMelding(n) {
+  return `${n === 1 ? 'Eén gesloten zaak past' : n + ' gesloten zaken passen'} ook bij je zoekopdracht. `
+    + `<button type="button" class="toon-gesloten">Toon ${n === 1 ? 'ze' : 'ze erbij'}</button>`;
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.toon-gesloten')) return;
+  f.s = '';
+  renderChips(); render();
+});
+
 function render() {
   const res = DATA.filter(match);
   const gv = res.filter(d => d.s === 'Geverifieerd').length;
@@ -45,12 +67,15 @@ function render() {
     + `<div><b>${res.length - gv - gs}</b><span>te bevestigen</span></div>`
     + `<div><b>${plaatsen}</b><span>plaatsen</span></div>`;
   const L = document.getElementById('list');
+  const dicht = geslotenTreffers();
   if (!res.length) {
     L.innerHTML = '<div class="empty-state"><p>Niets gevonden.</p>'
-      + 'Probeer een andere zoekterm of zet een filter af.</div>';
+      + (dicht ? geslotenMelding(dicht) : 'Probeer een andere zoekterm of zet een filter af.')
+      + '</div>';
     return;
   }
-  let html = '', last = null;
+  let html = dicht ? `<div class="gesloten-melding">${geslotenMelding(dicht)}</div>` : '',
+    last = null;
   const perGroup = {};
   res.forEach(d => { const k = d.p + '|' + d.g; perGroup[k] = (perGroup[k] || 0) + 1; });
   for (const d of res) {

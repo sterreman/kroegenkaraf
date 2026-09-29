@@ -256,3 +256,10 @@ footer{border-top:1px solid var(--line2);margin-top:40px;padding:16px 0 40px;
 .status-uitleg p{max-width:80ch;margin:10px 0}
 .status-notitie{font-size:12px;line-height:1.5;border-left:2px solid var(--line2);padding-left:10px;color:var(--ink2)}
 .tally span{white-space:normal}
+
+/* Melding bij zoeken: gesloten zaken die buiten beeld bleven */
+.gesloten-melding{margin:14px 0 4px;padding:10px 14px;border:1px solid var(--line2);
+ border-radius:8px;background:var(--paper2);color:var(--ink2);font-size:14px}
+.empty-state .toon-gesloten,.gesloten-melding .toon-gesloten{font:inherit;font-weight:600;
+ color:var(--wine);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;
+ text-underline-offset:2px}
