@@ -403,7 +403,9 @@ ICOON_DEEL = ('<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5
               '<circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/>'
               '<path d="m8.3 13.3 7.4 4.4M15.7 6.3l-7.4 4.4"/></svg>')
 
-VERSIE = 'pagina-20260929c'
+VERSIE = 'pagina-20260929d'
+
+KORT_VERHAAL = 480   # tot zoveel tekens blijft de hele beschrijving bovenaan
 
 FONTS_URL = ('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..100,500..800'
              '&family=Petrona:ital,wght@0,400..600;1,400&display=swap')
@@ -521,7 +523,20 @@ def pagina(d, buren):
     soort = f'<p class="soort">{e(d["t"])}</p>' if d.get('t') else ''
     plaatsregel = f'<p class="plaats">{plaats_html(gem)}</p>' if gem else (
         f'<p class="plaats">{e(d["p"])}</p>' if d.get('p') else '')
+    # Een korte beschrijving blijft in een stuk bovenaan, naast het praktische blok.
+    # Alleen een lange tekst loopt verder onder de kop, met de eerste zin als opening.
     lead, rest = lead_en_rest(d.get('i'))
+    kort_verhaal = len(' '.join(alineas(d.get('i')))) <= KORT_VERHAAL
+    verhaal = ''
+    if kort_verhaal:
+        verhaal = ((f'<p class="lead">{e(lead)}</p>' if lead else '')
+                   + ''.join(f'<p>{e(a)}</p>' for a in rest))
+        rest = []
+    elif lead:
+        verhaal = f'<p class="lead">{e(lead)}</p>'
+    if d.get('tags'):
+        verhaal += ('<p class="kenmerken"><span class="etiket">Kenmerken</span>'
+                    + ', '.join(e(t) for t in d['tags']) + '</p>')
 
     foto = ''
     if d.get('foto'):
@@ -554,22 +569,16 @@ def pagina(d, buren):
                       '<span class="onbekend">Nog aan te vullen</span></p>')
     archief = ('<p class="controle">Deze zaak is dicht en blijft als archief in de gids staan.</p>'
                if dicht else '')
+    sinds = f' In de gids sinds {e(datum(d["d"]))}.' if d.get('d') else ''
+    controle = status_blok(d) + archief
+    if sinds:
+        controle = (controle.replace('</p>', sinds + '</p>', 1) if controle
+                    else f'<p class="controle">{sinds.strip()}</p>')
     praktisch = (f'<div class="praktisch">{adresblok}{"".join(acties)}'
-                 f'<ul class="links">{"".join(links)}</ul>{deelpaneel}'
-                 f'{status_blok(d)}{archief}</div>')
+                 f'<ul class="links">{"".join(links)}</ul>{deelpaneel}{controle}</div>')
 
-    # ---- de romp: de rest van de beschrijving, kenmerken, en in de buurt
+    # ---- de romp: links de rest van een lange tekst en de ligging, rechts de buurt
     tekst = ''.join(f'<p>{e(a)}</p>' for a in rest)
-    if d.get('tags'):
-        tekst += ('<p class="kenmerken"><span class="etiket">Kenmerken</span>'
-                  + ', '.join(e(t) for t in d['tags']) + '</p>')
-    colofon = []
-    if d.get('d'):
-        colofon.append(f'In de gids sinds {e(datum(d["d"]))}')
-    if d.get('id'):
-        colofon.append(f'Fiche {e(d["id"])}')
-    if colofon:
-        tekst += f'<p class="colofon">{" · ".join(colofon)}</p>'
 
     buurt = ''
     if buren:
@@ -583,16 +592,11 @@ def pagina(d, buren):
         buurt = (f'<aside class="buurt" aria-labelledby="buurtkop"><h2 id="buurtkop">{kop}</h2>'
                  f'<ol>{items}</ol></aside>')
 
-    romp = ''
-    if tekst or buurt:
-        romp = (f'<div class="romp wrap{" zonderbuurt" if not buurt else ""}">'
-                f'<div class="tekst">{tekst}</div>{buurt}</div>')
-
     # ---- ligging
     if 'lat' in d:
         ligging = {'lat': d['lat'], 'lon': d['lon'], 'n': d['n'], 'dicht': dicht,
                    'buren': [{'lat': x['lat'], 'lon': x['lon'], 'n': x['n'], 'u': x['u']} for _, x in buren]}
-        kaart = ('<section class="ligging wrap" aria-labelledby="liggingkop"><h2 id="liggingkop">Ligging</h2>'
+        kaart = ('<section class="ligging" aria-labelledby="liggingkop"><h2 id="liggingkop">Ligging</h2>'
                  '<div id="minikaart" role="region" aria-label="Kaart met de ligging"></div>'
                  '<p class="kaartlinks">'
                  + ('' if dicht else f'<a href="/kaart.html#{d["u"]}">Bekijk op de grote kaart</a>')
@@ -602,13 +606,18 @@ def pagina(d, buren):
         leaflet = '<link rel="stylesheet" href="/assets/vendor/leaflet.css">\n'
         leaflet_js = '<script src="/assets/vendor/leaflet.js"></script>\n'
     else:
-        kaart = ('<section class="ligging wrap" aria-labelledby="liggingkop"><h2 id="liggingkop">Ligging</h2>'
+        kaart = ('<section class="ligging" aria-labelledby="liggingkop"><h2 id="liggingkop">Ligging</h2>'
                  '<p class="geenkaart">De exacte ligging is nog niet vastgelegd. '
                  f'<a href="{e(maps_zoek(d))}" target="_blank" rel="noopener">Zoek op Google Maps</a></p></section>')
         leaflet = leaflet_js = ''
 
+    tekstblok = f'<div class="tekst">{tekst}</div>' if tekst else ''
+    romp = (f'<div class="romp wrap{" zonderbuurt" if not buurt else ""}">'
+            f'<div class="hoofdkolom">{tekstblok}{kaart}</div>'
+            f'{buurt}</div>')
+
     klassen = ' '.join(k for k in ('zaak', 'dicht' if dicht else '', 'metfoto' if foto else '',
-                                   'metlead' if lead else '') if k)
+                                   'metverhaal' if verhaal else '') if k)
 
     return f'''<!doctype html>
 <html lang="nl">
@@ -661,13 +670,12 @@ def pagina(d, buren):
      {foto}
     </div>
     <div class="kopvoet">
-     {f'<p class="lead">{e(lead)}</p>' if lead else ''}
+     {f'<div class="verhaal">{verhaal}</div>' if verhaal else ''}
      {praktisch}
     </div>
    </div>
   </div>
   {romp}
-  {kaart}
  </article>
 </main>
 
