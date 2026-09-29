@@ -15,6 +15,8 @@ const f = {q: '', p: '', t: '', s: '_open', tags: []};
 let TOON_GESLOTEN = true;
 
 let DATA = [];
+/* Alle gemeenten en deelgemeenten, genormaliseerd, voor de zoekfunctie. */
+const PLAATSEN = new Set();
 
 const norm = s => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 const esc = s => (s || '').replace(/[&<>"]/g, c =>
@@ -50,7 +52,13 @@ function match(d) {
   if (f.t === '_geen' ? d.t : (f.t && d.t !== f.t)) return false;
   if (f.s === '_open' ? d.s === 'Gesloten' : (f.s && d.s !== f.s)) return false;
   if (f.tags.some(tag => !(d.tags || []).includes(tag))) return false;
-  if (f.q && !d._k.includes(f.q)) return false;
+  if (f.q) {
+    /* Is de zoekterm precies een gemeente of deelgemeente, dan tellen alleen de
+       zaken uit die plaats. Anders duikt bij "Haacht" ook een Gents café op
+       omdat brouwerij Haacht in de beschrijving staat. */
+    const q = f.q.trim();
+    if (PLAATSEN.has(q) ? !d._g.includes(q) : !d._k.includes(f.q)) return false;
+  }
   return true;
 }
 
@@ -163,6 +171,8 @@ function laadData(dan) {
       DATA.forEach((d, i) => {
         d.tags = Array.isArray(d.tags) ? [...new Set(d.tags.filter(t => typeof t === 'string' && t))] : [];
         d._k = norm([d.n, d.g, d.p, d.a, d.i, d.t, ...d.tags].join(' '));
+        d._g = (d.g || '').split(/[()]/).map(x => norm(x).trim()).filter(Boolean);
+        d._g.forEach(x => PLAATSEN.add(x));
         d._i = i;
         if (!PROV_ORDER.includes(d.p)) PROV_ORDER.push(d.p);
       });
