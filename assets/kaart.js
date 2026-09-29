@@ -119,6 +119,13 @@ function zoekMij() {
 }
 document.getElementById('buurt').addEventListener('click', zoekMij);
 
+/* Lange beschrijvingen staan volledig op de cafépagina; de ballon toont een begin. */
+function inkort(t, n = 220) {
+  t = t.replace(/\s+/g, ' ').trim();
+  if (t.length <= n) return t;
+  return t.slice(0, n).replace(/\s+\S*$/, '').replace(/[,;:.]+$/, '') + '…';
+}
+
 function ballon(d) {
   return `<div class="ballon">`
     + (d.u ? `<a class="nm" href="/${esc(d.u)}/">${esc(d.n)}</a>` : `<span class="nm">${esc(d.n)}</span>`)
@@ -126,7 +133,7 @@ function ballon(d) {
     + (mijnPlek ? `<span class="afst">op ${km(afstand(mijnPlek, [d.lat, d.lon]))} van jou</span>` : '')
     + `<span class="st">${esc(d.t || 'soort nog te bepalen')} · ${statusLabel(d)}`
     + `${d.z ? ' ' + esc(d.z) : ''}</span>`
-    + (d.i ? `<p>${esc(d.i)}</p>` : '')
+    + (d.i ? `<p>${esc(d.u ? inkort(d.i) : d.i)}</p>` : '')
     + statusUitleg(d)
     + tagLabels(d)
     + `<div class="acts">`
