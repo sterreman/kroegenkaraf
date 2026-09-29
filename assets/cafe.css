@@ -1,0 +1,111 @@
+/* De pagina van een zaak. Palet, kop en knoppen komen uit stijl.css. */
+
+.cafepagina .logo{width:clamp(170px,19vw,226px)}
+.cafepagina .mast{padding:12px 0 10px;align-items:center}
+.cafepagina .brand{display:flex}
+.cafepagina .mastside{flex-direction:row;gap:8px}
+
+/* smaller kolom dan de lijst: een fiche leest als een pagina, niet als een tabel.
+   Kop en voet volgen, zodat alles op een lijn staat. */
+.cafepagina .wrap{max-width:860px}
+.cafepagina main{padding:10px var(--sp) 20px}
+.cafepagina footer{margin-top:44px}
+.kruimel{font-size:12px;color:var(--ink3);padding:16px 0 4px}
+.kruimel a{color:var(--ink2);text-decoration:none;border-bottom:1px solid var(--line2)}
+.kruimel a:hover{color:var(--wine);border-color:var(--wine)}
+.kruimel span{margin:0 5px}
+
+.dichtband{margin:14px 0 0;padding:11px 14px;border:1px solid var(--dead);
+ background:var(--paper2);color:var(--ink2);font-size:13.5px;border-radius:2px}
+.dichtband b{color:var(--ink);margin-right:6px;text-transform:uppercase;letter-spacing:.06em;
+ font-size:12px}
+
+.fiche{padding:18px 0 6px}
+.soortlijn{margin:0;font-size:10.5px;text-transform:uppercase;letter-spacing:.13em;
+ font-weight:700;color:var(--wine)}
+/* stijl.css verbergt h1 omdat de lijst haar titel in het logo draagt. Hier is de
+   naam van de zaak de titel, dus die mag gewoon zichtbaar zijn. */
+.fiche h1{position:static;width:auto;height:auto;margin:6px 0 0;overflow:visible;
+ clip:auto;white-space:normal;font-family:var(--display);font-weight:400;
+ font-size:clamp(30px,6vw,46px);line-height:1.04;letter-spacing:-.01em;text-wrap:balance}
+.fiche.dicht h1{color:var(--ink2)}
+.plaatslijn{margin:10px 0 0;font-family:var(--read);font-size:18px;color:var(--ink)}
+
+.status{display:flex;gap:9px;align-items:baseline;margin:12px 0 0;font-size:13px;
+ color:var(--ink2);line-height:1.45;max-width:62ch}
+.status i{width:8px;height:8px;border-radius:50%;flex:0 0 auto;background:var(--todo);
+ transform:translateY(-1px)}
+.status.ok i{background:var(--ok)}
+
+.acties{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:18px}
+.knop{display:inline-flex;align-items:center;gap:7px;font-family:var(--ui);font-size:14px;
+ font-weight:600;padding:9px 15px;border:1px solid var(--line2);background:var(--paper);
+ color:var(--ink);border-radius:2px;cursor:pointer;text-decoration:none;transition:.12s}
+.knop:hover{border-color:var(--wine);color:var(--wine)}
+.knop:focus-visible{outline:2px solid var(--wine);outline-offset:2px}
+.knop.warm{background:var(--wine);border-color:var(--wine);color:#fff}
+.knop.warm:hover{background:#b83b1b;border-color:#b83b1b;color:#fff}
+.knop svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.7;
+ stroke-linejoin:round;stroke-linecap:round}
+.acties .btn{padding:9px 11px}
+.acties .btn svg{width:17px;height:17px}
+
+.deelpaneel{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:10px;
+ padding:10px;border:1px dashed var(--line2);background:var(--paper2)}
+.deelpaneel[hidden]{display:none}
+.deelpaneel a,.deelpaneel button{font-family:var(--ui);font-size:13px;padding:6px 11px;
+ border:1px solid var(--line2);background:var(--paper);color:var(--ink);border-radius:2px;
+ text-decoration:none;cursor:pointer}
+.deelpaneel a:hover,.deelpaneel button:hover{border-color:var(--wine);color:var(--wine)}
+.gekopieerd{font-size:12.5px;color:var(--ok);font-weight:600}
+
+.fichefoto{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;
+ margin-top:22px;border:1px solid var(--line2);background:var(--paper2)}
+.info p{margin:20px 0 0;font-family:var(--read);font-size:17.5px;line-height:1.6;
+ color:var(--ink);max-width:64ch}
+.info p.leeg{color:var(--ink3);font-style:italic;font-size:15.5px}
+.fiche .zaak-tags{margin-top:16px}
+.fiche .kv{display:flex;gap:18px;flex-wrap:wrap;margin-top:16px;font-size:12px;color:var(--ink3)}
+.fiche .kv b{font-weight:600;color:var(--ink2)}
+
+.blok{margin-top:34px;border-top:1px solid var(--line2);padding-top:14px}
+.blok h2{margin:0 0 10px;font-family:var(--display);font-weight:400;font-size:15px;
+ text-transform:uppercase;letter-spacing:.02em}
+.buurt ol{list-style:none;margin:0;padding:0;border:1px solid var(--line)}
+.buurt li{display:flex;align-items:center;gap:12px;border-top:1px solid var(--line);
+ padding:0 13px 0 0}
+.buurt li:first-child{border-top:0}
+.buurt li a{flex:1;min-width:0;display:block;padding:10px 13px;text-decoration:none;color:inherit}
+.buurt li a:hover{background:var(--paper2)}
+.buurt li a:hover .bnm{color:var(--wine)}
+.bnm{display:block;font-family:var(--read);font-size:16.5px;font-weight:600;line-height:1.25}
+.bsub{display:block;font-size:12px;color:var(--ink2);margin-top:2px}
+.bafst{font-size:12px;color:var(--ink3);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+.adresregel{margin:0 0 10px;font-family:var(--read);font-size:16px}
+#minikaart{height:340px;border:1px solid var(--line2);background:var(--paper2)}
+#minikaart .leaflet-tile-pane{filter:grayscale(.6) brightness(1.03) contrast(.94)}
+#minikaart.leaflet-container{font-family:var(--ui)}
+.leaflet-tooltip{background:var(--ink);color:#fff;border:0;font-family:var(--ui);
+ font-size:11.5px;font-weight:600;padding:3px 7px;box-shadow:none;border-radius:2px}
+.leaflet-tooltip-top:before{border-top-color:var(--ink)}
+.kaartlinks{display:flex;gap:16px;flex-wrap:wrap;margin:10px 0 0;font-size:13px}
+.kaartlinks a{color:var(--wine);text-underline-offset:3px}
+.geenkaart{color:var(--ink3);font-style:italic;margin:0}
+
+footer a{color:var(--ink2);text-underline-offset:3px}
+
+@media(max-width:760px){
+  .cafepagina .mast{flex-wrap:nowrap}
+  .cafepagina .brand{width:auto;justify-content:flex-start}
+  .cafepagina .logo{width:min(150px,40vw)}
+  .cafepagina .mastside{width:auto;flex-direction:column;align-items:stretch;gap:6px}
+  .cafepagina .naarkaart{padding:6px 10px}
+  .plaatslijn{font-size:16.5px}
+  .knop{padding:10px 14px}
+  .acties .knop.warm{flex:1;justify-content:center}
+  .fichefoto{width:calc(100% + 2 * var(--sp));margin-left:calc(-1 * var(--sp));
+   border-left:0;border-right:0}
+  .info p{font-size:16.5px}
+  #minikaart{height:280px}
+}

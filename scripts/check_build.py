@@ -15,6 +15,20 @@ def main():
             for suffix in ('.avif', '-klein.avif'):
                 if not Path('site/fotos', row['foto'] + suffix).is_file():
                     raise SystemExit(f"STOP: fotobestand ontbreekt voor {row['n']}.")
+    # Elke zaak heeft een eigen pagina en een deelkaartje, en elke url is uniek.
+    urls = [row.get('u') for row in data]
+    if not all(urls):
+        raise SystemExit('STOP: niet elke zaak heeft een url; draaide cafepaginas.py wel?')
+    if len(set(urls)) != len(urls):
+        raise SystemExit('STOP: twee zaken delen dezelfde url.')
+    for row in data:
+        for name in ('index.html', 'deel.jpg'):
+            if not Path('site', row['u'], name).is_file():
+                raise SystemExit(f"STOP: {name} ontbreekt voor {row['n']} ({row['u']}).")
+    for name in ('sitemap.xml', 'robots.txt', 'data/slugs.json', 'assets/cafe.css', 'assets/cafe.js'):
+        if not Path('site', name).is_file():
+            raise SystemExit(f'STOP: {name} ontbreekt.')
+    print(f'{len(urls)} cafepaginas aanwezig.')
     for name in ('index.html', 'kaart.html'):
         page = Path('site', name).read_text(encoding='utf-8')
         if '__DATUM__' in page or '__AANTAL__' in page:

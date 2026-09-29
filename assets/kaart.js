@@ -121,7 +121,7 @@ document.getElementById('buurt').addEventListener('click', zoekMij);
 
 function ballon(d) {
   return `<div class="ballon">`
-    + `<span class="nm">${esc(d.n)}</span>`
+    + (d.u ? `<a class="nm" href="/${esc(d.u)}/">${esc(d.n)}</a>` : `<span class="nm">${esc(d.n)}</span>`)
     + `<span class="ad">${esc([d.a, d.g].filter(Boolean).join(', ') || 'adres nog aan te vullen')}</span>`
     + (mijnPlek ? `<span class="afst">op ${km(afstand(mijnPlek, [d.lat, d.lon]))} van jou</span>` : '')
     + `<span class="st">${esc(d.t || 'soort nog te bepalen')} · ${statusLabel(d)}`
@@ -132,7 +132,7 @@ function ballon(d) {
     + `<div class="acts">`
       + `<a class="btn map" href="${mapsUrl(d)}" target="_blank" rel="noopener"`
       + ` title="${esc(d.n)} op Google Maps" aria-label="${esc(d.n)} op Google Maps">${SPELD}</a>`
-      + `<a class="btn" href="index.html#${d._i}">In de lijst</a>`
+      + (d.u ? `<a class="btn warm" href="/${esc(d.u)}/">Meer info</a>` : `<a class="btn" href="index.html#${d._i}">In de lijst</a>`)
       + socKnop(d, d.fb, 'fb', 'Facebook') + socKnop(d, d.ig, 'ig', 'Instagram')
     + `</div></div>`;
 }
@@ -148,7 +148,7 @@ function teken() {
       fillColor: KLEUR[d.s] || '#cf4521', fillOpacity: .92
     });
     m.bindPopup(() => ballon(d), {maxWidth: 300, minWidth: 220, autoPanPadding: [24, 24]});
-    m.bindTooltip(d.n + ' — ' + d.g, {direction: 'top', offset: [0, -6]});
+    m.bindTooltip(d.n + ', ' + d.g, {direction: 'top', offset: [0, -6]});
     spelden.set(d._i, m);
     return m;
   });
@@ -167,7 +167,10 @@ function teken() {
    kaart.html#buurt zoekt meteen de zaken rond de bezoeker. */
 function naarAnker() {
   if (location.hash === '#buurt') { zoekMij(); return; }
-  const i = parseInt(location.hash.slice(1), 10);
+  /* kaart.html#cafe/haacht/de-klok komt van de pagina van een zaak; het oude
+     kaart.html#123 (de rij in zaken.json) blijft werken voor bestaande links. */
+  const h = decodeURIComponent(location.hash.slice(1));
+  const i = h.startsWith('cafe/') ? DATA.findIndex(d => d.u === h) : parseInt(h, 10);
   if (isNaN(i) || !DATA[i] || !DATA[i].lat || DATA[i].s === 'Gesloten') return;
   const d = DATA[i];
   if (!match(d)) {

@@ -1,4 +1,6 @@
-/* De lijst. Groepeert op provincie en gemeente, klapt open per zaak. */
+/* De lijst. Groepeert op provincie en gemeente. Een zaak aanklikken opent haar
+   eigen pagina op /cafe/<plaats>/<naam>/. Een zaak zonder pagina (oude
+   zaken.json zonder veld u) klapt zoals vroeger open in de lijst. */
 
 /* Een pictogram voor zaken zonder foto, per soort. Rustige lijntekening in de
    zandtint van de pagina, 24x24. */
@@ -61,7 +63,8 @@ function render() {
     }
     const dead = d.s === 'Gesloten';
     html += `<div class="card${dead ? ' dead' : ''}" data-i="${d._i}">`
-      + `<button class="row" type="button" aria-expanded="false">`
+      + (d.u ? `<a class="row" href="/${esc(d.u)}/">`
+             : `<button class="row" type="button" aria-expanded="false">`)
         + `<span role="img" aria-label="${statusLabel(d)}" title="${statusLabel(d)}" class="dot ${d.s === 'Geverifieerd' ? 'ok' : dead ? 'cl' : ''}"></span>`
         + (FOTOS ? (d.foto
             ? `<img class="thumb" src="fotos/${esc(d.foto)}-klein.avif" alt=""`
@@ -74,15 +77,16 @@ function render() {
           + (dead ? `<span class="flag dead">gesloten${d.z ? ' ' + esc(d.z) : ''}</span>`
                   : d.s === 'Te checken' ? '<span class="flag">status te bevestigen</span>' : '')
         + `</span>`
-      + `</button>`
-      + `<div class="body">`
+      + (d.u ? `</a></div>` : `</button>`);
+    if (d.u) continue;
+    html += `<div class="body">`
         /* .tekst houdt de beschrijving, de tags, de datums en de knoppen bij elkaar,
            zodat de css ze als een blok naast de foto kan zetten. */
         + `<div class="tekst">`
         + (d.i ? `<p>${esc(d.i)}</p>` : '<p class="empty">Nog geen beschrijving.</p>')
         + statusUitleg(d)
         + tagLabels(d)
-        + `<div class="kv"><span>Toegevoegd <b>${esc(d.d) || '—'}</b></span>`
+        + `<div class="kv"><span>Toegevoegd <b>${esc(d.d) || 'onbekend'}</b></span>`
         + (d.z ? `<span>Gesloten <b>${esc(d.z)}</b></span>` : '')
         + `<span>Soort <b>${esc(d.t || 'nog te bepalen')}</b></span></div>`
         + `<div class="acts">`
@@ -125,16 +129,20 @@ function naarAnker() {
   }
   const card = document.querySelector(`.card[data-i="${i}"]`);
   if (!card) return;
-  card.classList.add('open', 'gevonden');
-  card.querySelector('.row').setAttribute('aria-expanded', 'true');
-  toonFoto(card);
+  card.classList.add('gevonden');
+  const row = card.querySelector('.row');
+  if (row.tagName === 'BUTTON') {
+    card.classList.add('open');
+    row.setAttribute('aria-expanded', 'true');
+    toonFoto(card);
+  }
   card.scrollIntoView({block: 'center', behavior: 'smooth'});
   setTimeout(() => card.classList.remove('gevonden'), 2600);
 }
 addEventListener('hashchange', naarAnker);
 
 document.addEventListener('click', e => {
-  const row = e.target.closest('.row');
+  const row = e.target.closest('button.row');
   if (row) {
     const card = row.parentElement;
     const open = card.classList.toggle('open');
@@ -147,6 +155,11 @@ laadData(() => {
   FOTOS = DATA.some(d => d.foto);
   document.getElementById('foot').textContent =
     DATA.length + ' zaken in de lijst · bijgewerkt ' + BIJGEWERKT;
+  const q = new URLSearchParams(location.search).get('q');
+  if (q) {
+    document.getElementById('q').value = q;
+    f.q = norm(q);
+  }
   renderChips();
   render();
   naarAnker();

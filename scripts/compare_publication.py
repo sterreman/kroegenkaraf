@@ -84,8 +84,15 @@ def main():
         print('Gewijzigd sinds de vorige succesvolle publicatie (' + str(previous.get('date', 'datum onbekend'))
               + '): ' + ('ja' if added or removed or changed else 'nee') + '. Datumwijziging telt niet mee.')
         for label, paths in (('Toegevoegd', added), ('Verwijderd', removed), ('Gewijzigd', changed)):
-            if paths:
-                print(label + ': ' + ', '.join(paths))
+            # Duizenden cafepaginas een voor een opsommen maakt het verslag
+            # onleesbaar; die worden per zaak geteld, de rest blijft voluit.
+            paginas = sorted({p.rsplit('/', 1)[0] for p in paths if p.startswith('cafe/')})
+            rest = [p for p in paths if not p.startswith('cafe/')]
+            if rest:
+                print(label + ': ' + ', '.join(rest))
+            if paginas:
+                print(f'{label}: {len(paginas)} cafepaginas'
+                      + (': ' + ', '.join(paginas) if len(paginas) <= 25 else ''))
     report = {'schema': 1, 'date': datetime.datetime.now(ZoneInfo('Europe/Brussels')).date().isoformat(),
               'counts': counts, 'files': current}
     (site / MANIFEST).write_text(json.dumps(report, ensure_ascii=False, sort_keys=True), encoding='utf-8')

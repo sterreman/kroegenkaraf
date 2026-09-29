@@ -36,6 +36,8 @@
 .leaflet-popup-content{margin:12px 14px 13px;line-height:1.5}
 .leaflet-popup-tip{background:var(--paper);border:1px solid var(--line2)}
 .leaflet-popup-close-button{color:var(--ink3)!important;font-family:var(--ui)}
+.ballon a.nm{text-decoration:none}
+.ballon a.nm:hover{color:var(--wine)}
 .ballon .nm{font-family:var(--read);font-size:17px;font-weight:600;line-height:1.2;
  display:block;color:var(--ink)}
 .ballon .ad{font-size:12.5px;color:var(--ink2);margin-top:3px;display:block}

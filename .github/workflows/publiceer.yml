@@ -17,7 +17,7 @@ jobs:
   build:
     if: github.event_name == 'workflow_dispatch' || vars.ENABLE_DAILY_PUBLICATION == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -43,6 +43,7 @@ jobs:
         run: |
           set -o pipefail
           python ../scripts/publiceer.py 2>&1 | tee build.log
+          python ../scripts/cafepaginas.py 2>&1 | tee paginas.log
           python ../scripts/check_build.py 2>&1 | tee checks.log
       - name: Proefsite bewaren
         uses: actions/upload-artifact@v4
@@ -62,7 +63,7 @@ jobs:
         if: always()
         shell: bash
         run: |
-          for report in .publication/download.log .publication/build.log .publication/checks.log; do
+          for report in .publication/download.log .publication/build.log .publication/paginas.log .publication/checks.log; do
             if [ -f "$report" ]; then
               echo '```text' >> "$GITHUB_STEP_SUMMARY"
               cat "$report" >> "$GITHUB_STEP_SUMMARY"

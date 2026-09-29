@@ -113,6 +113,8 @@ main{padding:6px 0 90px}
 .row{display:flex;align-items:flex-start;gap:11px;padding:10px 13px;cursor:pointer;
  width:100%;text-align:left;background:none;border:0;font:inherit;color:inherit}
 .row:hover{background:var(--paper2)}
+a.row{text-decoration:none}
+a.row:hover .nm{color:var(--wine)}
 .card.dead .row:hover{background:#eceef1}
 .row:focus-visible{outline:2px solid var(--wine);outline-offset:-2px}
 .dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto;margin-top:9px;background:var(--todo)}
