@@ -125,6 +125,11 @@ def e(t):
     return html.escape(t or '', quote=True)
 
 
+def alineas(t):
+    """Info in alinea's: elke regelovergang in de cel begint een nieuwe alinea."""
+    return [a.strip() for a in re.split(r'\r?\n', t or '') if a.strip()]
+
+
 def kort(t, n=158):
     t = re.sub(r'\s+', ' ', t or '').strip()
     if len(t) <= n:
@@ -424,7 +429,7 @@ def json_ld(d, url, beeld):
     if 'lat' in d:
         x['geo'] = {'@type': 'GeoCoordinates', 'latitude': d['lat'], 'longitude': d['lon']}
     if d.get('i'):
-        x['description'] = d['i']
+        x['description'] = ' '.join(alineas(d['i']))
     zelf = [v for v in (d.get('fb'), d.get('ig')) if v]
     if zelf:
         x['sameAs'] = zelf
@@ -485,7 +490,7 @@ def pagina(d, buren):
         foto = (f'<img class="fichefoto" src="/fotos/{e(d["foto"])}.avif" alt="Foto van {e(d["n"])}" '
                 'width="1100" height="733" decoding="async">')
 
-    info = (f'<p>{e(d["i"])}</p>' if d.get('i')
+    info = (''.join(f'<p>{e(a)}</p>' for a in alineas(d['i'])) if d.get('i')
             else '<p class="leeg">Nog geen beschrijving.</p>')
     tags = ''
     if d.get('tags'):
