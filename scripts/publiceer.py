@@ -122,7 +122,7 @@ if len(rows) < 100:
 
 # Er werken ook andere handen in dit bestand, dus vertrouw de vorm niet blind.
 KERN = ('Naam', 'Gemeente', 'Provincie')
-VERWACHT = KERN + ('Adres', 'Facebook', 'Instagram', 'Soort', 'Info', 'Status',
+VERWACHT = KERN + ('ID', 'Adres', 'Facebook', 'Instagram', 'Soort', 'Info', 'Status',
                    'Gesloten op', 'Datum toegevoegd', 'Geverifieerd op',
                    'Latitude', 'Longitude', 'Tags')
 kolommen = list(rows[0].keys())
@@ -153,6 +153,14 @@ STATUSSEN = {'Geverifieerd', 'Te checken', 'Gesloten'}
 vreemd_status = sorted({(r.get('Status') or '').strip() for r in rows} - STATUSSEN)
 if vreemd_status:
     sys.exit(f'STOP: ongeldige Status {vreemd_status}.')
+# Elke zaak heeft een vast ID (KK00001, ...), toegekend door merge_toevoegingen.py.
+ids = [(r.get('ID') or '').strip() for r in rows]
+dubbele_ids = sorted({i for i in ids if i and ids.count(i) > 1})
+if dubbele_ids:
+    print(f'  LET OP: dubbele ID\'s in de csv: {dubbele_ids[:10]}')
+zonder_id = sum(not i for i in ids)
+if zonder_id and 'ID' in kolommen:
+    print(f'  LET OP: {zonder_id} zaken hebben nog geen ID.')
 zonder_gemeente = sum(not (r.get('Gemeente') or '').strip() for r in rows)
 if zonder_gemeente:
     print(f'  LET OP: {zonder_gemeente} zaken met status Te checken hebben nog geen gemeente.')
@@ -235,7 +243,7 @@ if stuk:
 data = []
 for r in rows:
     v_ = lambda k: (r.get(k) or '').strip()
-    d = {'n': v_('Naam'), 'g': v_('Gemeente'), 'p': v_('Provincie'),
+    d = {'id': v_('ID'), 'n': v_('Naam'), 'g': v_('Gemeente'), 'p': v_('Provincie'),
          'a': v_('Adres'), 't': v_('Soort'), 'i': v_('Info'),
          'tags': parse_tags(r.get('Tags', '')),
          's': v_('Status'), 'z': v_('Gesloten op'),
