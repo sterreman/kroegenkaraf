@@ -57,11 +57,16 @@ a{color:inherit}
  display:flex;align-items:center;gap:12px}
 /* het streepje uit het logo, onder de ampersand */
 .soort::before{content:"";width:34px;height:5px;background:var(--roest);flex:0 0 auto}
+/* De naam is zo groot als de lengte toelaat, maar nooit groter dan wat het langste
+   woord op een regel laat passen: --blok is de breedte van dat woord in em, gemeten
+   bij het bouwen. Zo gaat geen woord ooit middendoor. */
+.kopnaam{container-type:inline-size;min-width:0}
 .naam{margin:14px 0 0;font-family:var(--kop);font-weight:800;font-stretch:66%;
- font-size:clamp(60px,11vw,128px);line-height:.9;letter-spacing:-.005em;color:var(--creme);
- text-wrap:balance;overflow-wrap:break-word;hyphens:auto}
-.naam.lang{font-size:clamp(46px,8vw,96px)}
-.naam.zeerlang{font-size:clamp(38px,5.8vw,68px);line-height:.95}
+ --max:clamp(60px,11vw,128px);font-size:min(var(--max),calc(100cqi / var(--blok,1)));
+ line-height:.9;letter-spacing:-.005em;color:var(--creme);text-wrap:balance;
+ overflow-wrap:break-word}
+.naam.lang{--max:clamp(46px,8vw,96px)}
+.naam.zeerlang{--max:clamp(38px,5.8vw,68px);line-height:.95}
 .plaats{margin:14px 0 0;font-size:clamp(20px,2.4vw,26px);line-height:1.3}
 .plaats span{color:var(--creme2)}
 .dichtlabel{display:inline-block;margin:0 0 16px;padding:5px 10px;border:1.5px solid var(--creme2);

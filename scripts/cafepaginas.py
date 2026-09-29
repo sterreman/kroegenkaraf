@@ -403,7 +403,7 @@ ICOON_DEEL = ('<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5
               '<circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/>'
               '<path d="m8.3 13.3 7.4 4.4M15.7 6.3l-7.4 4.4"/></svg>')
 
-VERSIE = 'pagina-20260929b'
+VERSIE = 'pagina-20260929c'
 
 FONTS_URL = ('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..100,500..800'
              '&family=Petrona:ital,wght@0,400..600;1,400&display=swap')
@@ -438,10 +438,27 @@ def lead_en_rest(info):
 
 
 def naam_html(n):
-    """Een kort voorwoord ('t, De, Le) blijft bij het volgende woord, zodat het
-    nooit alleen op een regel belandt."""
-    return re.sub(r"(?<![^\s(])((?:[’'][a-z]|[A-Za-zÀ-ÿ]{1,3}))\s+", lambda m: m.group(1) + '\u00a0',
+    """Alleen 't en zijn varianten blijven met een vaste spatie aan het volgende
+    woord, zodat 't nooit alleen op een regel staat. Langere voorwoorden niet:
+    die zouden met het volgende woord een blok vormen dat niet meer past."""
+    return re.sub(r"(?<![^\s(])([’'‘]t)\s+", lambda m: m.group(1) + '\u00a0',
                   e(n).replace('&#x27;', "'"))
+
+
+_MAAT = None
+
+
+def langste_blok_em(n):
+    """Breedte in em van het langste stuk van de naam dat niet mag breken, gemeten
+    in dezelfde smalle Archivo als op de pagina. De css laat de naam krimpen tot
+    dat stuk op een regel past, zodat geen woord ooit middendoor gaat."""
+    global _MAAT
+    if _MAAT is None:
+        _MAAT = lettertype('Archivo.ttf', 1000, 800, 66)
+    tekst = re.sub(r"(?<![^\s(])([’'‘]t)\s+", lambda m: m.group(1) + '\u00a0', n)
+    blokken = [b for b in re.split(r'[ \t\n-]+', tekst) if b]
+    breedste = max((_MAAT.getlength(b) for b in blokken), default=0)
+    return round(breedste / 1000 * 1.04 + .02, 3)
 
 
 def plaats_html(g):
@@ -638,7 +655,7 @@ def pagina(d, buren):
     <div class="kopraster">
      <div class="kopnaam">
       {dichtlabel}{soort}
-      <h1 class="naam{maat}">{naam_html(d["n"])}</h1>
+      <h1 class="naam{maat}" style="--blok:{langste_blok_em(d['n'])}">{naam_html(d["n"])}</h1>
       {plaatsregel}
      </div>
      {foto}
