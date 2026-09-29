@@ -292,11 +292,11 @@ MARINE, CREME, VERMILJOEN, GRIJS = (19, 39, 56), (247, 238, 223), (239, 106, 64)
 W, H = 1200, 630
 
 
-def lettertype(naam, grootte, gewicht=None):
+def lettertype(naam, grootte, gewicht=None, breedte=100):
     f = ImageFont.truetype(str(FONTS / naam), grootte)
     if gewicht:
         try:
-            f.set_variation_by_axes([gewicht, 100] if naam == 'Archivo.ttf' else [gewicht])
+            f.set_variation_by_axes([gewicht, breedte] if naam == 'Archivo.ttf' else [gewicht])
         except (OSError, ValueError):
             pass
     return f
@@ -350,7 +350,7 @@ class Kaartjes:
 
         dicht = d.get('s') == 'Gesloten'
         soortlijn = ' · '.join(x for x in ((d.get('t') or 'Café').upper(),) if x)
-        f_klein = lettertype('Archivo.ttf', 26, 700)
+        f_klein = lettertype('Archivo.ttf', 28, 700, 85)
         draw.text((links, boven), soortlijn, font=f_klein, fill=VERMILJOEN)
         if dicht:
             # het label staat naast de soort, dan duwt het nooit tegen de voet
@@ -362,8 +362,9 @@ class Kaartjes:
             draw.text((x0 + 11, boven + 2), label, font=f_band, fill=GRIJS)
 
         # naam: zo groot als past, hoogstens drie regels
-        for grootte in (84, 76, 68, 60, 54, 48, 42, 38):
-            f_naam = lettertype('ArchivoBlack-Regular.ttf', grootte)
+        # dezelfde smalle, zware Archivo als de naam op de pagina
+        for grootte in (112, 100, 90, 80, 72, 64, 56, 50):
+            f_naam = lettertype('Archivo.ttf', grootte, 800, 66)
             regels = breek(draw, d['n'], f_naam, tekstbreedte)
             past = all(draw.textlength(r, font=f_naam) <= tekstbreedte for r in regels)
             wees = len(regels) > 1 and min(len(r) for r in regels) < 4   # geen 't alleen op een regel
@@ -372,12 +373,12 @@ class Kaartjes:
         y = boven + 46
         for r in regels[:3]:
             draw.text((links, y), r, font=f_naam, fill=CREME)
-            y += int(grootte * 1.08)
+            y += int(grootte * .98)
 
         f_plaats = lettertype('Petrona.ttf', 38, 500)
         plaatslijn = d.get('g') or d.get('p') or ''
         for r in breek(draw, plaatslijn, f_plaats, tekstbreedte)[:2]:
-            y += 8
+            y += 14
             draw.text((links, y), r, font=f_plaats, fill=CREME)
             y += 40
 
@@ -402,18 +403,53 @@ ICOON_DEEL = ('<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5
               '<circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/>'
               '<path d="m8.3 13.3 7.4 4.4M15.7 6.3l-7.4 4.4"/></svg>')
 
-VERSIE = 'pagina-20260929'
+VERSIE = 'pagina-20260929b'
+
+FONTS_URL = ('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..100,500..800'
+             '&family=Petrona:ital,wght@0,400..600;1,400&display=swap')
 
 
 def status_blok(d):
     if d.get('s') == 'Geverifieerd':
         t = ('Online gecontroleerd' + (f' op {datum(d["v"])}' if d.get('v') else '')
              + '. Dat zegt niets over de openingsuren van vandaag.')
-        return f'<p class="status ok"><i aria-hidden="true"></i>{e(t)}</p>'
+        return f'<p class="controle">{e(t)}</p>'
     if d.get('s') == 'Gesloten':
         return ''
-    return ('<p class="status todo"><i aria-hidden="true"></i>Status te bevestigen. '
-            'Controleer voor je bezoek of de zaak nog actief is en wanneer ze open is.</p>')
+    return ('<p class="controle">Status nog te bevestigen. Controleer voor je bezoek of de '
+            'zaak nog actief is en wanneer ze open is.</p>')
+
+
+ZIN = re.compile(r"(?<=[a-zà-ÿ0-9)]{2}[.!?])\s+(?=[A-ZÀ-Ý'‘])")
+
+
+def lead_en_rest(info):
+    """De eerste zin van Info als introductie, als die kort genoeg is. De rest
+    blijft gewone tekst. Er wordt niets herschreven, alleen gesplitst."""
+    al = alineas(info)
+    if not al:
+        return '', []
+    zinnen = ZIN.split(al[0], maxsplit=1)
+    eerste = zinnen[0].strip()
+    if len(eerste) > 190:
+        return '', al
+    rest = ([zinnen[1].strip()] if len(zinnen) > 1 else []) + al[1:]
+    return eerste, rest
+
+
+def naam_html(n):
+    """Een kort voorwoord ('t, De, Le) blijft bij het volgende woord, zodat het
+    nooit alleen op een regel belandt."""
+    return re.sub(r"(?<![^\s(])((?:[’'][a-z]|[A-Za-zÀ-ÿ]{1,3}))\s+", lambda m: m.group(1) + '\u00a0',
+                  e(n).replace('&#x27;', "'"))
+
+
+def plaats_html(g):
+    """'Borgerhout (Antwerpen)': de hoofdgemeente iets stiller."""
+    m = re.fullmatch(r'(.*?)\s*\(([^)]+)\)', g or '')
+    if m:
+        return f'{e(m.group(1))} <span>({e(m.group(2))})</span>'
+    return e(g)
 
 
 def json_ld(d, url, beeld):
@@ -442,7 +478,7 @@ def pagina(d, buren):
     beeld = f'{ORIGIN}/{d["u"]}/deel.jpg'
     dicht = d.get('s') == 'Gesloten'
     gem = d.get('g') or ''
-    plaatslijn = ', '.join(x for x in (d.get('a'), gem) if x) or 'Adres nog aan te vullen'
+    adres = ', '.join(x for x in (d.get('a'), gem) if x)
     titel = f'{d["n"]}, {plaats(gem)}' if gem else d['n']
     omschrijving = kort(d.get('i')) or kort(
         f'{d.get("t") or "Café"} in {gem or d.get("p", "")}'
@@ -450,32 +486,44 @@ def pagina(d, buren):
     if dicht:
         omschrijving = kort(f'Gesloten{" sinds " + d["z"] if d.get("z") else ""}. ' + omschrijving)
     deeltekst = f'{d["n"]} in {plaats(gem) or d.get("p", "")}, gevonden op Kroeg & Karaf'
+    q = urllib.parse.quote
 
     kruimel = ['<a href="/">Alle zaken</a>']
     if d.get('p'):
-        kruimel.append(f'<a href="/?q={urllib.parse.quote(d["p"])}">{e(d["p"])}</a>')
-    if gem:
-        kruimel.append(f'<a href="/?q={urllib.parse.quote(plaats(gem))}">{e(gem)}</a>')
+        kruimel.append(f'<a href="/?q={q(d["p"])}">{e(d["p"])}</a>')
+    if gem and sleutel(plaats(gem)) != sleutel(d.get('p')):
+        kruimel.append(f'<a href="/?q={q(plaats(gem))}">{e(plaats(gem))}</a>')
 
-    band = ''
+    # ---- de kop: naam, soort, plaats en de eerste zin
+    lengte = len(d['n'])
+    maat = ' zeerlang' if lengte > 38 else ' lang' if lengte > 20 else ''
+    dichtlabel = ''
     if dicht:
-        band = ('<div class="dichtband"><b>Gesloten' + (f' sinds {e(datum(d["z"]))}' if d.get('z') else '')
-                + '</b> Deze zaak is dicht en blijft als archief in de gids staan.</div>')
+        dichtlabel = ('<p class="dichtlabel">Gesloten'
+                      + (f' sinds {e(datum(d["z"]))}' if d.get('z') else '') + '</p>')
+    soort = f'<p class="soort">{e(d["t"])}</p>' if d.get('t') else ''
+    plaatsregel = f'<p class="plaats">{plaats_html(gem)}</p>' if gem else (
+        f'<p class="plaats">{e(d["p"])}</p>' if d.get('p') else '')
+    lead, rest = lead_en_rest(d.get('i'))
 
-    knoppen = []
+    foto = ''
+    if d.get('foto'):
+        foto = (f'<figure class="kopfoto"><img src="/fotos/{e(d["foto"])}.avif" '
+                f'alt="Foto van {e(d["n"])}" width="1100" height="733" decoding="async"></figure>')
+
+    # ---- praktisch: adres, route, delen, links, controle
+    acties = []
     if not dicht:
-        knoppen.append(f'<a class="knop warm" href="{e(maps_route(d))}" target="_blank" rel="noopener">'
-                       f'{ICOON_ROUTE}Route</a>')
-    knoppen.append(f'<button class="knop" id="deel" type="button" aria-expanded="false" '
-                   f'aria-controls="deelpaneel" data-tekst="{e(deeltekst)}">{ICOON_DEEL}Delen</button>')
-    knoppen.append(f'<a class="btn map" href="{e(maps_zoek(d))}" target="_blank" rel="noopener" '
-                   f'title="Op Google Maps" aria-label="{e(d["n"])} op Google Maps">{SPELD}</a>')
-    for sl, naam in (('fb', 'Facebook'), ('ig', 'Instagram')):
+        acties.append(f'<a class="route" href="{e(maps_route(d))}" target="_blank" rel="noopener">'
+                      f'{ICOON_ROUTE}<span>Route</span></a>')
+    links = [f'<li><button class="link" id="deel" type="button" aria-expanded="false" '
+             f'aria-controls="deelpaneel" data-tekst="{e(deeltekst)}">{ICOON_DEEL}Delen</button></li>',
+             f'<li><a class="link" href="{e(maps_zoek(d))}" target="_blank" rel="noopener">'
+             f'{SPELD}Google Maps</a></li>']
+    for sl, naam in (('ig', 'Instagram'), ('fb', 'Facebook')):
         if d.get(sl):
-            knoppen.append(f'<a class="btn soc" href="{e(d[sl])}" target="_blank" rel="noopener" '
-                           f'title="{naam}" aria-label="{naam} van {e(d["n"])}">{MERK[sl]}</a>')
-
-    q = urllib.parse.quote
+            links.append(f'<li><a class="link" href="{e(d[sl])}" target="_blank" rel="noopener">'
+                         f'{MERK[sl]}{naam}</a></li>')
     deelpaneel = (
         '<div class="deelpaneel" id="deelpaneel" hidden>'
         f'<a href="https://wa.me/?text={q(deeltekst + " " + url)}" target="_blank" rel="noopener">WhatsApp</a>'
@@ -484,51 +532,66 @@ def pagina(d, buren):
         '<button type="button" id="kopieer">Link kopiëren</button>'
         '<span class="gekopieerd" id="gekopieerd" role="status"></span>'
         '</div>')
+    adresblok = (f'<p class="adres"><span class="etiket">Adres</span>{e(adres)}</p>' if d.get('a')
+                 else '<p class="adres"><span class="etiket">Adres</span>'
+                      '<span class="onbekend">Nog aan te vullen</span></p>')
+    archief = ('<p class="controle">Deze zaak is dicht en blijft als archief in de gids staan.</p>'
+               if dicht else '')
+    praktisch = (f'<div class="praktisch">{adresblok}{"".join(acties)}'
+                 f'<ul class="links">{"".join(links)}</ul>{deelpaneel}'
+                 f'{status_blok(d)}{archief}</div>')
 
-    foto = ''
-    if d.get('foto'):
-        foto = (f'<img class="fichefoto" src="/fotos/{e(d["foto"])}.avif" alt="Foto van {e(d["n"])}" '
-                'width="1100" height="733" decoding="async">')
-
-    info = (''.join(f'<p>{e(a)}</p>' for a in alineas(d['i'])) if d.get('i')
-            else '<p class="leeg">Nog geen beschrijving.</p>')
-    tags = ''
+    # ---- de romp: de rest van de beschrijving, kenmerken, en in de buurt
+    tekst = ''.join(f'<p>{e(a)}</p>' for a in rest)
     if d.get('tags'):
-        tags = ('<div class="zaak-tags" aria-label="Kenmerken">'
-                + ''.join(f'<span class="zaak-tag">{e(t)}</span>' for t in d['tags']) + '</div>')
-    kv = [f'<span>Soort <b>{e(d.get("t") or "nog te bepalen")}</b></span>']
+        tekst += ('<p class="kenmerken"><span class="etiket">Kenmerken</span>'
+                  + ', '.join(e(t) for t in d['tags']) + '</p>')
+    colofon = []
     if d.get('d'):
-        kv.append(f'<span>In de gids sinds <b>{e(datum(d["d"]))}</b></span>')
+        colofon.append(f'In de gids sinds {e(datum(d["d"]))}')
+    if d.get('id'):
+        colofon.append(f'Fiche {e(d["id"])}')
+    if colofon:
+        tekst += f'<p class="colofon">{" · ".join(colofon)}</p>'
 
     buurt = ''
     if buren:
         items = ''.join(
-            f'<li><a href="/{x["u"]}/"><span class="bnm">{e(x["n"])}</span>'
-            f'<span class="bsub">{e(" · ".join(v for v in (x.get("t"), plaats(x.get("g"))) if v))}</span></a>'
-            f'<span class="bafst">{afstand_tekst(a)}</span></li>' for a, x in buren)
-        buurt = (f'<section class="blok buurt"><h2>{"Wat er nog open is in de buurt" if dicht else "In de buurt"}</h2>'
-                 f'<ol>{items}</ol></section>')
+            f'<li><a href="/{x["u"]}/"><span class="bregel"><span class="bnm">{e(x["n"])}</span>'
+            f'<span class="stip" aria-hidden="true"></span>'
+            f'<span class="bafst">{afstand_tekst(a)}</span></span>'
+            f'<span class="bsub">{e(" · ".join(v for v in (x.get("t"), plaats(x.get("g"))) if v))}</span></a></li>'
+            for a, x in buren)
+        kop = 'Wat er nog open is in de buurt' if dicht else 'In de buurt'
+        buurt = (f'<aside class="buurt" aria-labelledby="buurtkop"><h2 id="buurtkop">{kop}</h2>'
+                 f'<ol>{items}</ol></aside>')
 
+    romp = ''
+    if tekst or buurt:
+        romp = (f'<div class="romp wrap{" zonderbuurt" if not buurt else ""}">'
+                f'<div class="tekst">{tekst}</div>{buurt}</div>')
+
+    # ---- ligging
     if 'lat' in d:
         ligging = {'lat': d['lat'], 'lon': d['lon'], 'n': d['n'], 'dicht': dicht,
                    'buren': [{'lat': x['lat'], 'lon': x['lon'], 'n': x['n'], 'u': x['u']} for _, x in buren]}
-        kaart = ('<section class="blok ligging"><h2>Ligging</h2>'
-                 f'<p class="adresregel">{e(plaatslijn)}</p>'
+        kaart = ('<section class="ligging wrap" aria-labelledby="liggingkop"><h2 id="liggingkop">Ligging</h2>'
                  '<div id="minikaart" role="region" aria-label="Kaart met de ligging"></div>'
                  '<p class="kaartlinks">'
                  + ('' if dicht else f'<a href="/kaart.html#{d["u"]}">Bekijk op de grote kaart</a>')
                  + f'<a href="{e(maps_zoek(d))}" target="_blank" rel="noopener">Open in Google Maps</a></p>'
                  '<script type="application/json" id="ligging">'
                  + json.dumps(ligging, ensure_ascii=False).replace('</', '<\\/') + '</script></section>')
-        leaflet = ('<link rel="stylesheet" href="/assets/vendor/leaflet.css">\n')
+        leaflet = '<link rel="stylesheet" href="/assets/vendor/leaflet.css">\n'
         leaflet_js = '<script src="/assets/vendor/leaflet.js"></script>\n'
     else:
-        kaart = ('<section class="blok ligging"><h2>Ligging</h2>'
-                 f'<p class="adresregel">{e(plaatslijn)}</p>'
-                 '<p class="geenkaart">De exacte ligging is nog niet vastgelegd.</p>'
-                 f'<p class="kaartlinks"><a href="{e(maps_zoek(d))}" target="_blank" rel="noopener">'
-                 'Zoek op Google Maps</a></p></section>')
+        kaart = ('<section class="ligging wrap" aria-labelledby="liggingkop"><h2 id="liggingkop">Ligging</h2>'
+                 '<p class="geenkaart">De exacte ligging is nog niet vastgelegd. '
+                 f'<a href="{e(maps_zoek(d))}" target="_blank" rel="noopener">Zoek op Google Maps</a></p></section>')
         leaflet = leaflet_js = ''
+
+    klassen = ' '.join(k for k in ('zaak', 'dicht' if dicht else '', 'metfoto' if foto else '',
+                                   'metlead' if lead else '') if k)
 
     return f'''<!doctype html>
 <html lang="nl">
@@ -553,47 +616,49 @@ def pagina(d, buren):
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Black&family=Petrona:wght@400;500;600&display=swap">
-{leaflet}<link rel="stylesheet" href="/assets/stijl.css?v={VERSIE}">
-<link rel="stylesheet" href="/assets/cafe.css?v={VERSIE}">
+<link rel="stylesheet" href="{FONTS_URL.replace('&', '&amp;')}">
+{leaflet}<link rel="stylesheet" href="/assets/cafe.css?v={VERSIE}">
 {json_ld(d, url, beeld)}</head>
 <body class="cafepagina">
-<header>
+<a class="naarinhoud" href="#inhoud">Naar de inhoud</a>
+<header class="balk">
  <div class="wrap">
-  <div class="mast">
-   <a class="brand" href="/"><img class="logo" src="/assets/logo.png"
-     alt="Kroeg &amp; Karaf, naar de volledige lijst" width="760" height="575"></a>
-   <div class="mastside">
-    <a class="naarkaart" href="/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Alle zaken</a>
-    <a class="naarkaart" href="/kaart.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3 3 5.4v15.2L9 18.2l6 2.4 6-2.4V3l-6 2.4z"/><path d="M9 3v15.2M15 5.4v15.2"/></svg>Kaart</a>
-   </div>
-  </div>
+  <a class="merk" href="/"><img src="/assets/logo.png" alt="Kroeg &amp; Karaf, naar de volledige lijst" width="760" height="575"></a>
+  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/">Alle zaken</a><a href="/kaart.html">Kaart</a></nav>
  </div>
 </header>
 
-<main class="wrap">
- <nav class="kruimel" aria-label="Kruimelpad">{' <span aria-hidden="true">/</span> '.join(kruimel)}</nav>
- {band}
- <article class="fiche{' dicht' if dicht else ''}">
-  <p class="soortlijn">{e(d.get("t") or "Soort nog te bepalen")}</p>
-  <h1>{e(d["n"])}</h1>
-  <p class="plaatslijn">{e(plaatslijn)}</p>
-  {status_blok(d)}
-  <div class="acties">{''.join(knoppen)}</div>
-  {deelpaneel}
-  {foto}
-  <div class="info">{info}</div>
-  {tags}
-  <div class="kv">{''.join(kv)}</div>
+<main id="inhoud">
+ <article class="{klassen}">
+  <div class="kop">
+   <div class="wrap">
+    <nav class="kruimel" aria-label="Kruimelpad">{' <span aria-hidden="true">/</span> '.join(kruimel)}</nav>
+    <div class="kopraster">
+     <div class="kopnaam">
+      {dichtlabel}{soort}
+      <h1 class="naam{maat}">{naam_html(d["n"])}</h1>
+      {plaatsregel}
+     </div>
+     {foto}
+    </div>
+    <div class="kopvoet">
+     {f'<p class="lead">{e(lead)}</p>' if lead else ''}
+     {praktisch}
+    </div>
+   </div>
+  </div>
+  {romp}
+  {kaart}
  </article>
- {buurt}
- {kaart}
 </main>
 
-<footer class="wrap">
- <a href="/">Alle zaken</a><a href="/kaart.html">Kaart</a>
- <span>Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</span>
+<footer class="voet">
+ <div class="wrap">
+  <nav aria-label="Onderaan"><a href="/">Alle zaken</a><a href="/kaart.html">Kaart</a></nav>
+  <p>Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</p>
+ </div>
 </footer>
 {leaflet_js}<script src="/assets/cafe.js?v={VERSIE}"></script>
 </body>
@@ -608,7 +673,7 @@ def main():
     if not pad.exists():
         sys.exit('STOP: site/data/zaken.json ontbreekt; draai eerst publiceer.py.')
     data = json.loads(pad.read_text(encoding='utf-8'))
-    for f in ('ArchivoBlack-Regular.ttf', 'Archivo.ttf', 'Petrona.ttf'):
+    for f in ('Archivo.ttf', 'Petrona.ttf'):
         if not (FONTS / f).exists():
             sys.exit(f'STOP: lettertype {f} ontbreekt in scripts/fonts.')
 
