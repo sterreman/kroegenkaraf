@@ -5,9 +5,8 @@ const START = [51.03, 4.35];   /* ergens tussen Gent, Brussel en Antwerpen */
 const START_ZOOM = 9;
 
 /* Gesloten zaken blijven van de kaart. Een zaak die dicht is heeft vaak een
-   opvolger op hetzelfde adres, en dan staan er twee spelden op een punt. */
-TOON_GESLOTEN = false;
-
+   opvolger op hetzelfde adres, en dan staan er twee spelden op een punt. Dat
+   staat in FB.basis, onderaan. */
 const kaart = L.map('kaart', {
   center: START, zoom: START_ZOOM, minZoom: 7, maxZoom: 19,
   zoomControl: true, scrollWheelZoom: true
@@ -23,7 +22,12 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19
 }).addTo(kaart);
 
-const KLEUR = {'Geverifieerd': '#2f6b43', 'Te checken': '#cf4521'};
+/* Online gecontroleerd is een volle marineblauwe stip, status te bevestigen een
+   open ring in roest. Zo verschillen ze ook in vorm, niet alleen in kleur. */
+const SPELD_STIJL = {
+  'Geverifieerd': {radius: 6.5, weight: 2, color: '#fbf7f0', opacity: 1, fillColor: '#132738', fillOpacity: 1},
+  'Te checken': {radius: 6, weight: 2.5, color: '#cf4521', opacity: 1, fillColor: '#fbf7f0', fillOpacity: 1}
+};
 
 const cluster = L.markerClusterGroup({
   /* Van dichtbij kleinere trossen: wie In de buurt gebruikt in een stad, wil de
@@ -126,21 +130,26 @@ function inkort(t, n = 220) {
   return t.slice(0, n).replace(/\s+\S*$/, '').replace(/[,;:.]+$/, '') + '…';
 }
 
+const MAANDEN = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli',
+  'augustus', 'september', 'oktober', 'november', 'december'];
+function datum(t) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(t || '');
+  return m ? `${+m[3]} ${MAANDEN[+m[2] - 1]} ${m[1]}` : (t || '');
+}
+
 function ballon(d) {
+  const status = d.s === 'Geverifieerd'
+    ? 'Online gecontroleerd' + (d.v ? ' op ' + esc(datum(d.v)) : '') + '. Dat zegt niets over de openingsuren van vandaag.'
+    : 'Status te bevestigen. Controleer voor je bezoek of de zaak nog actief is.';
   return `<div class="ballon">`
-    + (d.u ? `<a class="nm" href="/${esc(d.u)}/">${esc(d.n)}</a>` : `<span class="nm">${esc(d.n)}</span>`)
-    + `<span class="ad">${esc([d.a, d.g].filter(Boolean).join(', ') || 'adres nog aan te vullen')}</span>`
-    + (mijnPlek ? `<span class="afst">op ${km(afstand(mijnPlek, [d.lat, d.lon]))} van jou</span>` : '')
-    + `<span class="st">${esc(d.t || 'soort nog te bepalen')} · ${statusLabel(d)}`
-    + `${d.z ? ' ' + esc(d.z) : ''}</span>`
-    + (d.i ? `<p>${esc(d.u ? inkort(d.i) : d.i)}</p>` : '')
-    + statusUitleg(d)
-    + tagLabels(d)
-    + `<div class="acts">`
-      + `<a class="btn map" href="${mapsUrl(d)}" target="_blank" rel="noopener"`
-      + ` title="${esc(d.n)} op Google Maps" aria-label="${esc(d.n)} op Google Maps">${SPELD}</a>`
-      + (d.u ? `<a class="btn warm" href="/${esc(d.u)}/">Meer info</a>` : `<a class="btn" href="index.html#${d._i}">In de lijst</a>`)
-      + socKnop(d, d.fb, 'fb', 'Facebook') + socKnop(d, d.ig, 'ig', 'Instagram')
+    + (d.u ? `<a class="bnaam" href="/${esc(d.u)}/">${esc(d.n)}</a>` : `<span class="bnaam">${esc(d.n)}</span>`)
+    + `<span class="bmeta">${esc([d.t, [d.a, d.g].filter(Boolean).join(', ')].filter(Boolean).join(' · ') || 'adres nog aan te vullen')}</span>`
+    + (mijnPlek ? `<span class="bafst">Op ${km(afstand(mijnPlek, [d.lat, d.lon]))} van jou</span>` : '')
+    + (d.i ? `<p>${esc(inkort(d.i, 160))}</p>` : '')
+    + `<p class="bstatus">${status}</p>`
+    + `<div class="bacties">`
+      + (d.u ? `<a class="bmeer" href="/${esc(d.u)}/">Meer info</a>` : '')
+      + `<a class="blink" href="${mapsUrl(d)}" target="_blank" rel="noopener">Google Maps</a>`
     + `</div></div>`;
 }
 
@@ -150,24 +159,34 @@ function teken() {
   cluster.clearLayers();
   spelden.clear();
   const laag = res.map(d => {
-    const m = L.circleMarker([d.lat, d.lon], {
-      radius: 6, weight: 1.5, color: '#fdf8ee', opacity: .9,
-      fillColor: KLEUR[d.s] || '#cf4521', fillOpacity: .92
-    });
-    m.bindPopup(() => ballon(d), {maxWidth: 300, minWidth: 220, autoPanPadding: [24, 24]});
+    const m = L.circleMarker([d.lat, d.lon], SPELD_STIJL[d.s] || SPELD_STIJL['Te checken']);
+    m.bindPopup(() => ballon(d), {maxWidth: 300, minWidth: 230, autoPanPadding: [24, 24]});
     m.bindTooltip(d.n + ', ' + d.g, {direction: 'top', offset: [0, -6]});
     spelden.set(d._i, m);
     return m;
   });
   cluster.addLayers(laag);
 
-  const gv = res.filter(d => d.s === 'Geverifieerd').length;
-  const plaatsen = new Set(res.map(d => d.p + '|' + d.g)).size;
-  document.getElementById('tally').innerHTML =
-    `<div><b>${res.length}</b><span>op de kaart</span></div>`
-    + `<div><b>${gv}</b><span>online gecontroleerd</span></div>`
-    + `<div><b>${res.length - gv}</b><span>te bevestigen</span></div>`
-    + `<div><b>${plaatsen}</b><span>plaatsen</span></div>`;
+  const zoek = ruweQ.trim();
+  $('aantal').innerHTML = `<b>${telwoord(res.length)}</b> op de kaart`
+    + (zoek ? ` voor <q>${esc(zoek)}</q>` : '');
+  /* Zaken die bij de selectie passen maar nog geen ligging hebben, staan alleen
+     in de lijst. Dat zeggen we, anders lijkt de kaart er zaken te missen. */
+  const zonder = DATA.filter(d => !d.lat && d.s !== 'Gesloten' && match(d)).length;
+  const zl = $('zonderligging');
+  zl.hidden = !zonder;
+  zl.innerHTML = zonder ? `${zonder === 1 ? 'Eén zaak' : zonder.toLocaleString('nl-BE') + ' zaken'} uit deze selectie `
+    + `${zonder === 1 ? 'heeft' : 'hebben'} nog geen ligging en ${zonder === 1 ? 'staat' : 'staan'} alleen in de `
+    + `<a href="index.html${staatQuery(ruweQ)}">lijst</a>.` : '';
+  tekenBalk();
+}
+
+function pasAan() {
+  if (!ZICHTBAAR.length) { meld('Geen zaak op de kaart past bij deze zoekopdracht en filters.'); return; }
+  $('melding').hidden = true;
+  if (!f.q && !filtersActief()) { kaart.setView(START, START_ZOOM); return; }
+  kaart.fitBounds(L.latLngBounds(ZICHTBAAR.map(d => [d.lat, d.lon])),
+                  {padding: [48, 48], maxZoom: 15});
 }
 
 /* kaart.html#123 opent die ene zaak, zodat de lijst ernaar kan doorlinken.
@@ -181,13 +200,19 @@ function naarAnker() {
   if (isNaN(i) || !DATA[i] || !DATA[i].lat || DATA[i].s === 'Gesloten') return;
   const d = DATA[i];
   if (!match(d)) {
-    f.p = f.t = f.q = ''; f.s = '_open'; f.tags = [];
-    document.getElementById('q').value = '';
-    renderChips(); teken();
+    wisAlles();
+    wijzig();
   }
-  kaart.setView([d.lat, d.lon], 17);
   const m = spelden.get(i);
-  if (m) cluster.zoomToShowLayer(m, () => m.openPopup());
+  if (!m) { kaart.setView([d.lat, d.lon], 17); return; }
+  /* Eerst dichtbij, dan de tros openvouwen tot de speld zelf zichtbaar is en het
+     ballonnetje openen. zoomToShowLayer roept zijn callback niet altijd aan als
+     de kaart al stilstaat, vandaar de controle erna. */
+  kaart.setView([d.lat, d.lon], 17, {animate: false});
+  let open = false;
+  const toon = () => { if (!open && m._map) { open = true; m.openPopup(); } };
+  cluster.zoomToShowLayer(m, toon);
+  setTimeout(() => { if (!open) cluster.zoomToShowLayer(m, toon); setTimeout(toon, 500); }, 700);
 }
 addEventListener('hashchange', naarAnker);
 
@@ -195,25 +220,33 @@ document.getElementById('heel').addEventListener('click', () => {
   kaart.setView(START, START_ZOOM);
 });
 
-laadData(() => {
-  const open = DATA.filter(d => d.s !== 'Gesloten');
-  const zonder = open.filter(d => !d.lat).length;
-  document.getElementById('foot').textContent =
-    (open.length - zonder) + ' zaken met een adres op de kaart · '
-    + zonder + ' wachten nog op coördinaten · gesloten zaken staan alleen in de '
-    + 'lijst · bijgewerkt ' + BIJGEWERKT;
-  /* Komt de bezoeker van de lijst, dan neemt de kaart dezelfde zoekopdracht en
-     filters over. Gesloten zaken staan niet op de kaart, dus een statusfilter die
-     alleen gesloten zaken toont valt hier terug op de standaard. */
-  document.getElementById('q').value = leesStaat();
-  if (!['_open', 'Geverifieerd', 'Te checken'].includes(f.s)) f.s = '_open';
-  const terug = document.getElementById('naarlijst');
-  const bijwerken = () => {
-    if (terug) terug.href = 'index.html' + staatQuery(document.getElementById('q').value);
-  };
-  renderChips();
+function laadfout() {
+  $('aantal').textContent = 'De zaken kwamen niet binnen.';
+  $('kaartladen').innerHTML = '<p><b>De zaken kwamen niet binnen.</b> Controleer je verbinding en probeer het opnieuw.</p>'
+    + '<button type="button" class="knop" id="opnieuw">Opnieuw proberen</button>';
+  $('opnieuw').addEventListener('click', () => {
+    $('kaartladen').innerHTML = '<p>De zaken worden geladen.</p>';
+    $('aantal').textContent = 'Zaken laden…';
+    laadData(gereed, laadfout);
+  });
+}
+
+let geladen = false;
+function gereed() {
+  if (geladen) return;
+  geladen = true;
+  $('kaartladen').hidden = true;
+  $('foot').textContent = 'De gids telt ' + DATA.length.toLocaleString('nl-BE')
+    + ' zaken, gesloten zaken staan alleen in de lijst · bijgewerkt ' + BIJGEWERKT;
+  FB.basis = d => d.lat && d.s !== 'Gesloten';
+  FB.statussen = STATUS_ALLE.slice(0, 3);
+  /* Na een zoekopdracht of filter zoomt de kaart op wat overblijft. Zonder
+     selectie blijft ze op het overzicht staan. */
+  FB.teken = () => { teken(); pasAan(); };
+  startFilterbalk();
   teken();
-  bijwerken();
-  naarAnker();
-  opnieuw = () => { teken(); bijwerken(); };
-});
+  if (location.hash) naarAnker();
+  else if (f.q || filtersActief()) pasAan();
+}
+
+laadData(gereed, laadfout);
