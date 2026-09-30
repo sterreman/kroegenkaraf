@@ -78,6 +78,7 @@
 .leaflet-tooltip{background:var(--marine);color:var(--creme);border:0;border-radius:0;box-shadow:none;
  font-family:var(--kop);font-stretch:92%;font-size:13px;font-weight:700;padding:3px 8px}
 .leaflet-tooltip-top:before{border-top-color:var(--marine)}
+.leaflet-tooltip.enkel{font-size:14.5px;padding:4px 10px}
 
 /* onder de kaart: legende en wat er niet op staat */
 .kaartvoet{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 24px;padding-top:10px;
@@ -86,8 +87,9 @@
  font-size:14.5px;color:var(--inkt2)}
 .legenda span{display:inline-flex;align-items:center;gap:8px}
 .speld{display:inline-block;width:13px;height:13px;border-radius:50%}
-.speld.ok{background:var(--marine);box-shadow:0 0 0 2px var(--papier),0 0 0 3px var(--lijn)}
-.speld.todo{background:var(--papier);border:2.5px solid var(--roest)}
+.speld.ok{width:15px;height:15px;background:var(--roest);border:2.5px solid var(--papier);
+ box-shadow:0 0 0 1px var(--lijn)}
+.speld.todo{width:15px;height:15px;background:var(--papier);border:3px solid var(--roest)}
 .speld.tros{width:17px;height:17px;background:var(--marine)}
 .zonderligging{margin:0;font-family:var(--kop);font-stretch:92%;font-size:14.5px;color:var(--inkt2)}
 .zonderligging a{color:var(--roest-tekst);text-underline-offset:4px}

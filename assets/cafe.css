@@ -122,7 +122,7 @@ a{color:inherit}
  color:var(--creme);text-decoration:none;cursor:pointer}
 .deelpaneel a:hover,.deelpaneel button:hover{border-color:var(--roest-licht);color:var(--roest-licht)}
 .gekopieerd{font-family:var(--kop);font-size:14px;color:var(--creme)}
-.controle{margin:8px 0 0;font-size:14.5px;line-height:1.45;color:var(--creme2);max-width:46ch}
+.controle{margin:6px 0 0;font-size:14.5px;line-height:1.45;color:var(--creme2);max-width:46ch}
 
 /* ---- de romp: links de rest van een lange tekst en de ligging, rechts de buurt ---- */
 .romp{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);
@@ -160,6 +160,7 @@ h2::before{content:"";width:34px;height:5px;background:var(--roest)}
  font-stretch:90%;font-weight:600;font-size:15px}
 .kaartlinks a,.geenkaart a{color:var(--roest-tekst);text-underline-offset:4px;text-decoration-thickness:1.5px}
 .geenkaart{margin:0;color:var(--inkt2)}
+.sinds{margin:22px 0 0;font-family:var(--kop);font-stretch:90%;font-size:13.5px;color:var(--inkt2)}
 
 /* ---- voet ---- */
 .voet{margin-top:clamp(48px,6vw,80px);background:var(--marine);color:var(--creme2)}

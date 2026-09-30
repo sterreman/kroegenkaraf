@@ -403,7 +403,7 @@ ICOON_DEEL = ('<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5
               '<circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/>'
               '<path d="m8.3 13.3 7.4 4.4M15.7 6.3l-7.4 4.4"/></svg>')
 
-VERSIE = 'pagina-20260929d'
+VERSIE = 'pagina-20260930'
 
 KORT_VERHAAL = 480   # tot zoveel tekens blijft de hele beschrijving bovenaan
 
@@ -414,12 +414,12 @@ FONTS_URL = ('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..100
 def status_blok(d):
     if d.get('s') == 'Geverifieerd':
         t = ('Online gecontroleerd' + (f' op {datum(d["v"])}' if d.get('v') else '')
-             + '. Dat zegt niets over de openingsuren van vandaag.')
+             + '. Openingsuren niet gecontroleerd.')
         return f'<p class="controle">{e(t)}</p>'
     if d.get('s') == 'Gesloten':
         return ''
     return ('<p class="controle">Status nog te bevestigen. Controleer voor je bezoek of de '
-            'zaak nog actief is en wanneer ze open is.</p>')
+            'zaak nog open is.</p>')
 
 
 ZIN = re.compile(r"(?<=[a-zà-ÿ0-9)]{2}[.!?])\s+(?=[A-ZÀ-Ý'‘])")
@@ -569,13 +569,11 @@ def pagina(d, buren):
                       '<span class="onbekend">Nog aan te vullen</span></p>')
     archief = ('<p class="controle">Deze zaak is dicht en blijft als archief in de gids staan.</p>'
                if dicht else '')
-    sinds = f' In de gids sinds {e(datum(d["d"]))}.' if d.get('d') else ''
-    controle = status_blok(d) + archief
-    if sinds:
-        controle = (controle.replace('</p>', sinds + '</p>', 1) if controle
-                    else f'<p class="controle">{sinds.strip()}</p>')
-    praktisch = (f'<div class="praktisch">{adresblok}{"".join(acties)}'
-                 f'<ul class="links">{"".join(links)}</ul>{deelpaneel}{controle}</div>')
+    # de controle staat meteen bij het adres; wanneer de zaak in de gids kwam,
+    # staat onderaan de pagina
+    praktisch = (f'<div class="praktisch">{adresblok}{status_blok(d)}{archief}{"".join(acties)}'
+                 f'<ul class="links">{"".join(links)}</ul>{deelpaneel}</div>')
+    sinds = (f'<p class="sinds">In de gids sinds {e(datum(d["d"]))}.</p>' if d.get('d') else '')
 
     # ---- de romp: links de rest van een lange tekst en de ligging, rechts de buurt
     tekst = ''.join(f'<p>{e(a)}</p>' for a in rest)
@@ -613,7 +611,7 @@ def pagina(d, buren):
 
     tekstblok = f'<div class="tekst">{tekst}</div>' if tekst else ''
     romp = (f'<div class="romp wrap{" zonderbuurt" if not buurt else ""}">'
-            f'<div class="hoofdkolom">{tekstblok}{kaart}</div>'
+            f'<div class="hoofdkolom">{tekstblok}{kaart}{sinds}</div>'
             f'{buurt}</div>')
 
     klassen = ' '.join(k for k in ('zaak', 'dicht' if dicht else '', 'metfoto' if foto else '',

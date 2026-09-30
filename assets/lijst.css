@@ -53,7 +53,6 @@ button{font:inherit;color:inherit}
 .wisq svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 .wisq:hover{color:var(--roest-tekst)}
 .wisq:focus-visible{outline:2px solid var(--roest-tekst);outline-offset:-4px}
-.zoekhulp{margin:7px 0 0;font-family:var(--kop);font-stretch:90%;font-size:14px;color:var(--creme2)}
 
 /* ---- de filterbalk: kleeft bovenaan bij het scrollen ---- */
 .filterbalk{position:sticky;top:0;z-index:40;background:var(--papier);
@@ -206,7 +205,6 @@ a.rij:focus-visible{outline:2px solid var(--inkt);outline-offset:-2px;background
   .kop h1{font-size:clamp(27px,7.4vw,36px)}
   .zoek{margin-top:12px}
   .zoek input{height:52px;font-size:18px}
-  .zoekhulp{font-size:13.5px}
   .balkrij{min-height:54px}
   .filterknoppen{width:100%;gap:6px}
   .fknop{flex:1 1 0;justify-content:center;padding:0 8px;font-size:15px;height:42px}

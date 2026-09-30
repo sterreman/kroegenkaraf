@@ -22,11 +22,12 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19
 }).addTo(kaart);
 
-/* Online gecontroleerd is een volle marineblauwe stip, status te bevestigen een
-   open ring in roest. Zo verschillen ze ook in vorm, niet alleen in kleur. */
+/* De spelden in roest, de kleur die op de ontkleurde tegels het meest opvalt.
+   Online gecontroleerd is een volle stip met een crème rand, status te bevestigen
+   een ring met een crème kern. Zo verschillen ze ook in vorm, niet alleen in kleur. */
 const SPELD_STIJL = {
-  'Geverifieerd': {radius: 6.5, weight: 2, color: '#fbf7f0', opacity: 1, fillColor: '#132738', fillOpacity: 1},
-  'Te checken': {radius: 6, weight: 2.5, color: '#cf4521', opacity: 1, fillColor: '#fbf7f0', fillOpacity: 1}
+  'Geverifieerd': {radius: 8, weight: 3, color: '#fbf7f0', opacity: 1, fillColor: '#cf4521', fillOpacity: 1},
+  'Te checken': {radius: 7.5, weight: 3.5, color: '#cf4521', opacity: 1, fillColor: '#fbf7f0', fillOpacity: 1}
 };
 
 const cluster = L.markerClusterGroup({
@@ -166,6 +167,12 @@ function teken() {
     return m;
   });
   cluster.addLayers(laag);
+  /* Bij één zaak staat de naam er meteen bij, zonder eerst te moeten wijzen. */
+  if (laag.length === 1) {
+    laag[0].setStyle({radius: 11});
+    laag[0].unbindTooltip().bindTooltip(res[0].n, {direction: 'top', offset: [0, -9],
+      permanent: true, className: 'enkel'});
+  }
 
   const zoek = ruweQ.trim();
   $('aantal').innerHTML = `<b>${telwoord(res.length)}</b> op de kaart`
