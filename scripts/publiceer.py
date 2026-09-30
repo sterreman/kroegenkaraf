@@ -208,7 +208,14 @@ for (la, lo), rs in sorted(stapels.items(), key=lambda x: -len(x[1])):
 shutil.rmtree(f'{SITE}/{FOTOS}', ignore_errors=True)
 os.makedirs(f'{SITE}/{FOTOS}', exist_ok=True)
 koppeling, twijfel, stuk, fotobytes = {}, [], [], 0
-for naam in sorted(os.listdir(FOTOS)) if os.path.isdir(FOTOS) else []:
+def fotovolgorde(naam):
+    """DeKroon.jpg voor DeKroon-2.jpg voor DeKroon-10.jpg."""
+    stam = os.path.splitext(naam)[0]
+    m = re.match(r'^(.*?)(?:-(\d+))?$', stam)
+    return (m.group(1).lower(), int(m.group(2) or 1), naam)
+
+
+for naam in sorted(os.listdir(FOTOS), key=fotovolgorde) if os.path.isdir(FOTOS) else []:
     stam, ext = os.path.splitext(naam)
     if naam.startswith('.') or ext.lower() not in ('.jpg', '.jpeg', '.png', '.webp', '.avif'):
         continue
@@ -222,19 +229,24 @@ for naam in sorted(os.listdir(FOTOS)) if os.path.isdir(FOTOS) else []:
     if r is None:
         twijfel.append((naam, kand))
         continue
-    if id(r) in koppeling:
-        sys.exit(f'STOP: meerdere foto’s voor dezelfde zaak: {naam}.')
-    naar = slug(r['Naam']) + '-' + slug(r['Gemeente'].split(' (')[0])
+    # Meerdere foto's per zaak mogen: de eerste (alfabetisch) is de hoofdfoto met
+    # een miniatuur voor de lijst, de volgende krijgen -2, -3, ... en verschijnen
+    # in de carrousel op de pagina van de zaak. Geef ze op Drive dus een naam als
+    # DeKroonLommel.jpg, DeKroonLommel-2.jpg, ...
+    basis = slug(r['Naam']) + '-' + slug(r['Gemeente'].split(' (')[0])
+    reeks = koppeling.setdefault(id(r), [])
+    naar = basis if not reeks else f'{basis}-{len(reeks) + 1}'
     if os.path.exists(f'{SITE}/{FOTOS}/{naar}.avif'):
         sys.exit(f'STOP: dubbele fotobestemming: {naar}.')
-    ImageOps.fit(im, (KLEIN_PX, KLEIN_PX), Image.LANCZOS).convert('RGB').save(
-        f'{SITE}/{FOTOS}/{naar}-klein.avif', 'AVIF', quality=KLEIN_Q)
+    if not reeks:
+        ImageOps.fit(im, (KLEIN_PX, KLEIN_PX), Image.LANCZOS).convert('RGB').save(
+            f'{SITE}/{FOTOS}/{naar}-klein.avif', 'AVIF', quality=KLEIN_Q)
+        fotobytes += os.path.getsize(f'{SITE}/{FOTOS}/{naar}-klein.avif')
     groot = im.copy()
     groot.thumbnail((GROOT_PX, GROOT_MAX_H), Image.LANCZOS)
     groot.convert('RGB').save(f'{SITE}/{FOTOS}/{naar}.avif', 'AVIF', quality=GROOT_Q)
-    fotobytes += (os.path.getsize(f'{SITE}/{FOTOS}/{naar}-klein.avif')
-                  + os.path.getsize(f'{SITE}/{FOTOS}/{naar}.avif'))
-    koppeling[id(r)] = (naam, naar)
+    fotobytes += os.path.getsize(f'{SITE}/{FOTOS}/{naar}.avif')
+    reeks.append(naar)
 
 if stuk:
     sys.exit('STOP: onleesbare foto’s: ' + '; '.join(stuk))
@@ -258,7 +270,9 @@ for r in rows:
             except ValueError:
                 pass
     if id(r) in koppeling:
-        d['foto'] = koppeling[id(r)][1]
+        d['foto'] = koppeling[id(r)][0]
+        if len(koppeling[id(r)]) > 1:
+            d['fotos'] = [{'f': f} for f in koppeling[id(r)]]
     data.append({k: v for k, v in d.items() if v not in ('', None)})
 
 os.makedirs(f'{SITE}/data', exist_ok=True)
@@ -288,7 +302,8 @@ print(f'{len(data)} zaken, '
 print(f'{met_coord} met coordinaat, {len(data) - met_coord} zonder')
 print(f'soorten: ' + ', '.join(f'{s or "leeg"} {sum(1 for d in data if d.get("t", "") == s)}'
       for s in sorted({d.get('t', '') for d in data})))
-print(f"foto's: {len(koppeling)} gekoppeld, samen {fotobytes/1024:.0f} KB")
+print(f"foto's: {sum(len(v) for v in koppeling.values())} gekoppeld aan {len(koppeling)} zaken, "
+      f"samen {fotobytes/1024:.0f} KB")
 for naam, kand in twijfel:
     print(f'  LET OP: {naam} ' + ('past op meerdere zaken: '
           + '; '.join(f'{r["Naam"]} ({r["Gemeente"]})' for r in kand)

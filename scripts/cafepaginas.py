@@ -403,7 +403,17 @@ ICOON_DEEL = ('<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5
               '<circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/>'
               '<path d="m8.3 13.3 7.4 4.4M15.7 6.3l-7.4 4.4"/></svg>')
 
-VERSIE = 'pagina-20260930'
+VERSIE = 'pagina-20260930b'
+
+ICOON_FOTO = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5h4l1.8-2.5h6.4L17 8.5h4V19H3z"'
+              ' fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>'
+              '<circle cx="12" cy="13.3" r="3.3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>')
+
+# Bezoekers sturen hun foto in via dit Tally-formulier. De knop vult de zaak en
+# de vaste url in (verborgen velden cafe en slug); inzendingen.py leest de
+# goedgekeurde rijen terug uit de gekoppelde sheet.
+FOTO_FORMULIER = 'https://tally.so/r/zxPWka'
+MAX_FOTOS = 5        # zoveel foto's toont een pagina hoogstens
 
 KORT_VERHAAL = 480   # tot zoveel tekens blijft de hele beschrijving bovenaan
 
@@ -492,6 +502,75 @@ def json_ld(d, url, beeld):
     return f'<script type="application/ld+json">{blob}</script>\n'
 
 
+def fotolijst(d):
+    if d.get('fotos'):
+        return d['fotos'][:MAX_FOTOS]
+    return [{'f': d['foto']}] if d.get('foto') else []
+
+
+def fotoblok(d):
+    """Geen foto: niets. Een foto: de foto. Meer: een carrousel om door te vegen."""
+    fotos = fotolijst(d)
+    if not fotos:
+        return ''
+
+    def dia(i, f):
+        laden = 'eager' if i == 0 else 'lazy'
+        alt = f'Foto van {d["n"]}' + (f', {i + 1} van {len(fotos)}' if len(fotos) > 1 else '')
+        bij = (f'<figcaption>Foto: {e(f["c"])}</figcaption>' if f.get('c') else '')
+        return (f'<img src="/fotos/{e(f["f"])}.avif" alt="{e(alt)}" width="1100" height="733" '
+                f'loading="{laden}" decoding="async">{bij}')
+
+    if len(fotos) == 1:
+        return f'<figure class="kopfoto">{dia(0, fotos[0])}</figure>'
+    dias = ''.join(f'<figure class="dia">{dia(i, f)}</figure>' for i, f in enumerate(fotos))
+    return ('<div class="kopfoto carrousel" role="region" aria-roledescription="carrousel" '
+            f'aria-label="Foto\'s van {e(d["n"])}">'
+            f'<div class="rail" tabindex="0">{dias}</div>'
+            '<div class="dianav">'
+            '<button type="button" class="vorige" aria-label="Vorige foto">&#8249;</button>'
+            f'<span class="teller" aria-live="polite">1 / {len(fotos)}</span>'
+            '<button type="button" class="volgende" aria-label="Volgende foto">&#8250;</button>'
+            '</div></div>')
+
+
+def voeg_inzendingen_toe(data):
+    """Goedgekeurde bezoekersfoto's (zie inzendingen.py) bij de juiste zaak zetten."""
+    pad = Path('inzendingen.json')
+    if not pad.exists():
+        return
+    per_url = {d['u']: d for d in data}
+    gekoppeld = 0
+    for it in json.loads(pad.read_text(encoding='utf-8')):
+        d = per_url.get(it['slug'].strip('/'))
+        if d is None:
+            print(f'  LET OP: bezoekersfoto voor {it["slug"]} hoort bij geen enkele zaak')
+            continue
+        fotos = d.setdefault('fotos', [{'f': d['foto']}] if d.get('foto') else [])
+        if len(fotos) >= MAX_FOTOS:
+            print(f'  LET OP: {d["n"]} heeft al {MAX_FOTOS} foto\'s, bezoekersfoto overgeslagen')
+            continue
+        naar = d['u'].removeprefix('cafe/').replace('/', '-') + f'-b{len(fotos) + 1}'
+        try:
+            im = ImageOps.exif_transpose(Image.open(it['bestand']))
+            im.load()
+        except Exception as exc:
+            print(f'  LET OP: bezoekersfoto voor {d["n"]} niet te openen: {exc}')
+            continue
+        (SITE / 'fotos').mkdir(exist_ok=True)
+        groot = im.copy()
+        groot.thumbnail((1100, 900), Image.LANCZOS)
+        # opnieuw opslaan zonder exif: de locatie en het toestel gaan er zo uit
+        groot.convert('RGB').save(SITE / 'fotos' / f'{naar}.avif', 'AVIF', quality=58)
+        if not d.get('foto'):
+            ImageOps.fit(im, (92, 92), Image.LANCZOS).convert('RGB').save(
+                SITE / 'fotos' / f'{naar}-klein.avif', 'AVIF', quality=62)
+            d['foto'] = naar
+        fotos.append({'f': naar, 'c': it.get('naam') or 'een bezoeker'})
+        gekoppeld += 1
+    print(f"bezoekersfoto's: {gekoppeld} gekoppeld")
+
+
 def pagina(d, buren):
     url = f'{ORIGIN}/{d["u"]}/'
     beeld = f'{ORIGIN}/{d["u"]}/deel.jpg'
@@ -538,10 +617,7 @@ def pagina(d, buren):
         verhaal += ('<p class="kenmerken"><span class="etiket">Kenmerken</span>'
                     + ', '.join(e(t) for t in d['tags']) + '</p>')
 
-    foto = ''
-    if d.get('foto'):
-        foto = (f'<figure class="kopfoto"><img src="/fotos/{e(d["foto"])}.avif" '
-                f'alt="Foto van {e(d["n"])}" width="1100" height="733" decoding="async"></figure>')
+    foto = fotoblok(d)
 
     # ---- praktisch: adres, route, delen, links, controle
     acties = []
@@ -571,8 +647,12 @@ def pagina(d, buren):
                if dicht else '')
     # de controle staat meteen bij het adres; wanneer de zaak in de gids kwam,
     # staat onderaan de pagina
+    oproep_url = (FOTO_FORMULIER + '?' + urllib.parse.urlencode(
+        {'cafe': f'{d["n"]}, {gem}' if gem else d['n'], 'slug': d['u']}))
+    oproep = (f'<p class="fotooproep"><a class="link" href="{e(oproep_url)}" target="_blank" '
+              f'rel="noopener">{ICOON_FOTO}Upload jouw eigen foto van deze zaak</a></p>')
     praktisch = (f'<div class="praktisch">{adresblok}{status_blok(d)}{archief}{"".join(acties)}'
-                 f'<ul class="links">{"".join(links)}</ul>{deelpaneel}</div>')
+                 f'<ul class="links">{"".join(links)}</ul>{deelpaneel}{oproep}</div>')
     sinds = (f'<p class="sinds">In de gids sinds {e(datum(d["d"]))}.</p>' if d.get('d') else '')
 
     # ---- de romp: links de rest van een lange tekst en de ligging, rechts de buurt
@@ -706,6 +786,7 @@ def main():
     elif register.get('schema') != 1:
         sys.exit('STOP: onbekend formaat van het register met vaste urls.')
     weg = ken_urls_toe(data, register)
+    voeg_inzendingen_toe(data)
 
     shutil.rmtree(SITE / 'cafe', ignore_errors=True)
     buren = zoek_buren(data)

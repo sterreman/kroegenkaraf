@@ -38,6 +38,14 @@ jobs:
         run: |
           set -o pipefail
           python ../scripts/download_drive.py 2>&1 | tee download.log
+      - name: Bezoekersfoto's ophalen
+        working-directory: .publication
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          FOTO_INZENDINGEN_SHEET_ID: ${{ vars.FOTO_INZENDINGEN_SHEET_ID }}
+        run: |
+          set -o pipefail
+          python ../scripts/inzendingen.py 2>&1 | tee inzendingen.log
       - name: Bouwen en controleren
         working-directory: .publication
         run: |
@@ -63,7 +71,7 @@ jobs:
         if: always()
         shell: bash
         run: |
-          for report in .publication/download.log .publication/build.log .publication/paginas.log .publication/checks.log; do
+          for report in .publication/download.log .publication/inzendingen.log .publication/build.log .publication/paginas.log .publication/checks.log; do
             if [ -f "$report" ]; then
               echo '```text' >> "$GITHUB_STEP_SUMMARY"
               cat "$report" >> "$GITHUB_STEP_SUMMARY"

@@ -36,6 +36,29 @@
     });
   }
 
+  /* ---- de carrousel ----------------------------------------------------------
+     De foto's staan naast elkaar in een rail die op elke foto vastklikt. Vegen
+     werkt vanzelf; de pijltjes en de teller zijn er voor wie een muis heeft. */
+  document.querySelectorAll('.carrousel').forEach((c) => {
+    const rail = c.querySelector('.rail');
+    const dias = rail.children;
+    const teller = c.querySelector('.teller');
+    const vorige = c.querySelector('.vorige');
+    const volgende = c.querySelector('.volgende');
+    const nu = () => Math.round(rail.scrollLeft / rail.clientWidth);
+    const toon = () => {
+      const i = nu();
+      teller.textContent = (i + 1) + ' / ' + dias.length;
+      vorige.disabled = i === 0;
+      volgende.disabled = i === dias.length - 1;
+    };
+    const ga = (stap) => rail.scrollTo({left: (nu() + stap) * rail.clientWidth});
+    vorige.addEventListener('click', () => ga(-1));
+    volgende.addEventListener('click', () => ga(1));
+    rail.addEventListener('scroll', () => requestAnimationFrame(toon), {passive: true});
+    toon();
+  });
+
   /* ---- het kaartje ---------------------------------------------------------
      Scrollen met het wieltje zoomt niet, anders blijft wie de pagina afschuift
      in de kaart hangen. Op de gsm schuift de kaart ook niet mee met een vinger,

@@ -15,6 +15,9 @@ def main():
             for suffix in ('.avif', '-klein.avif'):
                 if not Path('site/fotos', row['foto'] + suffix).is_file():
                     raise SystemExit(f"STOP: fotobestand ontbreekt voor {row['n']}.")
+        for extra in row.get('fotos', []):
+            if not Path('site/fotos', extra['f'] + '.avif').is_file():
+                raise SystemExit(f"STOP: carrouselfoto ontbreekt voor {row['n']}.")
     # Elke zaak heeft een eigen pagina en een deelkaartje, en elke url is uniek.
     urls = [row.get('u') for row in data]
     if not all(urls):
