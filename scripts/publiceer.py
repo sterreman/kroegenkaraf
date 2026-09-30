@@ -51,7 +51,8 @@ def sociaal(v, host):
 
 
 VOOR = ('cafe', 'cafee', 'eetcafe', 'eetkafee', 'kafee', 'taverne', 'herberg',
-        'bistro', 'brasserie', 'de', 'den', 'het', 't', 'in', 'bij', 'oud', 'oude')
+        'bistro', 'brasserie', 'de', 'den', 'het', 't', 'in', 'bij', 'oud', 'oude',
+        'the', 'le', 'la', 'les', 'l')
 
 
 def kern(naam):
@@ -63,20 +64,29 @@ def kern(naam):
 
 def zoek_rij(fslug, rijen):
     """Welke zaak hoort bij dit fotobestand. Een bestandsnaam mag maar een
-    plaatsnaam bevatten, anders blijft de foto liggen."""
-    kand = [r for r in rijen
-            if slug(r['Naam']) in fslug
-            or (len(kern(r['Naam'])) >= 4 and kern(r['Naam']) in fslug)]
+    plaatsnaam bevatten, anders blijft de foto liggen.
+
+    Wat na de naam van de zaak overblijft in de bestandsnaam, moet leeg zijn of
+    de (deel)gemeente van die zaak bevatten. Zo belandt SevenOaksLeuven.png niet
+    bij Cafe 't Seven in Veldegem omdat "seven" toevallig in de bestandsnaam zit."""
+    def plaatsen(r):
+        return [slug(x) for x in re.split(r'[()]', r['Gemeente']) if len(slug(x)) >= 4]
+
+    def past(r):
+        for stuk in (slug(r['Naam']), kern(r['Naam']) if len(kern(r['Naam'])) >= 4 else ''):
+            if stuk and stuk in fslug:
+                rest = re.sub(r'\d+$', '', fslug.replace(stuk, '', 1))
+                if not rest or any(p in rest for p in plaatsen(r)):
+                    return True
+        return False
+
+    kand = [r for r in rijen if past(r)]
     if len(kand) <= 1:
         return (kand[0] if kand else None), kand
     exact = [r for r in kand if slug(r['Naam']) == fslug]
     if len(exact) == 1:
         return exact[0], kand
-    op_plaats = []
-    for r in kand:
-        delen = [slug(x) for x in re.split(r'[()]', r['Gemeente']) if slug(x)]
-        if any(len(d) >= 4 and d in fslug for d in delen):
-            op_plaats.append(r)
+    op_plaats = [r for r in kand if any(p in fslug for p in plaatsen(r))]
     return (op_plaats[0] if len(op_plaats) == 1 else None), kand
 
 
