@@ -152,10 +152,35 @@ function koppelFilters() {
   });
 }
 
+/* De zoekopdracht en de filters in de url, zodat een link deelbaar is en de lijst
+   en de kaart dezelfde selectie tonen: ?q=haacht&p=Antwerpen&t=Volkscafé&tag=Terras.
+   De standaardstatus (zonder gesloten zaken) komt er niet in. */
+function leesStaat(zoek) {
+  const u = new URLSearchParams(zoek === undefined ? location.search : zoek);
+  const q = u.get('q') || '';
+  f.q = norm(q);
+  f.p = u.get('p') || '';
+  f.t = u.get('t') || '';
+  f.s = u.has('s') ? (u.get('s') === 'alles' ? '' : u.get('s')) : '_open';
+  f.tags = u.getAll('tag').filter(Boolean);
+  return q;
+}
+function staatQuery(ruweQ) {
+  const u = new URLSearchParams();
+  if ((ruweQ || '').trim()) u.set('q', ruweQ.trim());
+  if (f.p) u.set('p', f.p);
+  if (f.t) u.set('t', f.t);
+  if (f.s !== '_open') u.set('s', f.s || 'alles');
+  f.tags.forEach(tag => u.append('tag', tag));
+  const s = u.toString();
+  return s ? '?' + s : '';
+}
+
 /* Een gedeelde json voor beide pagina's, zodat de browser ze maar een keer haalt.
    De zoeksleutel wordt hier gezet en niet in het bouwscript: dat scheelt bijna
-   een derde van het bestand. */
-function laadData(dan) {
+   een derde van het bestand. Op de kaart hangen de oude filterchips; de lijst
+   heeft haar eigen filterbalk in gids.js. */
+function laadData(dan, fout) {
   fetch('data/zaken.json')
     .then(r => { if (!r.ok) throw new Error(r.status + ' ' + r.statusText); return r.json(); })
     .then(rijen => {
@@ -176,12 +201,13 @@ function laadData(dan) {
         d._i = i;
         if (!PROV_ORDER.includes(d.p)) PROV_ORDER.push(d.p);
       });
-      koppelFilters();
+      if (document.getElementById('f-p')) koppelFilters();
       dan();
     })
     .catch(err => {
-      document.getElementById('laadfout').hidden = false;
       console.error('zaken.json kwam niet binnen:', err);
+      if (fout) fout(err);
+      else document.getElementById('laadfout').hidden = false;
     });
 }
 

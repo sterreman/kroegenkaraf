@@ -202,8 +202,18 @@ laadData(() => {
     (open.length - zonder) + ' zaken met een adres op de kaart · '
     + zonder + ' wachten nog op coördinaten · gesloten zaken staan alleen in de '
     + 'lijst · bijgewerkt ' + BIJGEWERKT;
+  /* Komt de bezoeker van de lijst, dan neemt de kaart dezelfde zoekopdracht en
+     filters over. Gesloten zaken staan niet op de kaart, dus een statusfilter die
+     alleen gesloten zaken toont valt hier terug op de standaard. */
+  document.getElementById('q').value = leesStaat();
+  if (!['_open', 'Geverifieerd', 'Te checken'].includes(f.s)) f.s = '_open';
+  const terug = document.getElementById('naarlijst');
+  const bijwerken = () => {
+    if (terug) terug.href = 'index.html' + staatQuery(document.getElementById('q').value);
+  };
   renderChips();
   teken();
+  bijwerken();
   naarAnker();
-  opnieuw = teken;
+  opnieuw = () => { teken(); bijwerken(); };
 });
