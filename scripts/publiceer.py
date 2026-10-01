@@ -68,19 +68,42 @@ def zoek_rij(fslug, rijen):
 
     Wat na de naam van de zaak overblijft in de bestandsnaam, moet leeg zijn of
     de (deel)gemeente van die zaak bevatten. Zo belandt SevenOaksLeuven.png niet
-    bij Cafe 't Seven in Veldegem omdat "seven" toevallig in de bestandsnaam zit."""
+    bij Cafe 't Seven in Veldegem omdat "seven" toevallig in de bestandsnaam zit.
+
+    Een naam tussen haakjes telt ook als naam: PerSempreHaacht.webp hoort bij
+    De Ton (Per Sempre). Past er dan nog niets, dan mag de bestandsnaam het
+    begin van de naam zijn, op voorwaarde dat de plaats erin staat en er in die
+    plaats maar een zaak zo begint: ViaViaMechelen.webp hoort bij ViaVia Joker
+    Reiscafe in Mechelen."""
     def plaatsen(r):
         return [slug(x) for x in re.split(r'[()]', r['Gemeente']) if len(slug(x)) >= 4]
 
+    def namen(r):
+        naam = r['Naam']
+        zonder = re.sub(r'\([^)]*\)', ' ', naam).strip()
+        stukken = [slug(naam), kern(naam), slug(zonder), kern(zonder)]
+        stukken += [slug(x) for x in re.findall(r'\(([^)]*)\)', naam)]
+        return [s for s in dict.fromkeys(stukken) if len(s) >= 4 or s == slug(naam)]
+
     def past(r):
-        for stuk in (slug(r['Naam']), kern(r['Naam']) if len(kern(r['Naam'])) >= 4 else ''):
+        for stuk in namen(r):
             if stuk and stuk in fslug:
                 rest = re.sub(r'\d+$', '', fslug.replace(stuk, '', 1))
                 if not rest or any(p in rest for p in plaatsen(r)):
                     return True
         return False
 
+    def begint(r):
+        for p in plaatsen(r):
+            if p in fslug:
+                rest = re.sub(r'\d+$', '', fslug.replace(p, '', 1))
+                if len(rest) >= 5 and any(s.startswith(rest) for s in namen(r)):
+                    return True
+        return False
+
     kand = [r for r in rijen if past(r)]
+    if not kand:
+        kand = [r for r in rijen if begint(r)]
     if len(kand) <= 1:
         return (kand[0] if kand else None), kand
     exact = [r for r in kand if slug(r['Naam']) == fslug]
