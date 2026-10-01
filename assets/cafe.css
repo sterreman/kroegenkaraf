@@ -215,3 +215,25 @@ h2::before{content:"";width:34px;height:5px;background:var(--roest)}
   .voet .wrap{flex-direction:column}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ---- tekstpagina (privacy): een smalle leeskolom op papier ---- */
+.tekstpagina .kop{padding:clamp(28px,5vw,56px) 0 clamp(24px,4vw,40px)}
+.tekstpagina .kop h1{margin:0;font-family:var(--kop);font-weight:800;font-stretch:70%;
+ font-size:clamp(40px,7vw,72px);line-height:.95;text-transform:uppercase;letter-spacing:.005em}
+.tekstpagina .kop .bij{margin:14px 0 0;font-family:var(--kop);font-stretch:90%;font-size:14px;color:var(--creme2)}
+.taalwissel{display:flex;gap:16px;margin:18px 0 0;font-family:var(--kop);font-stretch:90%;
+ font-weight:600;font-size:15px}
+.taalwissel a{color:var(--roest-licht);text-underline-offset:4px}
+.leeskolom{max-width:42em;padding-top:clamp(28px,4vw,48px)}
+.leeskolom h2{margin:40px 0 10px;font-size:26px}
+.leeskolom section:first-child h2{margin-top:0}
+.leeskolom p,.leeskolom li{color:var(--inkt2)}
+.leeskolom p{margin:0 0 14px}
+.leeskolom ul{margin:0 0 14px;padding-left:1.2em}
+.leeskolom li{margin:0 0 6px}
+.leeskolom strong{color:var(--inkt)}
+.leeskolom a{color:var(--roest-tekst);text-underline-offset:3px}
+.taalblok + .taalblok{margin-top:clamp(48px,7vw,80px);padding-top:clamp(32px,5vw,56px);
+ border-top:2px solid var(--marine)}
+.taalblok > h1{margin:0 0 24px;font-family:var(--kop);font-weight:800;font-stretch:70%;
+ font-size:clamp(30px,5vw,44px);line-height:1;text-transform:uppercase}

@@ -28,7 +28,7 @@ def main():
         for name in ('index.html', 'deel.jpg'):
             if not Path('site', row['u'], name).is_file():
                 raise SystemExit(f"STOP: {name} ontbreekt voor {row['n']} ({row['u']}).")
-    for name in ('sitemap.xml', 'robots.txt', 'data/slugs.json', 'assets/cafe.css', 'assets/cafe.js'):
+    for name in ('privacy.html', 'assets/fonts/fonts.css', 'sitemap.xml', 'robots.txt', 'data/slugs.json', 'assets/cafe.css', 'assets/cafe.js'):
         if not Path('site', name).is_file():
             raise SystemExit(f'STOP: {name} ontbreekt.')
     print(f'{len(urls)} cafepaginas aanwezig.')

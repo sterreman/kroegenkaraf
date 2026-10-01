@@ -449,9 +449,6 @@ MAX_FOTOS = 5        # zoveel foto's toont een pagina hoogstens
 
 KORT_VERHAAL = 480   # tot zoveel tekens blijft de hele beschrijving bovenaan
 
-FONTS_URL = ('https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..100,500..800'
-             '&family=Petrona:ital,wght@0,400..600;1,400&display=swap')
-
 
 def status_blok(d):
     if d.get('s') == 'Geverifieerd':
@@ -752,9 +749,7 @@ def pagina(d, buren):
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="{FONTS_URL.replace('&', '&amp;')}">
+<link rel="stylesheet" href="/assets/fonts/fonts.css">
 {leaflet}<link rel="stylesheet" href="/assets/cafe.css?v={VERSIE}">
 {json_ld(d, url, beeld)}</head>
 <body class="cafepagina">
@@ -791,7 +786,7 @@ def pagina(d, buren):
 
 <footer class="voet">
  <div class="wrap">
-  <nav aria-label="Onderaan"><a href="/">Alle zaken</a><a href="/kaart.html">Kaart</a></nav>
+  <nav aria-label="Onderaan"><a href="/">Alle zaken</a><a href="/kaart.html">Kaart</a><a href="/privacy.html">Privacy</a></nav>
   <p>Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</p>
  </div>
 </footer>
