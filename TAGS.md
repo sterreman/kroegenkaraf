@@ -19,6 +19,7 @@ verwijdert alle geselecteerde tags en herstelt de bestaande standaardfilters.
 
 De bouw stopt bij een onbekende categorie of tag.
 `Wielercafé` (koers- en supportersband) en `Wandelcafé` (vaste stop voor wandelaars)
-kwamen er op 1 oktober 2026 bewust bij. Een nieuwe tag kan bewust aan
+kwamen er op 1 oktober 2026 bewust bij, net als `Kicker` (er staat een kickerkast,
+naast `Darts`, `Biljart` en `Pool`). Een nieuwe tag kan bewust aan
 de toegestane lijst worden toegevoegd als geen bestaande tag volstaat en het
 kenmerk nuttig is voor filtering. Maak geen nieuwe categorieën aan.

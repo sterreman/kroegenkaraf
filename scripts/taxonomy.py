@@ -2,7 +2,7 @@
 CATEGORIES = ('Volkscafé', 'Bruin café', 'Biercafé', 'Eetcafé', 'Muziekcafé',
               'Sportcafé', 'Dans- & feestcafé', 'Stadscafé / Grand Café', 'Cocktail- & wijnbar')
 TAGS = ('Terras|Groot terras|Verwarmd terras|Live muziek|DJ|Jazz|Rock|Dansen|Feestcafé|'
-        'Darts|Biljart|Pool|Kaarten|Sport op tv|Supporterscafé|Speciaalbier|Belgische bieren|'
+        'Darts|Biljart|Pool|Kicker|Kaarten|Sport op tv|Supporterscafé|Speciaalbier|Belgische bieren|'
         'Grote bierkaart|Trappist|Brouwerijcafé|Cocktails|Wijn|Natuurwijn|Aperitief|Sterke drank|'
         'Eten|Kleine kaart|Lunch|Brunch|Snacks|Historisch|Authentiek interieur|Erfgoed|Dorpscafé|'
         'Buurtcafé|Stamcafé|Studentencafé|Fietscafé|Wielercafé|Wandelcafé|Motorrijders|Gezinsvriendelijk|Honden welkom|'
