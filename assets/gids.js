@@ -34,6 +34,7 @@ function rij(d) {
 }
 
 function render() {
+  tekenOntdek();
   const res = selectie();
   const dicht = geslotenTreffers();
   const zoek = ruweQ.trim();
@@ -111,6 +112,68 @@ function naarAnker() {
   setTimeout(() => el.classList.remove('gevonden'), 2600);
 }
 addEventListener('hashchange', naarAnker);
+
+/* ---- ontdekken ----------------------------------------------------------- */
+
+/* Drie zaken om te ontdekken, boven de lijst zolang er niet gezocht of gefilterd
+   wordt. De keuze komt uit assets/ontdek.json, een lijst ID's uit de CSV; alles
+   wat getoond wordt, staat al in zaken.json. Elke week schuift de selectie op,
+   met telkens drie verschillende provincies. */
+let ONTDEK = [];
+
+function eersteZin(info) {
+  const t = (info || '').split(/\r?\n/)[0].trim();
+  const m = t.match(/^(.+?[a-zà-ÿ0-9)]{2}[.!?])\s+[A-ZÀ-Ý'‘]/);
+  let zin = (m ? m[1] : t).trim();
+  if (zin.length > 160) zin = zin.slice(0, 160).replace(/\s+\S*$/, '').replace(/[,;:.]$/, '') + '…';
+  return zin;
+}
+
+function weekNummer(d) {
+  const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  t.setUTCDate(t.getUTCDate() + 4 - (t.getUTCDay() || 7));
+  return t.getUTCFullYear() * 53 + Math.ceil(((t - Date.UTC(t.getUTCFullYear(), 0, 1)) / 864e5 + 1) / 7);
+}
+
+function kiesOntdek() {
+  const perId = new Map(DATA.map(d => [d.id, d]));
+  const pool = ONTDEK.map(id => perId.get(id))
+    .filter(d => d && d.s === 'Geverifieerd' && d.u && d.i);
+  if (pool.length < 3) return [];
+  const start = (weekNummer(new Date()) * 3) % pool.length;
+  const keuze = [], provincies = new Set();
+  for (let k = 0; k < pool.length && keuze.length < 3; k++) {
+    const d = pool[(start + k) % pool.length];
+    if (provincies.has(d.p)) continue;
+    provincies.add(d.p);
+    keuze.push(d);
+  }
+  return keuze;
+}
+
+function tekenOntdek() {
+  const blok = $('ontdek');
+  const keuze = (f.q || filtersActief()) ? [] : kiesOntdek();
+  blok.hidden = !keuze.length;
+  if (!keuze.length || blok.dataset.klaar) return;
+  blok.dataset.klaar = '1';
+  $('ontdeklijst').innerHTML = keuze.map(d =>
+    `<li class="ontdekzaak${d.foto ? ' metfoto' : ''}"><a href="/${esc(d.u)}/">`
+    + (d.foto ? `<img src="fotos/${esc(d.foto)}-klein.avif" alt="" width="64" height="64" loading="lazy" decoding="async">` : '')
+    + `<span class="osoort">${esc(d.t || 'Café')}</span>`
+    + `<span class="onaam">${esc(d.n)}</span>`
+    + `<span class="oplaats">${esc(d.g || d.p)}</span>`
+    + `<span class="oreden">${esc(eersteZin(d.i))}</span>`
+    + `<span class="olink">Naar de zaak</span></a></li>`).join('');
+}
+
+function laadOntdek() {
+  fetch('assets/ontdek.json')
+    .then(r => r.ok ? r.json() : {ids: []})
+    .then(j => { ONTDEK = Array.isArray(j.ids) ? j.ids : []; if (geladen) tekenOntdek(); })
+    .catch(() => {});
+}
+laadOntdek();
 
 /* ---- laden ----------------------------------------------------------------- */
 

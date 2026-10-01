@@ -244,18 +244,50 @@ def nieuw_register(data, weg):
     return {'schema': 1, 'zaken': [item(d) for d in data], 'weg': weg}
 
 
+def zelfde_naam(a, b):
+    """Is de ene naam een variant van de andere? 'Sfeercafé De Punt' en 'De Punt',
+    'Eetkaffee 't Smiske' en ''t Smiske', 'Den Engel' en 'Den Enghel',
+    'Brouwershof (De Snoek)' en 'Het Mout- & Brouwhuis De Snoek'."""
+    def vormen(n):
+        n = n or ''
+        stukken = [n, re.sub(r'\([^)]*\)', ' ', n)] + re.findall(r'\(([^)]*)\)', n)
+        return {kern(s) for s in stukken if len(kern(s)) >= 4}
+    return any(_lijkt(x, y) for x in vormen(a) for y in vormen(b))
+
+
+def _lijkt(ka, kb):
+    if ka in kb or kb in ka:
+        return True
+    # een letter verschil in een naam van minstens vijf tekens
+    if abs(len(ka) - len(kb)) <= 1 and min(len(ka), len(kb)) >= 5:
+        kort, lang = sorted((ka, kb), key=len)
+        fouten = sum(1 for i in range(len(kort)) if kort[i] != lang[i])
+        if len(kort) == len(lang):
+            return fouten <= 1
+        return any(lang[:i] + lang[i + 1:] == kort for i in range(len(lang)))
+    return False
+
+
 def doorverwijzingen(data, weg):
     """Oude url's van verdwenen zaken: naar de zaak op dezelfde plek, anders naar
-    de lijst gefilterd op de gemeente."""
+    de lijst gefilterd op de gemeente.
+
+    Dezelfde plek is binnen 15 meter, of binnen 150 meter als de naam een
+    variant is (twee vermeldingen van een zaak die samengevoegd werden, met
+    coordinaten uit verschillende bronnen)."""
     regels = []
     for x in weg:
         doel = None
         if 'lat' in x:
-            dichtst = min((d for d in data if 'lat' in d),
-                          key=lambda d: km((x['lat'], x['lon']), (d['lat'], d['lon'])),
-                          default=None)
-            if dichtst and km((x['lat'], x['lon']), (dichtst['lat'], dichtst['lon'])) < .015:   # zelfde adres, niet de buren
-                doel = f'/{dichtst["u"]}/'
+            kand = sorted(((km((x['lat'], x['lon']), (d['lat'], d['lon'])), d)
+                           for d in data if 'lat' in d
+                           and abs(d['lat'] - x['lat']) < .01 and abs(d['lon'] - x['lon']) < .01),
+                          key=lambda t: t[0])
+            naamgenoot = [d for a, d in kand if a < .15 and zelfde_naam(x.get('n'), d['n'])]
+            if naamgenoot:
+                doel = f'/{naamgenoot[0]["u"]}/'
+            elif kand and kand[0][0] < .015:   # zelfde adres, niet de buren
+                doel = f'/{kand[0][1]["u"]}/'
         if not doel:
             doel = '/?q=' + urllib.parse.quote(plaats(x.get('g')) or '')
         regels.append(f'/{x["u"]}/ {doel} 301')

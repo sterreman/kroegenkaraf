@@ -1,0 +1,12 @@
+{
+  "_uitleg": "Pool voor het blok Ontdek deze cafés op de homepage. Alleen ID's uit de CSV; naam, plaats, foto en de reden (de eerste zin van Info) komen uit zaken.json. De homepage kiest er elke week drie uit, uit drie verschillende provincies, en slaat zaken over die niet (meer) online gecontroleerd zijn. Een ID toevoegen of schrappen volstaat.",
+  "ids": [
+    "KK00003", "KK00138", "KK00446",
+    "KK00720", "KK00746",
+    "KK01454", "KK01448",
+    "KK02298", "KK02671",
+    "KK01865", "KK01864",
+    "KK00965", "KK00915",
+    "KK00822", "KK01108", "KK01128"
+  ]
+}

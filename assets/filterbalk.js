@@ -20,6 +20,18 @@ const STATUS_ALLE = [
 ];
 const STATUS_CHIP = {'Geverifieerd': 'Online gecontroleerd', 'Te checken': 'Status te bevestigen',
   '': 'Ook gesloten zaken', 'Gesloten': 'Alleen gesloten zaken'};
+/* De kenmerken uit scripts/taxonomy.py, per thema voor het paneel Meer filters. */
+const TAGGROEPEN = [
+  ['Buiten', ['Terras', 'Groot terras', 'Verwarmd terras', 'Café met tuin', 'Aan het water', 'Uitzicht', 'Zomerbar']],
+  ['Drinken', ['Speciaalbier', 'Grote bierkaart', 'Belgische bieren', 'Trappist', 'Brouwerijcafé', 'Cocktails',
+    'Wijn', 'Natuurwijn', 'Aperitief', 'Sterke drank', 'Koffie']],
+  ['Eten', ['Eten', 'Snacks', 'Kleine kaart', 'Lunch', 'Ontbijt', 'Brunch']],
+  ['Spelen en sport', ['Biljart', 'Darts', 'Kicker', 'Pool', 'Kaarten', 'Sport op tv', 'Supporterscafé', 'Wielercafé']],
+  ['Muziek en uitgaan', ['Live muziek', 'DJ', 'Rock', 'Jazz', 'Dansen', 'Feestcafé', 'Late night']],
+  ['Karakter', ['Dorpscafé', 'Buurtcafé', 'Gezellig', 'Historisch', 'Erfgoed', 'Authentiek interieur', 'Stamcafé',
+    'Studentencafé', 'Rustig', 'Trendy', 'Alternatief', 'Speakeasy', 'Date night']],
+  ['Voor wie', ['Fietscafé', 'Wandelcafé', 'Gezinsvriendelijk', 'Honden welkom', 'Motorrijders']]
+];
 const soortLabel = t => t === '_geen' ? 'Soort nog te bepalen' : t;
 const telwoord = n => n === 1 ? '1 zaak' : n.toLocaleString('nl-BE') + ' zaken';
 
@@ -70,13 +82,26 @@ function tekenPaneel(id) {
       + (zonder ? keuze('t', '_geen', 'Soort nog te bepalen', telMet({t: '_geen'})) : '');
   } else if (id === 'paneel-meer') {
     $('f-status').innerHTML = FB.statussen.map(([v, l]) => keuze('s', v, l, telMet({s: v}))).join('');
-    const tags = [...new Set(basis.flatMap(d => d.tags))].sort((a, b) => a.localeCompare(b, 'nl'));
-    $('f-tags').innerHTML = tags.map(tag => {
+    /* Kenmerken per thema, in een vaste volgorde; binnen een groep staat het
+       meest vastgelegde kenmerk bovenaan. Een kenmerk dat in geen enkele groep
+       staat, komt onder Overige, zodat een nieuwe tag nooit verdwijnt. */
+    const aantal = {};
+    basis.forEach(d => d.tags.forEach(t => { aantal[t] = (aantal[t] || 0) + 1; }));
+    const bekend = new Set(TAGGROEPEN.flatMap(([, ts]) => ts));
+    const overige = Object.keys(aantal).filter(t => !bekend.has(t));
+    const groepen = [...TAGGROEPEN, ['Overige', overige]]
+      .map(([naam, ts]) => [naam, ts.filter(t => aantal[t] || f.tags.includes(t))
+        .sort((a, b) => (aantal[b] || 0) - (aantal[a] || 0) || a.localeCompare(b, 'nl'))])
+      .filter(([, ts]) => ts.length);
+    const tagLabel = tag => {
       const aan = f.tags.includes(tag);
       const n = aan ? telMet({}) : telMet({tags: [...f.tags, tag]});
       return `<label class="tag${n === 0 && !aan ? ' leeg' : ''}"><input type="checkbox" value="${esc(tag)}"`
         + `${aan ? ' checked' : ''}><span>${esc(tag)}</span><span class="n">${n.toLocaleString('nl-BE')}</span></label>`;
-    }).join('');
+    };
+    $('f-tags').innerHTML = groepen.map(([naam, ts]) =>
+      `<div class="taggroep" role="group" aria-label="${esc(naam)}"><h3>${esc(naam)}</h3>`
+      + `<div class="taggroepkeuzes">${ts.map(tagLabel).join('')}</div></div>`).join('');
   }
   const n = selectie().length;
   document.querySelectorAll('#' + id + ' .toon-n').forEach(el => { el.textContent = telwoord(n); });

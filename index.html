@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..100,500..800&amp;family=Petrona:ital,wght@0,400..600;1,400&amp;display=swap">
-<link rel="stylesheet" href="assets/lijst.css?v=fijn-20260930">
+<link rel="stylesheet" href="assets/lijst.css?v=ontdek-20261001">
 </head>
 <body class="lijstpagina">
 <a class="naarinhoud" href="#resultaten">Naar de resultaten</a>
@@ -78,7 +78,7 @@
     </fieldset>
     <fieldset class="groep">
      <legend>Kenmerken</legend>
-     <p class="groephulp" id="tags-help">Een zaak moet alle gekozen kenmerken hebben. Ontbreekt een kenmerk, dan is het nog niet vastgelegd.</p>
+     <p class="groephulp" id="tags-help">Kies je meer kenmerken, dan zie je alleen zaken die ze allemaal hebben. Een kenmerk staat er pas bij als een bron het vermeldt: ontbreekt het, dan is het nog niet vastgelegd, niet afwezig.</p>
      <div class="tagkeuzes" id="f-tags" aria-describedby="tags-help"></div>
     </fieldset>
    </div>
@@ -89,6 +89,11 @@
 <div class="scherm" id="scherm" hidden></div>
 
 <main class="wrap" id="resultaten" tabindex="-1">
+ <section class="ontdek" id="ontdek" aria-labelledby="ontdekkop" hidden>
+  <h2 id="ontdekkop">Ontdek deze cafés</h2>
+  <ol class="ontdeklijst" id="ontdeklijst"></ol>
+  <p class="ontdekvoet">Een wisselende greep uit zaken die online gecontroleerd zijn. Kijk voor je vertrekt even na of ze open zijn.</p>
+ </section>
  <div class="resultaatkop">
   <p class="aantal" id="aantal" role="status">Zaken laden…</p>
   <nav class="weergave" aria-label="Weergave">
@@ -109,8 +114,8 @@
 </footer>
 
 <script>const BIJGEWERKT = "11 september 2026";</script>
-<script src="assets/gemeen.js?v=fijn-20260930"></script>
-<script src="assets/filterbalk.js?v=fijn-20260930"></script>
-<script src="assets/gids.js?v=fijn-20260930"></script>
+<script src="assets/gemeen.js?v=ontdek-20261001"></script>
+<script src="assets/filterbalk.js?v=ontdek-20261001"></script>
+<script src="assets/gids.js?v=ontdek-20261001"></script>
 </body>
 </html>

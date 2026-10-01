@@ -123,6 +123,39 @@ button{font:inherit;color:inherit}
 .uitleg p{margin:10px 0 0;line-height:1.5}
 .scherm{position:fixed;inset:0;z-index:30;background:rgba(19,39,56,.35)}
 
+/* ---- ontdekken: drie zaken boven de lijst, alleen zonder zoekopdracht of filter ---- */
+.ontdek{margin:4px 0 26px;padding-bottom:14px;border-bottom:2px solid var(--inkt)}
+.ontdek h2{margin:0 0 4px;font-family:var(--kop);font-weight:800;font-stretch:70%;font-size:28px;line-height:1.05}
+.ontdeklijst{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+ border-top:1px solid var(--lijn)}
+.ontdekzaak+.ontdekzaak{border-left:1px solid var(--lijn)}
+.ontdekzaak a{display:flex;flex-direction:column;height:100%;padding:14px 18px 14px 0;text-decoration:none;color:inherit}
+.ontdekzaak+.ontdekzaak a{padding-left:18px}
+.ontdekzaak img{float:right;width:64px;height:64px;object-fit:cover;margin:0 0 6px 12px;
+ background:var(--papier2);order:-1;align-self:flex-end}
+.ontdekzaak.metfoto a{display:block}
+.osoort{display:block;font-family:var(--kop);font-weight:700;font-stretch:85%;font-size:12.5px;
+ letter-spacing:.1em;text-transform:uppercase;color:var(--roest-tekst)}
+.onaam{display:block;margin-top:2px;font-family:var(--kop);font-weight:800;font-stretch:72%;font-size:25px;
+ line-height:1.02;overflow-wrap:break-word}
+.oplaats{display:block;margin-top:3px;font-size:15.5px;color:var(--inkt2)}
+.oreden{display:block;clear:both;margin-top:8px;font-size:16px;line-height:1.42}
+.olink{display:inline-block;margin-top:auto;padding-top:8px;font-family:var(--kop);font-stretch:90%;
+ font-weight:700;font-size:15px;color:var(--roest-tekst);text-decoration:underline;text-underline-offset:4px}
+.ontdekzaak.metfoto .olink{display:block;margin-top:0}
+.ontdekzaak a:hover .onaam{color:var(--roest-tekst);text-decoration:underline;text-decoration-thickness:1.5px;
+ text-underline-offset:4px}
+.ontdekzaak a:hover{background:var(--papier2)}
+.ontdekzaak a:focus-visible{outline:2px solid var(--inkt);outline-offset:-2px;background:var(--papier2)}
+.ontdekvoet{margin:10px 0 0;font-family:var(--kop);font-stretch:92%;font-size:14px;color:var(--inkt3)}
+
+/* ---- kenmerken in groepen ---- */
+.tagkeuzes{columns:auto}
+.taggroep{break-inside:avoid;margin-bottom:14px}
+.taggroep h3{margin:6px 0 2px;font-family:var(--kop);font-weight:700;font-stretch:85%;font-size:12.5px;
+ letter-spacing:.1em;text-transform:uppercase;color:var(--roest-tekst)}
+.taggroepkeuzes{columns:3 170px;column-gap:24px}
+
 /* ---- resultaten ---- */
 #resultaten{padding-top:20px;padding-bottom:10px;min-height:60vh}
 #resultaten:focus{outline:none}
@@ -219,7 +252,19 @@ a.rij:focus-visible{outline:2px solid var(--inkt);outline-offset:-2px;background
   .toon{flex:1}
   .meerraster{grid-template-columns:1fr;gap:22px}
   .keuzes{grid-template-columns:1fr}
-  .tagkeuzes{columns:2;column-gap:14px}
+  .tagkeuzes{columns:auto}
+  .taggroepkeuzes{columns:2;column-gap:14px}
+  .ontdek{margin-bottom:20px;padding-bottom:10px}
+  .ontdek h2{font-size:24px}
+  .ontdeklijst{grid-template-columns:1fr}
+  .ontdekzaak+.ontdekzaak{border-left:0;border-top:1px solid var(--lijn)}
+  .ontdekzaak a,.ontdekzaak+.ontdekzaak a{padding:10px 2px}
+  .onaam{font-size:22px}
+  .oplaats{font-size:15px;margin-top:1px}
+  .oreden{font-size:15.5px;line-height:1.38;margin-top:4px;display:-webkit-box;-webkit-box-orient:vertical;
+   -webkit-line-clamp:2;line-clamp:2;overflow:hidden}
+  .olink{padding-top:4px;font-size:14.5px}
+  .ontdekvoet{font-size:13px}
   body.paneel-open{overflow:hidden}
   .resultaatkop{flex-wrap:nowrap}
   .aantal{font-size:15.5px}

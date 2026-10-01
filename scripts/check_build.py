@@ -32,6 +32,21 @@ def main():
         if not Path('site', name).is_file():
             raise SystemExit(f'STOP: {name} ontbreekt.')
     print(f'{len(urls)} cafepaginas aanwezig.')
+    # Het blok Ontdek deze cafés: verwijst alleen naar ID's uit de CSV.
+    pool = json.loads(Path('site/assets/ontdek.json').read_text(encoding='utf-8')).get('ids', [])
+    per_id = {row.get('id'): row for row in data if row.get('id')}
+    bruikbaar = 0
+    for i in pool:
+        row = per_id.get(i)
+        if row is None:
+            print(f'  LET OP: ontdek.json noemt {i}, maar die zaak staat niet (meer) in de lijst.')
+        elif row.get('s') != 'Geverifieerd' or not row.get('i'):
+            print(f'  LET OP: ontdek.json noemt {i} ({row["n"]}), maar die is niet online gecontroleerd '
+                  'of heeft geen beschrijving; de homepage slaat ze over.')
+        else:
+            bruikbaar += 1
+    if bruikbaar < 3:
+        print(f'  LET OP: maar {bruikbaar} bruikbare zaken voor Ontdek deze cafés; het blok blijft verborgen.')
     for name in ('index.html', 'kaart.html'):
         page = Path('site', name).read_text(encoding='utf-8')
         if '__DATUM__' in page or '__AANTAL__' in page:
