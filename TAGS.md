@@ -17,6 +17,8 @@ De lijst en kaart vereisen alle geselecteerde tags (EN). Tags worden ook in de
 vrije zoektekst meegenomen en bij een geopende zaak getoond. `Alles wissen`
 verwijdert alle geselecteerde tags en herstelt de bestaande standaardfilters.
 
-De bouw stopt bij een onbekende categorie of tag. Een nieuwe tag kan bewust aan
+De bouw stopt bij een onbekende categorie of tag.
+`Wielercafé` (koers- en supportersband) en `Wandelcafé` (vaste stop voor wandelaars)
+kwamen er op 1 oktober 2026 bewust bij. Een nieuwe tag kan bewust aan
 de toegestane lijst worden toegevoegd als geen bestaande tag volstaat en het
 kenmerk nuttig is voor filtering. Maak geen nieuwe categorieën aan.
