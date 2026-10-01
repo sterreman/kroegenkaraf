@@ -2,7 +2,9 @@
 import hashlib
 import json
 import os
+import time
 from pathlib import Path
+import requests
 from google.oauth2 import service_account
 from google.auth.transport.requests import AuthorizedSession
 
@@ -15,21 +17,48 @@ def main():
     base = 'https://www.googleapis.com/drive/v3/files'
     fields = 'id,name,size,md5Checksum,mimeType,modifiedTime'
 
+    retry_status = {429, 500, 502, 503, 504}
+    max_tries = 5
+
+    def wait(attempt, what):
+        delay = min(2 ** attempt, 30)
+        print(f"Drive API tijdelijke fout ({what}), poging {attempt + 1}/{max_tries} binnen {delay}s")
+        time.sleep(delay)
+
     def get(url, **kwargs):
-        r = session.get(url, timeout=120, **kwargs)
-        r.raise_for_status()
-        return r
+        for attempt in range(1, max_tries + 1):
+            try:
+                r = session.get(url, timeout=120, **kwargs)
+            except (requests.ConnectionError, requests.Timeout) as e:
+                if attempt == max_tries:
+                    raise
+                wait(attempt, type(e).__name__)
+                continue
+            if r.status_code in retry_status and attempt < max_tries:
+                r.close()
+                wait(attempt, r.status_code)
+                continue
+            r.raise_for_status()
+            return r
 
     def download(meta, path):
         if 'size' not in meta or meta['mimeType'].startswith('application/vnd.google-apps.'):
             raise RuntimeError(f"Geen gewoon bestand: {meta['name']}")
         path.parent.mkdir(parents=True, exist_ok=True)
-        digest = hashlib.md5()
-        with get(f"{base}/{meta['id']}", params={'alt':'media'}, stream=True) as response:
-            with path.open('wb') as out:
-                for chunk in response.iter_content(1024 * 1024):
-                    out.write(chunk)
-                    digest.update(chunk)
+        for attempt in range(1, max_tries + 1):
+            digest = hashlib.md5()
+            try:
+                with get(f"{base}/{meta['id']}", params={'alt':'media'}, stream=True) as response:
+                    with path.open('wb') as out:
+                        for chunk in response.iter_content(1024 * 1024):
+                            out.write(chunk)
+                            digest.update(chunk)
+                break
+            except (requests.ConnectionError, requests.Timeout,
+                    requests.exceptions.ChunkedEncodingError) as e:
+                if attempt == max_tries:
+                    raise
+                wait(attempt, f"onderbroken download {meta['name']}: {type(e).__name__}")
         if path.stat().st_size != int(meta['size']):
             raise RuntimeError(f"Bytegrootte wijkt af: {meta['name']}")
         if meta.get('md5Checksum') and digest.hexdigest() != meta['md5Checksum']:
