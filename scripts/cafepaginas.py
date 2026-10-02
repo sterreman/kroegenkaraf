@@ -829,7 +829,7 @@ def main():
         json.dump(data, fp, ensure_ascii=False, separators=(',', ':'))
     (SITE / REGISTER).write_text(json.dumps(nieuw_register(data, weg), ensure_ascii=False,
                                             separators=(',', ':')), encoding='utf-8')
-    urls = [f'{ORIGIN}/', f'{ORIGIN}/kaart.html'] + [f'{ORIGIN}/{d["u"]}/' for d in data]
+    urls = [f'{ORIGIN}/', f'{ORIGIN}/kaart.html', f'{ORIGIN}/afspreken.html'] +[f'{ORIGIN}/{d["u"]}/' for d in data]
     (SITE / 'sitemap.xml').write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'

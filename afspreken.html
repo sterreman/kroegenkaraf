@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#132738">
+<title>Afspreken in het midden · Kroeg &amp; Karaf</title>
+<meta name="description" content="Spreek je af met iemand uit een andere gemeente? Vul in waar iedereen vertrekt en vind een café dat voor iedereen ongeveer even ver ligt.">
+<link rel="canonical" href="https://kroegenkaraf.be/afspreken.html">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="/assets/fonts/fonts.css">
+<link rel="stylesheet" href="assets/vendor/leaflet.css">
+<link rel="stylesheet" href="assets/lijst.css?v=afspreken-20261002">
+<link rel="stylesheet" href="assets/kaart.css?v=ontdek-20261001">
+<link rel="stylesheet" href="assets/afspreken.css?v=afspreken-20261002">
+</head>
+<body class="afspreekpagina">
+<a class="naarinhoud" href="#resultaten">Naar het formulier</a>
+
+<header class="kop">
+ <div class="wrap kopraster">
+  <a class="merk" href="/"><img src="assets/logo.png" alt="Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen" width="760" height="575"></a>
+  <h1>Waar spreken we af?</h1>
+  <p class="kopuitleg">Vul in waar iedereen vertrekt. We zoeken cafés die voor iedereen ongeveer even ver liggen.</p>
+ </div>
+</header>
+
+<main class="wrap" id="resultaten" tabindex="-1">
+ <div class="afspraakraster">
+  <form class="afspraak" id="afspraak" novalidate>
+   <fieldset class="groep">
+    <legend>Wie vertrekt waar?</legend>
+    <ol class="vertrekken" id="vertrekken"></ol>
+    <button type="button" class="linkknop erbij" id="erbij" disabled>+ Nog iemand</button>
+   </fieldset>
+   <fieldset class="groep voorkeur">
+    <legend>Voorkeur</legend>
+    <div class="voorkeurrij">
+     <label>Soort zaak<select id="fsoort" disabled><option value="">Alle soorten</option></select></label>
+     <label>Kenmerk<select id="fkenmerk" disabled><option value="">Geen voorkeur</option></select></label>
+    </div>
+    <label class="vink"><input type="checkbox" id="fgecontroleerd" disabled> Alleen online gecontroleerde zaken</label>
+   </fieldset>
+   <p class="formfout" id="formfout" role="alert"></p>
+   <button type="submit" class="toon zoekmidden" disabled>Zoek een café in het midden</button>
+   <p class="privacyregel">Je plaatsen blijven in je browser. Er wordt niets doorgestuurd of bewaard.</p>
+   <datalist id="plaatsen"></datalist>
+  </form>
+
+  <div class="kaartvak" id="kaartvak" hidden>
+   <div id="kaart" role="region" aria-label="Kaart met de vertrekplaatsen en de voorstellen"></div>
+  </div>
+
+  <section class="uitslag" id="uitslag" aria-live="polite" hidden></section>
+ </div>
+ <div class="leeg" id="laadmelding" hidden></div>
+</main>
+
+<footer class="voet">
+ <div class="wrap">
+  <nav aria-label="Onderaan"><a href="/">Alle zaken</a><a href="kaart.html">Kaart</a><a href="afspreken.html" aria-current="page">Afspreken</a><a href="/privacy.html">Privacy</a></nav>
+  <p id="foot">Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</p>
+ </div>
+</footer>
+
+<script src="assets/vendor/leaflet.js"></script>
+<script src="assets/gemeen.js?v=ontdek-20261001"></script>
+<script src="assets/filterbalk.js?v=ontdek-20261001"></script>
+<script src="assets/afspreken.js?v=afspreken-20261002"></script>
+</body>
+</html>

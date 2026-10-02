@@ -1,0 +1,111 @@
+/* Afspreken in het midden. De kop, de voet en de rijen met zaken komen uit
+   lijst.css, de kaart uit kaart.css; hier staat alleen wat deze pagina extra
+   nodig heeft. */
+
+.kopuitleg{grid-area:zoek;margin:12px 0 0;max-width:46ch;font-size:18px;line-height:1.4;color:var(--creme2)}
+
+/* op de computer: formulier en uitslag links, de kaart kleeft rechts */
+.afspraakraster{display:grid;grid-template-columns:minmax(0,1fr);grid-template-areas:"form" "uitslag";
+ gap:28px}
+.afspraak{grid-area:form}
+.uitslag{grid-area:uitslag}
+.afspreekpagina .kaartvak{grid-area:kaart;margin-top:0;border:1.5px solid var(--inkt)}
+.heeftuitslag .afspraakraster{grid-template-columns:minmax(0,5fr) minmax(0,6fr);
+ grid-template-areas:"form kaart" "uitslag kaart";align-items:start}
+.heeftuitslag .kaartvak{position:sticky;top:16px;grid-row:1 / span 2}
+.afspreekpagina #kaart{height:min(640px,calc(100vh - 32px))}
+.afspraak{max-width:620px}
+
+/* de vertrekplaatsen */
+.afspraak .groep{margin-bottom:18px}
+.vertrekken{list-style:none;margin:0;padding:0}
+.vertrek{display:grid;grid-template-columns:30px minmax(0,1fr) 44px auto;grid-template-areas:"letter veld plek weg" ". fout fout fout";
+ align-items:center;column-gap:8px;margin-bottom:10px}
+.vertrek .letter{grid-area:letter}
+.vertrek input{grid-area:veld;display:block;width:100%;height:50px;padding:0 14px;border:1.5px solid var(--inkt);
+ border-radius:0;background:#fff;color:var(--inkt);font-family:var(--kop);font-stretch:95%;font-size:18px;font-weight:500;
+ -webkit-appearance:none;appearance:none}
+.vertrek input::placeholder{color:var(--inkt3);opacity:1}
+.vertrek input:focus{outline:none;border-color:var(--roest);box-shadow:0 0 0 2px var(--roest-licht)}
+.vertrek input[aria-invalid="true"]{border-color:var(--roest-tekst)}
+.vertrek input::-webkit-calendar-picker-indicator{opacity:.5}
+.mijnplek{grid-area:plek;width:44px;height:50px;display:flex;align-items:center;justify-content:center;
+ border:1.5px solid var(--inkt);background:var(--papier);cursor:pointer;color:var(--inkt)}
+.mijnplek svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round}
+.mijnplek:hover{background:var(--papier2);color:var(--roest-tekst)}
+.mijnplek[aria-busy="true"]{cursor:progress;opacity:.6}
+.vertrek .weg{grid-area:weg;width:36px;height:44px;display:flex;align-items:center;justify-content:center;
+ border:0;background:none;cursor:pointer;color:var(--inkt2)}
+.vertrek .weg svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+.vertrek .weg:hover{color:var(--roest-tekst)}
+.veldfout{grid-area:fout;font-family:var(--kop);font-stretch:92%;font-size:14.5px;color:var(--roest-tekst)}
+.veldfout:empty{display:none}
+.veldfout:not(:empty){margin-top:4px}
+.erbij{margin-left:38px}
+
+/* een letter per persoon, op de kaart en in de uitslag dezelfde */
+.letter{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;
+ background:var(--marine);color:var(--creme);font-family:var(--kop);font-stretch:85%;font-weight:800;font-size:14px}
+.letter.klein{width:20px;height:20px;font-size:11.5px;margin-right:6px;vertical-align:1px}
+
+/* voorkeuren */
+.voorkeurrij{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.voorkeur label{font-family:var(--kop);font-stretch:90%;font-size:15px;color:var(--inkt2)}
+.voorkeur select{display:block;width:100%;height:46px;margin-top:4px;padding:0 10px;border:1.5px solid var(--inkt);
+ border-radius:0;background:var(--papier);color:var(--inkt);font-family:var(--kop);font-stretch:95%;font-size:16.5px}
+.voorkeur .vink{display:flex;align-items:center;gap:9px;margin-top:12px;min-height:40px;cursor:pointer;
+ font-size:16.5px;color:var(--inkt)}
+.vink input{width:18px;height:18px;margin:0;accent-color:var(--marine)}
+
+.formfout{margin:0;font-family:var(--kop);font-stretch:92%;font-size:15px;color:var(--roest-tekst)}
+.formfout:not(:empty){margin-bottom:10px}
+.zoekmidden{width:100%;height:52px;font-size:18px}
+.zoekmidden:disabled{opacity:.6;cursor:default}
+.privacyregel{margin:10px 0 0;font-family:var(--kop);font-stretch:92%;font-size:13.5px;color:var(--inkt3)}
+
+/* de uitslag */
+.uitslagkop{margin:0 0 4px;font-family:var(--kop);font-weight:800;font-stretch:70%;font-size:30px;line-height:1.05}
+.voorstellen{list-style:none;margin:0;padding:0}
+.voorstel{margin-top:22px}
+.voorstelkop{display:flex;align-items:center;gap:12px;padding-bottom:6px;border-bottom:2px solid var(--inkt)}
+.voorstelkop h3{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px;margin:0;min-width:0}
+.ritten{display:flex;flex-wrap:wrap;gap:4px 18px;margin:8px 0 2px;font-family:var(--kop);font-stretch:92%;
+ font-size:15px;color:var(--inkt2)}
+.ritten b{font-weight:700;color:var(--inkt)}
+.voorstel .meer{margin:8px 0 0}
+.voorstel .meer a{font-family:var(--kop);font-stretch:90%;font-weight:700;font-size:15px;color:var(--roest-tekst);
+ text-underline-offset:4px}
+.uitleg-afstand{margin:24px 0 0;padding-top:12px;border-top:1px solid var(--lijn);font-family:var(--kop);
+ font-stretch:92%;font-size:14px;color:var(--inkt3)}
+
+/* het nummer van een voorstel, op de kaart en in de lijst */
+.nummer{background:transparent}
+.nummer span{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;
+ background:var(--roest);color:#fff;border:2px solid var(--papier);font-family:var(--kop);font-stretch:85%;
+ font-weight:800;font-size:15px;box-sizing:border-box}
+.voorstelkop .nummer span{border:0;flex:0 0 auto}
+.vertrekpunt{background:transparent}
+.vertrekpunt span{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;
+ background:var(--marine);color:var(--creme);border:2px solid var(--papier);font-family:var(--kop);
+ font-stretch:85%;font-weight:800;font-size:14px;box-sizing:border-box}
+.leaflet-tooltip.vertreklabel{background:var(--papier);color:var(--inkt);border:1.5px solid var(--inkt);
+ font-size:13px;padding:2px 7px}
+.leaflet-tooltip-bottom.vertreklabel:before{border-bottom-color:var(--inkt)}
+
+@media(max-width:900px){
+  .heeftuitslag .afspraakraster{grid-template-columns:minmax(0,1fr);grid-template-areas:"form" "kaart" "uitslag"}
+  .heeftuitslag .kaartvak{position:relative;top:0;grid-row:auto}
+  .afspreekpagina #kaart{height:340px}
+  .afspraak{max-width:none}
+}
+@media(max-width:760px){
+  .kopraster{grid-template-areas:"merk titel" "zoek zoek"}
+  .kopuitleg{font-size:16.5px;margin-top:10px}
+  .afspreekpagina .kaartvak{margin-left:calc(-1 * var(--sp));margin-right:calc(-1 * var(--sp));
+   border-left:0;border-right:0}
+  .voorkeurrij{grid-template-columns:1fr}
+  .uitslagkop{font-size:26px}
+  .vertrek{grid-template-columns:28px minmax(0,1fr) 44px auto;column-gap:6px}
+  .vertrek input{font-size:17px}
+  .erbij{margin-left:34px}
+}
