@@ -28,7 +28,7 @@ def main():
         for name in ('index.html', 'deel.jpg'):
             if not Path('site', row['u'], name).is_file():
                 raise SystemExit(f"STOP: {name} ontbreekt voor {row['n']} ({row['u']}).")
-    for name in ('privacy.html', 'afspreken.html', 'assets/afspreken.js', 'assets/fonts/fonts.css', 'sitemap.xml', 'robots.txt', 'data/slugs.json', 'assets/cafe.css', 'assets/cafe.js'):
+    for name in ('privacy.html', 'afspreken.html', 'assets/afspreken.js', 'lijst.html', 'data/start.json', 'assets/fonts/fonts.css', 'sitemap.xml', 'robots.txt', 'data/slugs.json', 'assets/cafe.css', 'assets/cafe.js'):
         if not Path('site', name).is_file():
             raise SystemExit(f'STOP: {name} ontbreekt.')
     print(f'{len(urls)} cafepaginas aanwezig.')
@@ -45,9 +45,9 @@ def main():
                   'of heeft geen beschrijving; de homepage slaat ze over.')
         else:
             bruikbaar += 1
-    if bruikbaar < 3:
-        print(f'  LET OP: maar {bruikbaar} bruikbare zaken voor Ontdek deze cafés; het blok blijft verborgen.')
-    for name in ('index.html', 'kaart.html'):
+    if bruikbaar < 6:
+        print(f'  LET OP: maar {bruikbaar} bruikbare zaken voor Ontdek deze cafés; de startpagina toont er zes.')
+    for name in ('index.html', 'lijst.html', 'kaart.html'):
         page = Path('site', name).read_text(encoding='utf-8')
         if '__DATUM__' in page or '__AANTAL__' in page:
             raise SystemExit(f'STOP: oningevulde placeholder in {name}.')

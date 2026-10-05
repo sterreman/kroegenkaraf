@@ -117,7 +117,7 @@ def zoek_rij(fslug, rijen):
 for pad, wat in ((SITE, 'de kloon van de repo'), (CSV, 'de csv')):
     if not os.path.exists(pad):
         sys.exit(f'STOP: {pad} ontbreekt ({wat}). Niets gepubliceerd.')
-for pagina in ('index.html', 'kaart.html'):
+for pagina in ('index.html', 'lijst.html', 'kaart.html'):
     if not os.path.exists(f'{SITE}/{pagina}'):
         sys.exit(f'STOP: {SITE}/{pagina} ontbreekt. Is de kloon wel gelukt? '
                  'Niets gepubliceerd.')
@@ -313,7 +313,7 @@ with open(f'{SITE}/data/zaken.json', 'w', encoding='utf-8') as fp:
     json.dump(data, fp, ensure_ascii=False, separators=(',', ':'))
 
 # ---- datum en aantal in de pagina's ------------------------------------------
-for pagina in ('index.html', 'kaart.html'):
+for pagina in ('index.html', 'lijst.html', 'kaart.html'):
     p = f'{SITE}/{pagina}'
     t = open(p, encoding='utf-8').read()
     t = t.replace('__DATUM__', vandaag()).replace('__AANTAL__', str(len(data)))

@@ -184,7 +184,7 @@ function teken() {
   zl.hidden = !zonder;
   zl.innerHTML = zonder ? `${zonder === 1 ? 'Eén zaak' : zonder.toLocaleString('nl-BE') + ' zaken'} uit deze selectie `
     + `${zonder === 1 ? 'heeft' : 'hebben'} nog geen ligging en ${zonder === 1 ? 'staat' : 'staan'} alleen in de `
-    + `<a href="index.html${staatQuery(ruweQ)}">lijst</a>.` : '';
+    + `<a href="lijst.html${staatQuery(ruweQ)}">lijst</a>.` : '';
   tekenBalk();
 }
 

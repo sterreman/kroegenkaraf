@@ -37,7 +37,7 @@ def fingerprint(site):
         if name == MANIFEST:
             continue
         raw = path.read_bytes()
-        if name in ('index.html', 'kaart.html'):
+        if name in ('index.html', 'lijst.html', 'kaart.html'):
             # Keep every other byte meaningful, including counts and metadata.
             raw = re.sub(r'(const BIJGEWERKT = ")[^"]*(")',
                          r'\g<1>__DATUM__\g<2>', raw.decode('utf-8')).encode('utf-8')

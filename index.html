@@ -6,115 +6,78 @@
 <meta name="theme-color" content="#132738">
 <title>Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</title>
 <meta name="description" content="Een gids voor Belgische volkscafés, bruine kroegen en biercafés. 2797 zaken, met adres, soort en beschrijving.">
+<link rel="canonical" href="https://kroegenkaraf.be/">
+<script>
+/* Oude links naar de lijst (/?q=haacht, index.html#cafe/...) staan sinds de
+   startpagina op lijst.html. Die sturen we meteen door, voor er iets getekend wordt. */
+(function () {
+  var s = location.search, h = location.hash;
+  if (/[?&](q|p|t|s|tag)=/.test(s) || /^#(cafe\/|\d)/.test(h)) location.replace('lijst.html' + s + h);
+})();
+</script>
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="stylesheet" href="/assets/fonts/fonts.css">
-<link rel="stylesheet" href="assets/lijst.css?v=afspreken-20261002">
+<link rel="stylesheet" href="assets/lijst.css?v=start-20261005">
+<link rel="stylesheet" href="assets/start.css?v=start-20261005">
 </head>
-<body class="lijstpagina">
-<a class="naarinhoud" href="#resultaten">Naar de resultaten</a>
+<body class="startpagina">
+<a class="naarinhoud" href="#inhoud">Naar de inhoud</a>
 
 <header class="kop">
  <div class="wrap kopraster">
   <a class="merk" href="/"><img src="assets/logo.png" alt="Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen" width="760" height="575"></a>
   <h1>Waar gaan we iets drinken?</h1>
-  <form class="zoek" role="search" id="zoekform">
+  <form class="zoek" role="search" action="lijst.html" method="get">
    <label class="sr" for="q">Zoek een gemeente of café</label>
    <div class="zoekveld">
     <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M12.8 12.8 17 17"/></svg>
     <input type="search" id="q" name="q" placeholder="Zoek een gemeente of café" autocomplete="off"
      spellcheck="false" enterkeyhint="search">
-    <button type="button" class="wisq" id="wisq" hidden>
-     <span class="sr">Zoekopdracht wissen</span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5 5 15"/></svg></button>
    </div>
   </form>
-  <a class="afspreeklink" href="afspreken.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="4.5" cy="12" r="2.2"/><circle cx="19.5" cy="12" r="2.2"/><path d="M7.5 12h2.5M14 12h2.5M12 8.5v7"/></svg>Afspreken halverwege? Zoek een café in het midden</a>
+  <nav class="kopknoppen" aria-label="Weergaven">
+   <a href="lijst.html">Alle cafés</a><a href="kaart.html">Kaart</a><a href="afspreken.html">Afspreken</a>
+  </nav>
  </div>
 </header>
 
-<div class="filterbalk" id="filterbalk">
- <div class="wrap balkrij">
-  <div class="filterknoppen" role="group" aria-label="Filters">
-   <button class="fknop" id="k-p" type="button" aria-expanded="false" aria-controls="paneel-p" disabled>
-    <span class="flabel">Provincie</span><span class="fwaarde" id="w-p"></span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg></button>
-   <button class="fknop" id="k-t" type="button" aria-expanded="false" aria-controls="paneel-t" disabled>
-    <span class="flabel">Soort zaak</span><span class="fwaarde" id="w-t"></span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg></button>
-   <button class="fknop" id="k-meer" type="button" aria-expanded="false" aria-controls="paneel-meer" disabled>
-    <span class="flabel">Meer filters</span><span class="fwaarde" id="w-meer"></span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg></button>
-  </div>
- </div>
-
- <div class="paneel" id="paneel-p" role="dialog" aria-label="Provincie kiezen" hidden>
-  <div class="wrap">
-   <div class="paneelkop"><h2>Provincie</h2><button type="button" class="sluit" data-sluit>Sluiten</button></div>
-   <div class="keuzes" id="f-prov"></div>
-   <div class="paneelvoet"><button type="button" class="toon" data-sluit>Toon <span class="toon-n"></span></button></div>
-  </div>
- </div>
- <div class="paneel" id="paneel-t" role="dialog" aria-label="Soort zaak kiezen" hidden>
-  <div class="wrap">
-   <div class="paneelkop"><h2>Soort zaak</h2><button type="button" class="sluit" data-sluit>Sluiten</button></div>
-   <div class="keuzes" id="f-soort"></div>
-   <div class="paneelvoet"><button type="button" class="toon" data-sluit>Toon <span class="toon-n"></span></button></div>
-  </div>
- </div>
- <div class="paneel breed" id="paneel-meer" role="dialog" aria-label="Meer filters" hidden>
-  <div class="wrap">
-   <div class="paneelkop"><h2>Meer filters</h2><button type="button" class="sluit" data-sluit>Sluiten</button></div>
-   <div class="meerraster">
-    <fieldset class="groep">
-     <legend>Status</legend>
-     <div class="keuzes" id="f-status"></div>
-     <details class="uitleg">
-      <summary>Wat betekenen de statussen?</summary>
-      <p><strong>Online gecontroleerd:</strong> de vermelding is nagekeken aan de hand van online bronnen, zoals Google Maps, de website of sociale media van de zaak. De controledatum staat op de pagina van de zaak, als die is vastgelegd. Dit label betekent geen persoonlijk bezoek of kwaliteitsbeoordeling.</p>
-      <p><strong>Status te bevestigen:</strong> de actuele uitbating is nog niet voldoende bevestigd. Controleer vóór je bezoek of de zaak nog actief is.</p>
-      <p><strong>Gesloten:</strong> de zaak staat als gesloten geregistreerd en blijft als archief in de lijst. Gesloten zaken verschijnen niet op de kaart.</p>
-      <p><strong>Zonder gesloten zaken</strong> toont zowel online gecontroleerde zaken als zaken waarvan de status nog te bevestigen is. Geen enkele status betekent “nu open”. Raadpleeg de zaak of Google Maps voor de actuele openingsuren.</p>
-      <p>In de lijst dragen alleen zaken met status te bevestigen of gesloten een label. Een zaak zonder label is online gecontroleerd.</p>
-     </details>
-    </fieldset>
-    <fieldset class="groep">
-     <legend>Kenmerken</legend>
-     <p class="groephulp" id="tags-help">Kies je meer kenmerken, dan zie je alleen zaken die ze allemaal hebben. Een kenmerk staat er pas bij als een bron het vermeldt: ontbreekt het, dan is het nog niet vastgelegd, niet afwezig.</p>
-     <div class="tagkeuzes" id="f-tags" aria-describedby="tags-help"></div>
-    </fieldset>
-   </div>
-   <div class="paneelvoet"><button type="button" class="wisalles" data-wisfilters hidden>Wis filters</button><button type="button" class="toon" data-sluit>Toon <span class="toon-n"></span></button></div>
-  </div>
- </div>
-</div>
-<div class="scherm" id="scherm" hidden></div>
-
-<main class="wrap" id="resultaten" tabindex="-1">
- <section class="ontdek" id="ontdek" aria-labelledby="ontdekkop" hidden>
-  <h2 id="ontdekkop">Ontdek deze cafés</h2>
-  <ol class="ontdeklijst" id="ontdeklijst"></ol>
-  <p class="ontdekvoet">Een wisselende greep uit zaken die online gecontroleerd zijn. Kijk voor je vertrekt even na of ze open zijn.</p>
+<main class="wrap" id="inhoud" tabindex="-1">
+ <section class="ontdek" id="ontdek" aria-labelledby="ontdekkop">
+  <h2 id="ontdekkop">Ontdek deze Belgische cafés</h2>
+  <ol class="ontdeklijst" id="ontdeklijst" aria-busy="true"></ol>
+  <p class="ontdekvoet">Elke week een andere greep uit zaken die online gecontroleerd zijn. Kijk voor je vertrekt even na of ze open zijn.</p>
  </section>
- <div class="resultaatkop">
-  <p class="aantal" id="aantal" role="status">Zaken laden…</p>
-  <nav class="weergave" aria-label="Weergave">
-   <a href="index.html" aria-current="page">Lijst</a><a href="kaart.html" id="andereweergave" data-doel="kaart.html">Kaart</a>
-  </nav>
- </div>
- <div class="actief" id="actief" hidden></div>
- <div id="list" aria-busy="true">
-  <p class="laden">De zaken worden geladen.</p>
- </div>
+
+ <section class="oppad" aria-labelledby="oppadkop">
+  <h2 id="oppadkop">Op pad</h2>
+  <ul class="tegels">
+   <li><a class="tegel" href="afspreken.html">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="4.5" cy="12" r="2.2"/><circle cx="19.5" cy="12" r="2.2"/><path d="M7.5 12h2.5M14 12h2.5M12 8.5v7"/></svg>
+    <span class="tkop">Afspreken in het midden</span>
+    <span class="ttekst">Vul in waar iedereen vertrekt. We zoeken cafés die voor iedereen ongeveer even ver liggen.</span></a></li>
+   <li><a class="tegel" href="kaart.html#buurt">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6"/><path d="M12 2.5v2.8M12 18.7v2.8M2.5 12h2.8M18.7 12h2.8"/></svg>
+    <span class="tkop">Cafés in de buurt</span>
+    <span class="ttekst">De kaart toont de zaken rond de plek waar je nu bent. Je locatie blijft in je browser.</span></a></li>
+  </ul>
+ </section>
+
+ <section class="provincies" id="provincies" aria-labelledby="provkop" hidden>
+  <h2 id="provkop">Per provincie</h2>
+  <ul class="provlijst" id="provlijst"></ul>
+ </section>
 </main>
 
 <footer class="voet">
  <div class="wrap">
-  <nav aria-label="Onderaan"><a href="/">Alle zaken</a><a href="kaart.html">Kaart</a><a href="afspreken.html">Afspreken</a><a href="/privacy.html">Privacy</a></nav>
+  <nav aria-label="Onderaan"><a href="/" aria-current="page">Start</a><a href="lijst.html">Lijst</a><a href="kaart.html">Kaart</a><a href="afspreken.html">Afspreken</a><a href="/privacy.html">Privacy</a></nav>
   <p id="foot">Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</p>
  </div>
 </footer>
 
 <script>const BIJGEWERKT = "11 september 2026";</script>
-<script src="assets/gemeen.js?v=ontdek-20261001"></script>
-<script src="assets/filterbalk.js?v=ontdek-20261001"></script>
-<script src="assets/gids.js?v=ontdek-20261001"></script>
+<script src="assets/start.js?v=start-20261005"></script>
 </body>
 </html>

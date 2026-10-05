@@ -1,0 +1,57 @@
+/* De startpagina. De kop, de voet en het blok Ontdek komen uit lijst.css; hier
+   staat wat deze pagina anders doet: zes zaken in twee rijen, de tegels om op
+   pad te gaan en de provincies. */
+
+/* de knoppen onder de zoekbalk, licht op donker */
+.kopknoppen{grid-area:link;justify-self:start;display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.kopknoppen a{display:inline-flex;align-items:center;height:40px;padding:0 16px;border:1.5px solid var(--creme);
+ color:var(--creme);text-decoration:none;font-family:var(--kop);font-stretch:85%;font-weight:700;font-size:16px}
+.kopknoppen a:hover{background:var(--creme);color:var(--marine)}
+
+#inhoud{padding-top:26px}
+#inhoud:focus{outline:none}
+.startpagina h2{margin:0 0 4px;font-family:var(--kop);font-weight:800;font-stretch:70%;font-size:30px;line-height:1.05}
+
+/* zes zaken: drie naast elkaar, zonder verticale lijnen die bij de tweede rij
+   op de verkeerde plek zouden vallen */
+.startpagina .ontdek{margin:0 0 34px;padding-bottom:0;border-bottom:0}
+.startpagina .ontdeklijst{column-gap:32px;border-top:2px solid var(--inkt)}
+.startpagina .ontdeklijst[aria-busy="true"]{min-height:420px}
+.startpagina .ontdekzaak+.ontdekzaak{border-left:0}
+.startpagina .ontdekzaak{border-bottom:1px solid var(--lijn)}
+.startpagina .ontdekzaak a,.startpagina .ontdekzaak+.ontdekzaak a{padding:16px 6px 16px 0}
+
+/* op pad */
+.oppad{margin-bottom:34px}
+.tegels{list-style:none;margin:10px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.tegel{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"ico kop" "ico tekst";
+ column-gap:16px;height:100%;padding:18px 20px;border:1.5px solid var(--inkt);text-decoration:none;color:inherit}
+.tegel svg{grid-area:ico;width:34px;height:34px;margin-top:2px;fill:none;stroke:var(--roest);stroke-width:1.9;
+ stroke-linecap:round;stroke-linejoin:round}
+.tkop{grid-area:kop;font-family:var(--kop);font-weight:800;font-stretch:72%;font-size:25px;line-height:1.05}
+.ttekst{grid-area:tekst;margin-top:6px;font-size:16px;line-height:1.42;color:var(--inkt2)}
+.tegel:hover{background:var(--papier2)}
+.tegel:hover .tkop{color:var(--roest-tekst);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:4px}
+.tegel:focus-visible{outline:2px solid var(--inkt);outline-offset:2px}
+
+/* provincies */
+.provlijst{list-style:none;margin:6px 0 0;padding:0;columns:3 220px;column-gap:32px;border-top:2px solid var(--inkt)}
+.provlijst li{break-inside:avoid}
+.provlijst a{display:flex;align-items:baseline;justify-content:space-between;gap:10px;min-height:44px;
+ padding:10px 2px;border-bottom:1px solid var(--lijn);text-decoration:none;font-size:18px}
+.provlijst a:hover span:first-child{color:var(--roest-tekst);text-decoration:underline;text-underline-offset:4px}
+.provlijst .n{font-family:var(--kop);font-stretch:90%;font-size:14px;color:var(--inkt3);font-variant-numeric:tabular-nums}
+
+@media(max-width:760px){
+  .kopknoppen{margin-top:12px;width:100%;gap:6px}
+  .kopknoppen a{flex:1 1 0;justify-content:center;padding:0 8px;height:42px;font-size:15px}
+  #inhoud{padding-top:20px}
+  .startpagina h2{font-size:25px}
+  .startpagina .ontdeklijst[aria-busy="true"]{min-height:600px}
+  .startpagina .ontdekzaak a,.startpagina .ontdekzaak+.ontdekzaak a{padding:12px 2px}
+  .tegels{grid-template-columns:1fr;gap:10px}
+  .tegel{padding:14px 16px;column-gap:14px}
+  .tegel svg{width:28px;height:28px}
+  .tkop{font-size:22px}
+  .ttekst{font-size:15.5px}
+}

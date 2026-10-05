@@ -289,7 +289,7 @@ def doorverwijzingen(data, weg):
             elif kand and kand[0][0] < .015:   # zelfde adres, niet de buren
                 doel = f'/{kand[0][1]["u"]}/'
         if not doel:
-            doel = '/?q=' + urllib.parse.quote(plaats(x.get('g')) or '')
+            doel = '/lijst.html?q=' + urllib.parse.quote(plaats(x.get('g')) or '')
         regels.append(f'/{x["u"]}/ {doel} 301')
         regels.append(f'/{x["u"]} {doel} 301')
     return regels
@@ -615,11 +615,11 @@ def pagina(d, buren):
     deeltekst = f'{d["n"]} in {plaats(gem) or d.get("p", "")}, gevonden op Kroeg & Karaf'
     q = urllib.parse.quote
 
-    kruimel = ['<a href="/">Alle zaken</a>']
+    kruimel = ['<a href="/lijst.html">Alle zaken</a>']
     if d.get('p'):
-        kruimel.append(f'<a href="/?q={q(d["p"])}">{e(d["p"])}</a>')
+        kruimel.append(f'<a href="/lijst.html?q={q(d["p"])}">{e(d["p"])}</a>')
     if gem and sleutel(plaats(gem)) != sleutel(d.get('p')):
-        kruimel.append(f'<a href="/?q={q(plaats(gem))}">{e(plaats(gem))}</a>')
+        kruimel.append(f'<a href="/lijst.html?q={q(plaats(gem))}">{e(plaats(gem))}</a>')
 
     # ---- de kop: naam, soort, plaats en de eerste zin
     lengte = len(d['n'])
@@ -756,8 +756,8 @@ def pagina(d, buren):
 <a class="naarinhoud" href="#inhoud">Naar de inhoud</a>
 <header class="balk">
  <div class="wrap">
-  <a class="merk" href="/"><img src="/assets/logo.png" alt="Kroeg &amp; Karaf, naar de volledige lijst" width="760" height="575"></a>
-  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/">Alle zaken</a><a href="/kaart.html">Kaart</a></nav>
+  <a class="merk" href="/"><img src="/assets/logo.png" alt="Kroeg &amp; Karaf, naar de startpagina" width="760" height="575"></a>
+  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/lijst.html">Alle zaken</a><a href="/kaart.html">Kaart</a></nav>
  </div>
 </header>
 
@@ -786,7 +786,7 @@ def pagina(d, buren):
 
 <footer class="voet">
  <div class="wrap">
-  <nav aria-label="Onderaan"><a href="/">Alle zaken</a><a href="/kaart.html">Kaart</a><a href="/privacy.html">Privacy</a></nav>
+  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/lijst.html">Lijst</a><a href="/kaart.html">Kaart</a><a href="/afspreken.html">Afspreken</a><a href="/privacy.html">Privacy</a></nav>
   <p>Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</p>
  </div>
 </footer>
@@ -794,6 +794,35 @@ def pagina(d, buren):
 </body>
 </html>
 '''
+
+
+# ---- de startpagina ------------------------------------------------------------
+
+def schrijf_start(data):
+    """data/start.json: wat de startpagina nodig heeft, zonder de hele zaken.json
+    van een megabyte. De pool van Ontdek deze cafés (de ID's uit
+    assets/ontdek.json) met naam, plaats, foto en beschrijving, en de aantallen
+    per provincie. Alleen de eerste alinea van de beschrijving gaat mee; de
+    pagina haalt er zelf de eerste zin uit."""
+    pool = json.loads((SITE / 'assets/ontdek.json').read_text(encoding='utf-8')).get('ids', [])
+    per_id = {d.get('id'): d for d in data if d.get('id')}
+    zaken = []
+    for i in pool:
+        d = per_id.get(i)
+        if d is None:
+            continue
+        z = {k: d[k] for k in ('id', 'n', 'g', 'p', 't', 's', 'u', 'foto') if d.get(k)}
+        if d.get('i'):
+            z['i'] = d['i'].split('\n')[0][:600]
+        zaken.append(z)
+    open_ = [d for d in data if d.get('s') != 'Gesloten']
+    provincies = {}
+    for d in open_:
+        provincies[d['p']] = provincies.get(d['p'], 0) + 1
+    (SITE / 'data/start.json').write_text(json.dumps({
+        'aantal': len(data), 'open': len(open_),
+        'provincies': sorted(provincies.items(), key=lambda x: sleutel(x[0])),
+        'zaken': zaken}, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
 
 
 # ---- alles samen -------------------------------------------------------------
@@ -829,7 +858,9 @@ def main():
         json.dump(data, fp, ensure_ascii=False, separators=(',', ':'))
     (SITE / REGISTER).write_text(json.dumps(nieuw_register(data, weg), ensure_ascii=False,
                                             separators=(',', ':')), encoding='utf-8')
-    urls = [f'{ORIGIN}/', f'{ORIGIN}/kaart.html', f'{ORIGIN}/afspreken.html'] +[f'{ORIGIN}/{d["u"]}/' for d in data]
+    schrijf_start(data)
+    urls = ([f'{ORIGIN}/', f'{ORIGIN}/lijst.html', f'{ORIGIN}/kaart.html', f'{ORIGIN}/afspreken.html']
+            + [f'{ORIGIN}/{d["u"]}/' for d in data])
     (SITE / 'sitemap.xml').write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
         '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'

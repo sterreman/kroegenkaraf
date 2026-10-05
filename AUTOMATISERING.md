@@ -3,7 +3,7 @@
 Dit aanvullingspakket gebruikt de websitebestanden aan de root van de bestaande
 repository. Upload alle inhoud, inclusief de map `.github`, naar diezelfde root.
 Gebruik hiervoor dit pakket, niet het eerdere overdrachtspakket met een map `site`.
-De websitebron blijft in `index.html`, `kaart.html` en `assets`.
+De websitebron blijft in `index.html` (de startpagina), `lijst.html`, `kaart.html`, `afspreken.html` en `assets`.
 
 ## Proefrun
 

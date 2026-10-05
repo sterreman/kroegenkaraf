@@ -285,7 +285,7 @@ function tekenUitslag(vertrek, plaatsen) {
   U.innerHTML = `<h2 class="uitslagkop">${zelfde ? 'Dicht bij ' : 'In het midden van '}${esc(noemNamen(vertrek))}</h2>`
     + '<ol class="voorstellen">' + plaatsen.map((pl, i) => {
       const n = pl.cafes.length;
-      const zoek = 'index.html?q=' + encodeURIComponent(pl.g.split(' (')[0]);
+      const zoek = 'lijst.html?q=' + encodeURIComponent(pl.g.split(' (')[0]);
       return `<li class="voorstel" data-i="${i}">`
         + `<div class="voorstelkop"><span class="nummer" aria-hidden="true"><span>${i + 1}</span></span>`
         + `<h3><span class="pnaam">${esc(pl.g)}</span><span class="pprov">${esc(pl.p)}</span></h3></div>`

@@ -4,18 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#132738">
-<title>Kroeg &amp; Karaf op de kaart</title>
-<meta name="description" content="Alle zaken uit de gids Kroeg &amp; Karaf op een kaart van België, met zoeken en filters.">
+<title>Alle cafés in de gids · Kroeg &amp; Karaf</title>
+<meta name="description" content="Alle Belgische volkscafés, bruine kroegen en biercafés uit Kroeg &amp; Karaf. 2797 zaken, met adres, soort en beschrijving, te doorzoeken per gemeente.">
+<link rel="canonical" href="https://kroegenkaraf.be/lijst.html">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="stylesheet" href="/assets/fonts/fonts.css">
-<link rel="stylesheet" href="assets/vendor/leaflet.css">
-<link rel="stylesheet" href="assets/vendor/MarkerCluster.css">
 <link rel="stylesheet" href="assets/lijst.css?v=start-20261005">
-<link rel="stylesheet" href="assets/kaart.css?v=ontdek-20261001">
 </head>
-<body class="kaartpagina">
+<body class="lijstpagina">
 <a class="naarinhoud" href="#resultaten">Naar de resultaten</a>
 
 <header class="kop">
@@ -94,44 +92,25 @@
  <div class="resultaatkop">
   <p class="aantal" id="aantal" role="status">Zaken laden…</p>
   <nav class="weergave" aria-label="Weergave">
-   <a href="lijst.html" id="andereweergave" data-doel="lijst.html">Lijst</a><a href="kaart.html" aria-current="page">Kaart</a>
+   <a href="lijst.html" aria-current="page">Lijst</a><a href="kaart.html" id="andereweergave" data-doel="kaart.html">Kaart</a>
   </nav>
  </div>
  <div class="actief" id="actief" hidden></div>
- <div class="kaartvak">
-  <div class="kaartknoppen">
-   <button class="buurtknop" id="buurt" type="button">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/>
-     <circle cx="12" cy="12" r="2.6"/><path d="M12 2.5v2.8M12 18.7v2.8M2.5 12h2.8M18.7 12h2.8"/></svg>
-    In de buurt</button>
-   <button class="heel" id="heel" type="button">Hele kaart</button>
-  </div>
-  <div id="kaart" role="region" aria-label="Kaart met de zaken"></div>
-  <div class="kaartladen" id="kaartladen"><p>De zaken worden geladen.</p></div>
-  <div class="melding" id="melding" role="status" hidden></div>
- </div>
- <div class="kaartvoet">
-  <p class="legenda" aria-label="Legende">
-   <span><i class="speld ok" aria-hidden="true"></i>Online gecontroleerd</span>
-   <span><i class="speld todo" aria-hidden="true"></i>Status te bevestigen</span>
-   <span><i class="speld tros" aria-hidden="true"></i>Groep zaken, tik om in te zoomen</span>
-  </p>
-  <p class="zonderligging" id="zonderligging" hidden></p>
+ <div id="list" aria-busy="true">
+  <p class="laden">De zaken worden geladen.</p>
  </div>
 </main>
 
 <footer class="voet">
  <div class="wrap">
-  <nav aria-label="Onderaan"><a href="/">Start</a><a href="lijst.html">Lijst</a><a href="kaart.html" aria-current="page">Kaart</a><a href="afspreken.html">Afspreken</a><a href="/privacy.html">Privacy</a></nav>
+  <nav aria-label="Onderaan"><a href="/">Start</a><a href="lijst.html" aria-current="page">Lijst</a><a href="kaart.html">Kaart</a><a href="afspreken.html">Afspreken</a><a href="/privacy.html">Privacy</a></nav>
   <p id="foot">Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</p>
  </div>
 </footer>
 
 <script>const BIJGEWERKT = "11 september 2026";</script>
-<script src="assets/vendor/leaflet.js"></script>
-<script src="assets/vendor/leaflet.markercluster.js"></script>
 <script src="assets/gemeen.js?v=ontdek-20261001"></script>
 <script src="assets/filterbalk.js?v=ontdek-20261001"></script>
-<script src="assets/kaart.js?v=start-20261005"></script>
+<script src="assets/gids.js?v=start-20261005"></script>
 </body>
 </html>
