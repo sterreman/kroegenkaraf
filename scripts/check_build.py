@@ -47,6 +47,14 @@ def main():
             bruikbaar += 1
     if bruikbaar < 6:
         print(f'  LET OP: maar {bruikbaar} bruikbare zaken voor Ontdek deze cafés; de startpagina toont er zes.')
+    # De tegel Laatste ronde: alleen gesloten zaken met een verhaal.
+    for i in json.loads(Path('site/assets/laatsteronde.json').read_text(encoding='utf-8')).get('ids', []):
+        row = per_id.get(i)
+        if row is None:
+            print(f'  LET OP: laatsteronde.json noemt {i}, maar die zaak staat niet (meer) in de lijst.')
+        elif row.get('s') != 'Gesloten' or not row.get('i'):
+            print(f'  LET OP: laatsteronde.json noemt {i} ({row["n"]}), maar die is niet gesloten '
+                  'of heeft geen beschrijving; de startpagina slaat ze over.')
     for name in ('index.html', 'lijst.html', 'kaart.html'):
         page = Path('site', name).read_text(encoding='utf-8')
         if '__DATUM__' in page or '__AANTAL__' in page:

@@ -1,0 +1,13 @@
+{
+  "_uitleg": "Pool voor de tegel Laatste ronde op de startpagina: elke week één verdwenen café. Alleen ID's van gesloten zaken uit de CSV, met een verhaal in Info. Een zaak verschijnt pas als ze minstens drie maanden dicht is (volgens Gesloten op; staat er enkel een jaar, dan pas het jaar erna). Kies met zorg: laat sluitingen na een overlijden, ziekte of faillissement liever weg. Een ID toevoegen of schrappen volstaat.",
+  "ids": [
+    "KK02795", "KK02941", "KK01998", "KK01970",
+    "KK00083", "KK00097",
+    "KK02965", "KK02850",
+    "KK00358", "KK00150", "KK02854", "KK02964", "KK02812",
+    "KK00403", "KK02881",
+    "KK00977",
+    "KK01135",
+    "KK02967"
+  ]
+}

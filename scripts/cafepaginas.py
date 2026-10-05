@@ -822,7 +822,38 @@ def schrijf_start(data):
     (SITE / 'data/start.json').write_text(json.dumps({
         'aantal': len(data), 'open': len(open_),
         'provincies': sorted(provincies.items(), key=lambda x: sleutel(x[0])),
-        'zaken': zaken}, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+        'zaken': zaken, 'ronde': laatste_ronde(data, per_id, open_)},
+        ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+
+
+def laatste_ronde(data, per_id, open_):
+    """De pool van de tegel Laatste ronde (assets/laatsteronde.json): gesloten
+    zaken met hun verhaal, de link om een oude foto in te sturen en het dichtste
+    café dat nog open is, als dat binnen 5 km ligt. Welke zaak deze week aan de
+    beurt is en of ze al lang genoeg dicht is, beslist de pagina zelf."""
+    pad = SITE / 'assets/laatsteronde.json'
+    if not pad.exists():
+        return []
+    met_ligging = [d for d in open_ if 'lat' in d]
+    uit = []
+    for i in json.loads(pad.read_text(encoding='utf-8')).get('ids', []):
+        d = per_id.get(i)
+        if d is None or d.get('s') != 'Gesloten' or not d.get('i'):
+            continue
+        z = {k: d[k] for k in ('id', 'n', 'g', 'p', 't', 'u', 'z', 'foto') if d.get(k)}
+        z['i'] = d['i'].split('\n')[0][:600]
+        gem = d.get('g', '')
+        z['oproep'] = FOTO_FORMULIER + '?' + urllib.parse.urlencode(
+            {'cafe': f'{d["n"]}, {gem}' if gem else d['n'], 'slug': d['u']})
+        if 'lat' in d and met_ligging:
+            afst, buur = min(((km((d['lat'], d['lon']), (b['lat'], b['lon'])), b) for b in met_ligging),
+                             key=lambda x: (x[0], x[1].get('s') != 'Geverifieerd'))
+            if afst <= 5:
+                # "10 m" leest vreemd: vaak is het de buur of de opvolger op hetzelfde plein
+                z['buur'] = {'n': buur['n'], 'g': buur.get('g', ''), 'u': buur['u'],
+                             'a': 'een paar stappen verder' if afst < .06 else afstand_tekst(afst)}
+        uit.append(z)
+    return uit
 
 
 # ---- alles samen -------------------------------------------------------------

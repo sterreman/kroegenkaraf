@@ -34,6 +34,30 @@
 .tegel:hover .tkop{color:var(--roest-tekst);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:4px}
 .tegel:focus-visible{outline:2px solid var(--inkt);outline-offset:2px}
 
+/* laatste ronde: een verdwenen café, over de volle breedte en in marine, zodat
+   ze niet verward wordt met een café dat open is */
+.rondevak{grid-column:1 / -1}
+.ronde{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:20px;padding:20px 22px 18px;
+ background:var(--marine);color:var(--creme)}
+.ronde>*{grid-column:1}
+.rkop{display:flex;align-items:center;gap:10px;font-family:var(--kop);font-weight:700;font-stretch:85%;
+ font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--creme2)}
+.rkop::before{content:"";width:22px;height:2px;background:var(--roest-licht)}
+.rfoto{grid-column:2;grid-row:1 / span 3;width:72px;height:72px;object-fit:cover;filter:grayscale(1) sepia(.15)}
+.rnaam{margin:6px 0 0;font-family:var(--kop);font-weight:800;font-stretch:72%;font-size:28px;line-height:1.02}
+.rnaam a{color:var(--creme);text-decoration:none}
+.rnaam a:hover{text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:4px}
+.rplaats{display:block;margin-top:4px;font-family:var(--kop);font-stretch:92%;font-size:15px;color:var(--creme2)}
+.rreden{margin:10px 0 0;max-width:70ch;font-size:16.5px;line-height:1.45}
+.racties{display:flex;flex-wrap:wrap;gap:6px 22px;margin:12px 0 0}
+.racties a,.rbuur a{font-family:var(--kop);font-stretch:90%;font-weight:700;font-size:15px;color:var(--creme);
+ text-decoration-color:var(--roest-licht);text-decoration-thickness:1.5px;text-underline-offset:4px}
+.racties a:hover,.rbuur a:hover{color:#fff;text-decoration-color:#fff}
+.rbuur{margin:12px 0 0;padding-top:10px;border-top:1px solid var(--lijn-m);font-family:var(--kop);
+ font-stretch:92%;font-size:15px;color:var(--creme2)}
+.rbuur span{color:var(--creme2)}
+.ronde a:focus-visible{outline-color:var(--creme)}
+
 /* provincies */
 .provlijst{list-style:none;margin:6px 0 0;padding:0;columns:3 220px;column-gap:32px;border-top:2px solid var(--inkt)}
 .provlijst li{break-inside:avoid}
@@ -54,4 +78,8 @@
   .tegel svg{width:28px;height:28px}
   .tkop{font-size:22px}
   .ttekst{font-size:15.5px}
+  .ronde{padding:16px 16px 14px}
+  .rnaam{font-size:24px}
+  .rfoto{width:56px;height:56px}
+  .rreden{font-size:15.5px}
 }

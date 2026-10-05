@@ -41,7 +41,46 @@ function kies(zaken) {
   return keuze;
 }
 
+/* ---- laatste ronde -----------------------------------------------------------
+   Elke week één verdwenen café uit assets/laatsteronde.json. Een zaak komt pas
+   aan de beurt als ze minstens drie maanden dicht is: "Gesloten op" mag een
+   datum, een maand of alleen een jaar zijn, en telt dan vanaf het einde ervan. */
+const MAANDEN = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli',
+  'augustus', 'september', 'oktober', 'november', 'december'];
+
+function sluiting(z) {
+  const m = /^(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?/.exec(z || '');
+  if (!m) return {einde: new Date(0), tekst: 'gesloten'};
+  const [, j, mnd, dag] = m;
+  if (dag) return {einde: new Date(+j, +mnd - 1, +dag),
+    tekst: `gesloten op ${+dag} ${MAANDEN[+mnd - 1]} ${j}`};
+  if (mnd) return {einde: new Date(+j, +mnd, 0), tekst: `gesloten in ${MAANDEN[+mnd - 1]} ${j}`};
+  return {einde: new Date(+j, 11, 31), tekst: `gesloten in ${j}`};
+}
+
+function tekenRonde(pool) {
+  const grens = new Date();
+  grens.setMonth(grens.getMonth() - 3);
+  const kand = (pool || []).filter(d => d.u && d.i && sluiting(d.z).einde <= grens);
+  if (!kand.length) return;
+  const d = kand[weekNummer(new Date()) % kand.length];
+  $('ronde').innerHTML = `<div class="ronde">`
+    + `<span class="rkop">Laatste ronde</span>`
+    + (d.foto ? `<img class="rfoto" src="fotos/${esc(d.foto)}-klein.avif" alt="" width="64" height="64" loading="lazy" decoding="async">` : '')
+    + `<h3 class="rnaam"><a href="/${esc(d.u)}/">${esc(d.n)}</a></h3>`
+    + `<span class="rplaats">${esc(d.g || d.p)} · ${esc(sluiting(d.z).tekst)}</span>`
+    + `<p class="rreden">${esc(eersteZin(d.i))}</p>`
+    + `<p class="racties"><a href="/${esc(d.u)}/">Lees het verhaal</a>`
+    + (d.oproep ? `<a href="${esc(d.oproep)}" target="_blank" rel="noopener">Ken je dit café? Stuur je eigen oude foto</a>` : '')
+    + '</p>'
+    + (d.buur ? `<p class="rbuur">Hier vlakbij nog open: <a href="/${esc(d.buur.u)}/">${esc(d.buur.n)}</a>`
+      + ` <span>(${esc(d.buur.a)}${d.buur.g && d.buur.g !== d.g ? ', ' + esc(d.buur.g) : ''})</span></p>` : '')
+    + '</div>';
+  $('ronde').hidden = false;
+}
+
 function toon(start) {
+  tekenRonde(start.ronde);
   const keuze = kies(start.zaken || []);
   const lijst = $('ontdeklijst');
   lijst.removeAttribute('aria-busy');
