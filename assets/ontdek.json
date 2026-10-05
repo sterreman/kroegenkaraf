@@ -1,12 +1,14 @@
 {
-  "_uitleg": "Pool voor het blok Ontdek deze cafés op de homepage. Alleen ID's uit de CSV; naam, plaats, foto en de reden (de eerste zin van Info) komen uit zaken.json. De homepage kiest er elke week drie uit, uit drie verschillende provincies, en slaat zaken over die niet (meer) online gecontroleerd zijn. Een ID toevoegen of schrappen volstaat.",
+  "_uitleg": "Pool voor het blok Ontdek deze cafés op de startpagina. Alleen ID's uit de CSV; naam, plaats, foto en de reden (de eerste zin van Info) komen bij de bouw in data/start.json. De startpagina kiest er elke week zes uit, zoveel mogelijk uit verschillende provincies, en slaat zaken over die niet (meer) online gecontroleerd zijn of geen beschrijving hebben. Een ID toevoegen of schrappen volstaat. Per regel een provincie.",
   "ids": [
-    "KK00003", "KK00138", "KK00446",
+    "KK00003", "KK00138", "KK00446", "KK00061", "KK03023", "KK00189", "KK00256", "KK00430", "KK00627", "KK00419", "KK00666",
     "KK00720", "KK00746",
-    "KK01454", "KK01448",
-    "KK02298", "KK02671",
-    "KK01865", "KK01864",
+    "KK01454", "KK01448", "KK01356", "KK01388", "KK01456",
+    "KK02298", "KK02671", "KK02300", "KK03024", "KK02663", "KK02303", "KK02296",
+    "KK01865", "KK01864", "KK01999", "KK02966", "KK02886", "KK02942",
     "KK00965", "KK00915",
-    "KK00822", "KK01108", "KK01128"
+    "KK00822",
+    "KK01108",
+    "KK01128", "KK03020", "KK03022"
   ]
 }
