@@ -236,6 +236,13 @@ h2::before{content:"";width:34px;height:5px;background:var(--roest)}
 .leeskolom li{margin:0 0 6px}
 .leeskolom strong{color:var(--inkt)}
 .leeskolom a{color:var(--roest-tekst);text-underline-offset:3px}
+/* over.html: ondertitel, een grotere eerste alinea en de groet onderaan */
+.tekstpagina .kop .ondertitel{margin:14px 0 0;font-family:var(--lees);font-style:italic;
+ font-size:clamp(19px,2.4vw,24px);color:var(--creme)}
+.leeskolom .aanhef{font-size:21px;line-height:1.45;color:var(--inkt)}
+.leeskolom .groet{margin-top:36px;font-style:italic;color:var(--inkt)}
+.leeskolom .handtekening{margin:0;font-family:var(--kop);font-weight:800;font-stretch:72%;font-size:24px;
+ color:var(--inkt)}
 .taalblok + .taalblok{margin-top:clamp(48px,7vw,80px);padding-top:clamp(32px,5vw,56px);
  border-top:2px solid var(--marine)}
 .taalblok > h1{margin:0 0 24px;font-family:var(--kop);font-weight:800;font-stretch:70%;

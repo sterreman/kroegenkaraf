@@ -435,7 +435,7 @@ ICOON_DEEL = ('<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5
               '<circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/>'
               '<path d="m8.3 13.3 7.4 4.4M15.7 6.3l-7.4 4.4"/></svg>')
 
-VERSIE = 'pagina-20261006'
+VERSIE = 'pagina-20261006b'
 
 ICOON_WEB = ('<svg class="lijn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/>'
              '<path d="M2.8 12h18.4M12 2.8c2.6 2.6 3.8 5.7 3.8 9.2s-1.2 6.6-3.8 9.2c-2.6-2.6-3.8-5.7-3.8-9.2'
@@ -809,7 +809,7 @@ def pagina(d, buren):
 
 <footer class="voet">
  <div class="wrap">
-  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/lijst.html">Alle cafés</a><a href="/kaart.html">Kaart</a><a href="/afspreken.html">Afspreken</a><a href="/privacy.html">Privacy</a></nav>
+  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/lijst.html">Alle cafés</a><a href="/kaart.html">Kaart</a><a href="/afspreken.html">Afspreken</a><a href="/over.html">Over</a><a href="/privacy.html">Privacy</a></nav>
   <p>Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</p>
  </div>
 </footer>
@@ -913,7 +913,7 @@ def main():
     (SITE / REGISTER).write_text(json.dumps(nieuw_register(data, weg), ensure_ascii=False,
                                             separators=(',', ':')), encoding='utf-8')
     schrijf_start(data)
-    urls = ([f'{ORIGIN}/', f'{ORIGIN}/lijst.html', f'{ORIGIN}/kaart.html', f'{ORIGIN}/afspreken.html']
+    urls = ([f'{ORIGIN}/', f'{ORIGIN}/lijst.html', f'{ORIGIN}/kaart.html', f'{ORIGIN}/afspreken.html', f'{ORIGIN}/over.html']
             + [f'{ORIGIN}/{d["u"]}/' for d in data])
     (SITE / 'sitemap.xml').write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
