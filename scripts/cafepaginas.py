@@ -437,6 +437,17 @@ ICOON_DEEL = ('<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5
 
 VERSIE = 'pagina-20260930b'
 
+ICOON_WEB = ('<svg class="lijn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/>'
+             '<path d="M2.8 12h18.4M12 2.8c2.6 2.6 3.8 5.7 3.8 9.2s-1.2 6.6-3.8 9.2c-2.6-2.6-3.8-5.7-3.8-9.2'
+             's1.2-6.6 3.8-9.2z"/></svg>')
+
+
+def domein(url):
+    """'https://www.cafederoos.be/menu' wordt 'cafederoos.be'."""
+    h = urllib.parse.urlsplit(url).netloc.lower()
+    return h[4:] if h.startswith('www.') else h
+
+
 ICOON_FOTO = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5h4l1.8-2.5h6.4L17 8.5h4V19H3z"'
               ' fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>'
               '<circle cx="12" cy="13.3" r="3.3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>')
@@ -524,7 +535,7 @@ def json_ld(d, url, beeld):
         x['geo'] = {'@type': 'GeoCoordinates', 'latitude': d['lat'], 'longitude': d['lon']}
     if d.get('i'):
         x['description'] = ' '.join(alineas(d['i']))
-    zelf = [v for v in (d.get('fb'), d.get('ig')) if v]
+    zelf = [v for v in (d.get('w'), d.get('fb'), d.get('ig')) if v]
     if zelf:
         x['sameAs'] = zelf
     blob = json.dumps(x, ensure_ascii=False).replace('</', '<\\/')
@@ -657,6 +668,9 @@ def pagina(d, buren):
              f'aria-controls="deelpaneel" data-tekst="{e(deeltekst)}">{ICOON_DEEL}Delen</button></li>',
              f'<li><a class="link" href="{e(maps_zoek(d))}" target="_blank" rel="noopener">'
              f'{SPELD}Google Maps</a></li>']
+    if d.get('w') and not dicht:
+        links.append(f'<li><a class="link" href="{e(d["w"])}" target="_blank" rel="noopener">'
+                     f'{ICOON_WEB}{e(domein(d["w"]))}</a></li>')
     for sl, naam in (('ig', 'Instagram'), ('fb', 'Facebook')):
         if d.get(sl):
             links.append(f'<li><a class="link" href="{e(d[sl])}" target="_blank" rel="noopener">'

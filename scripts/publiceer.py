@@ -50,6 +50,16 @@ def sociaal(v, host):
     return 'https://' + host + '/' + v.lstrip('@')
 
 
+def website(v):
+    """Eigen site van de zaak. Alleen http(s); losse invoer krijgt https:// ervoor."""
+    v = (v or '').strip()
+    if not v or ' ' in v:
+        return ''
+    if not v.startswith(('http://', 'https://')):
+        v = 'https://' + v.lstrip('/')
+    return v if '.' in v.split('/')[2] else ''
+
+
 VOOR = ('cafe', 'cafee', 'eetcafe', 'eetkafee', 'kafee', 'taverne', 'herberg',
         'bistro', 'brasserie', 'de', 'den', 'het', 't', 'in', 'bij', 'oud', 'oude',
         'the', 'le', 'la', 'les', 'l')
@@ -155,7 +165,7 @@ if len(rows) < 100:
 
 # Er werken ook andere handen in dit bestand, dus vertrouw de vorm niet blind.
 KERN = ('Naam', 'Gemeente', 'Provincie')
-VERWACHT = KERN + ('ID', 'Adres', 'Facebook', 'Instagram', 'Soort', 'Info', 'Status',
+VERWACHT = KERN + ('ID', 'Adres', 'Facebook', 'Instagram', 'Website', 'Soort', 'Info', 'Status',
                    'Gesloten op', 'Datum toegevoegd', 'Geverifieerd op',
                    'Latitude', 'Longitude', 'Tags')
 kolommen = list(rows[0].keys())
@@ -294,7 +304,8 @@ for r in rows:
          's': v_('Status'), 'z': v_('Gesloten op'),
          'd': v_('Datum toegevoegd'), 'v': v_('Geverifieerd op'),
          'fb': sociaal(r.get('Facebook'), 'www.facebook.com'),
-         'ig': sociaal(r.get('Instagram'), 'www.instagram.com')}
+         'ig': sociaal(r.get('Instagram'), 'www.instagram.com'),
+         'w': website(r.get('Website'))}
     for kol, sleutel in (('Latitude', 'lat'), ('Longitude', 'lon')):
         v = (r.get(kol) or '').strip()
         if v:

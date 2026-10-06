@@ -103,6 +103,7 @@ a{color:inherit}
 
 .fotooproep{margin:10px 0 0;padding-top:10px;border-top:1px dashed var(--lijn-m)}
 .fotooproep .link svg{fill:none;stroke:currentColor}
+.link svg.lijn{fill:none;stroke:currentColor;stroke-width:1.7}
 
 /* de voet van de kop: het verhaal links, het praktische rechts. Een lijn ertussen,
    zoals de onderrand van een affiche. */
