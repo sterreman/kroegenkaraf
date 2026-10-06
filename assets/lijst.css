@@ -211,6 +211,9 @@ a.rij:focus-visible{outline:2px solid var(--inkt);outline-offset:-2px;background
 .zmeta{display:block;margin-top:3px;font-family:var(--kop);font-stretch:92%;font-size:15px;
  color:var(--inkt2)}
 .zmeta .onbekend{font-style:italic;color:var(--inkt3)}
+.ztags{display:block;margin-top:3px;font-family:var(--kop);font-stretch:90%;font-weight:600;font-size:14px;
+ color:var(--roest-tekst)}
+.ztags .sep{color:var(--inkt3);font-weight:400}
 .zstatus{display:inline-flex;align-items:center;gap:7px;margin-top:5px;font-family:var(--kop);
  font-stretch:90%;font-weight:600;font-size:13.5px;color:var(--oker)}
 .zstatus::before{content:"";width:8px;height:8px;border:1.5px solid currentColor;border-radius:50%}

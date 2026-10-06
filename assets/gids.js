@@ -21,11 +21,23 @@ function statusRegel(d) {
   return '';
 }
 
+/* Hoe vaak elk kenmerk voorkomt. In de lijst tonen we per zaak de drie
+   zeldzaamste: "Aan het water" zegt meer over een café dan "Gezellig". */
+const TAGTEL = {};
+function telKenmerken() {
+  DATA.forEach(d => d.tags.forEach(t => { TAGTEL[t] = (TAGTEL[t] || 0) + 1; }));
+}
+function kenmerken(d) {
+  const kies = [...d.tags].sort((a, b) => (TAGTEL[a] || 0) - (TAGTEL[b] || 0)).slice(0, 3);
+  const ts = d.tags.filter(t => kies.includes(t));
+  return ts.length ? `<span class="ztags">${ts.map(esc).join('<span class="sep" aria-hidden="true"> · </span>')}</span>` : '';
+}
+
 function rij(d) {
   const meta = [d.a ? esc(d.a) : '<span class="onbekend">adres nog aan te vullen</span>',
                 d.t ? esc(d.t) : ''].filter(Boolean).join('<span class="sep" aria-hidden="true"> · </span>');
   const binnen = `<span class="ztekst"><span class="znaam">${esc(d.n)}</span>`
-    + `<span class="zmeta">${meta}</span>${statusRegel(d)}</span>`
+    + `<span class="zmeta">${meta}</span>${kenmerken(d)}${statusRegel(d)}</span>`
     + (d.foto ? `<img class="zfoto" src="fotos/${esc(d.foto)}-klein.avif" alt="" width="64" height="64"`
       + ` loading="lazy" decoding="async">` : '');
   return `<li class="zaak${d.s === 'Gesloten' ? ' dicht' : ''}" data-i="${d._i}">`
@@ -131,6 +143,7 @@ function laadfout() {
 function gereed() {
   if (geladen) return;
   geladen = true;
+  telKenmerken();
   $('foot').textContent = 'De gids telt ' + DATA.length.toLocaleString('nl-BE')
     + ' zaken · bijgewerkt ' + BIJGEWERKT;
   FB.teken = render;

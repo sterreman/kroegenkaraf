@@ -435,7 +435,7 @@ ICOON_DEEL = ('<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5
               '<circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/>'
               '<path d="m8.3 13.3 7.4 4.4M15.7 6.3l-7.4 4.4"/></svg>')
 
-VERSIE = 'pagina-20260930b'
+VERSIE = 'pagina-20261006'
 
 ICOON_WEB = ('<svg class="lijn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/>'
              '<path d="M2.8 12h18.4M12 2.8c2.6 2.6 3.8 5.7 3.8 9.2s-1.2 6.6-3.8 9.2c-2.6-2.6-3.8-5.7-3.8-9.2'
@@ -456,6 +456,9 @@ ICOON_FOTO = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5h4l1.8
 # de vaste url in (verborgen velden cafe en slug); inzendingen.py leest de
 # goedgekeurde rijen terug uit de gekoppelde sheet.
 FOTO_FORMULIER = 'https://tally.so/r/zxPWka'
+CONTACT = 'info@kroegenkaraf.be'   # voor correcties, zoals op de privacypagina
+ICOON_PEN = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z M13.5 6.5l4 4"'
+             ' fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>')
 MAX_FOTOS = 5        # zoveel foto's toont een pagina hoogstens
 
 KORT_VERHAAL = 480   # tot zoveel tekens blijft de hele beschrijving bovenaan
@@ -626,9 +629,9 @@ def pagina(d, buren):
     deeltekst = f'{d["n"]} in {plaats(gem) or d.get("p", "")}, gevonden op Kroeg & Karaf'
     q = urllib.parse.quote
 
-    kruimel = ['<a href="/lijst.html">Alle zaken</a>']
+    kruimel = ['<a href="/lijst.html">Alle cafés</a>']
     if d.get('p'):
-        kruimel.append(f'<a href="/lijst.html?q={q(d["p"])}">{e(d["p"])}</a>')
+        kruimel.append(f'<a href="/lijst.html?p={q(d["p"])}">{e(d["p"])}</a>')
     if gem and sleutel(plaats(gem)) != sleutel(d.get('p')):
         kruimel.append(f'<a href="/lijst.html?q={q(plaats(gem))}">{e(plaats(gem))}</a>')
 
@@ -694,6 +697,12 @@ def pagina(d, buren):
         {'cafe': f'{d["n"]}, {gem}' if gem else d['n'], 'slug': d['u']}))
     oproep = (f'<p class="fotooproep"><a class="link" href="{e(oproep_url)}" target="_blank" '
               f'rel="noopener">{ICOON_FOTO}Upload jouw eigen foto van deze zaak</a></p>')
+    # Een fout melden gaat gewoon per mail, met de zaak en de pagina al ingevuld.
+    naam_gem = f'{d["n"]}, {gem}' if gem else d['n']
+    correctie_url = (f'mailto:{CONTACT}?subject=' + urllib.parse.quote(f'Correctie: {naam_gem}')
+                     + '&body=' + urllib.parse.quote(f'Pagina: {ORIGIN}/{d["u"]}/\n\nWat klopt er niet?\n'))
+    oproep += (f'<p class="correctie"><a class="link" href="{e(correctie_url)}">{ICOON_PEN}'
+               'Klopt er iets niet? Laat het weten</a></p>')
     praktisch = (f'<div class="praktisch">{adresblok}{status_blok(d)}{archief}{"".join(acties)}'
                  f'<ul class="links">{"".join(links)}</ul>{deelpaneel}{oproep}</div>')
     sinds = (f'<p class="sinds">In de gids sinds {e(datum(d["d"]))}.</p>' if d.get('d') else '')
@@ -771,7 +780,7 @@ def pagina(d, buren):
 <header class="balk">
  <div class="wrap">
   <a class="merk" href="/"><img src="/assets/logo.png" alt="Kroeg &amp; Karaf, naar de startpagina" width="760" height="575"></a>
-  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/lijst.html">Alle zaken</a><a href="/kaart.html">Kaart</a></nav>
+  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/lijst.html">Alle cafés</a><a href="/kaart.html">Kaart</a></nav>
  </div>
 </header>
 
@@ -800,7 +809,7 @@ def pagina(d, buren):
 
 <footer class="voet">
  <div class="wrap">
-  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/lijst.html">Lijst</a><a href="/kaart.html">Kaart</a><a href="/afspreken.html">Afspreken</a><a href="/privacy.html">Privacy</a></nav>
+  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/lijst.html">Alle cafés</a><a href="/kaart.html">Kaart</a><a href="/afspreken.html">Afspreken</a><a href="/privacy.html">Privacy</a></nav>
   <p>Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</p>
  </div>
 </footer>

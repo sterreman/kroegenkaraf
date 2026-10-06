@@ -34,9 +34,10 @@
 .tegel:hover .tkop{color:var(--roest-tekst);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:4px}
 .tegel:focus-visible{outline:2px solid var(--inkt);outline-offset:2px}
 
-/* laatste ronde: een verdwenen café, over de volle breedte en in marine, zodat
-   ze niet verward wordt met een café dat open is */
-.rondevak{grid-column:1 / -1}
+/* verhalen van aan de toog, met de laatste ronde: een verdwenen café, in marine,
+   zodat ze niet verward wordt met een café waar je vandaag naartoe kunt */
+.verhalen{margin-bottom:34px}
+.verhalen #ronde{margin-top:10px}
 .ronde{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:20px;padding:20px 22px 18px;
  background:var(--marine);color:var(--creme)}
 .ronde>*{grid-column:1}

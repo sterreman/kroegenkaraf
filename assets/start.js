@@ -73,10 +73,10 @@ function tekenRonde(pool) {
     + `<p class="racties"><a href="/${esc(d.u)}/">Lees het verhaal</a>`
     + (d.oproep ? `<a href="${esc(d.oproep)}" target="_blank" rel="noopener">Ken je dit café? Stuur je eigen oude foto</a>` : '')
     + '</p>'
-    + (d.buur ? `<p class="rbuur">Hier vlakbij nog open: <a href="/${esc(d.buur.u)}/">${esc(d.buur.n)}</a>`
+    + (d.buur ? `<p class="rbuur">Een ander café in de buurt: <a href="/${esc(d.buur.u)}/">${esc(d.buur.n)}</a>`
       + ` <span>(${esc(d.buur.a)}${d.buur.g && d.buur.g !== d.g ? ', ' + esc(d.buur.g) : ''})</span></p>` : '')
     + '</div>';
-  $('ronde').hidden = false;
+  $('verhalen').hidden = false;
 }
 
 function toon(start) {
