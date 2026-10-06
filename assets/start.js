@@ -69,7 +69,7 @@ function tekenRonde(pool) {
     + (d.foto ? `<img class="rfoto" src="fotos/${esc(d.foto)}-klein.avif" alt="" width="64" height="64" loading="lazy" decoding="async">` : '')
     + `<h3 class="rnaam"><a href="/${esc(d.u)}/">${esc(d.n)}</a></h3>`
     + `<span class="rplaats">${esc(d.g || d.p)} · ${esc(sluiting(d.z).tekst)}</span>`
-    + `<p class="rreden">${esc(eersteZin(d.i))}</p>`
+    + `<p class="rreden">${esc(d.k || eersteZin(d.i))}</p>`
     + `<p class="racties"><a href="/${esc(d.u)}/">Lees het verhaal</a>`
     + (d.oproep ? `<a href="${esc(d.oproep)}" target="_blank" rel="noopener">Ken je dit café? Stuur je eigen oude foto</a>` : '')
     + '</p>'
@@ -91,7 +91,7 @@ function toon(start) {
       + `<span class="osoort">${esc(d.t || 'Café')}</span>`
       + `<span class="onaam">${esc(d.n)}</span>`
       + `<span class="oplaats">${esc(d.g || d.p)}</span>`
-      + `<span class="oreden">${esc(eersteZin(d.i))}</span>`
+      + `<span class="oreden">${esc(d.k || eersteZin(d.i))}</span>`
       + `<span class="olink">Naar de zaak</span></a></li>`).join('');
   }
   const prov = start.provincies || [];

@@ -435,7 +435,7 @@ ICOON_DEEL = ('<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5
               '<circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/>'
               '<path d="m8.3 13.3 7.4 4.4M15.7 6.3l-7.4 4.4"/></svg>')
 
-VERSIE = 'pagina-20261006b'
+VERSIE = 'pagina-20261006c'
 
 ICOON_WEB = ('<svg class="lijn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/>'
              '<path d="M2.8 12h18.4M12 2.8c2.6 2.6 3.8 5.7 3.8 9.2s-1.2 6.6-3.8 9.2c-2.6-2.6-3.8-5.7-3.8-9.2'
@@ -621,7 +621,7 @@ def pagina(d, buren):
     gem = d.get('g') or ''
     adres = ', '.join(x for x in (d.get('a'), gem) if x)
     titel = f'{d["n"]}, {plaats(gem)}' if gem else d['n']
-    omschrijving = kort(d.get('i')) or kort(
+    omschrijving = kort(d.get('k') or d.get('i')) or kort(
         f'{d.get("t") or "Café"} in {gem or d.get("p", "")}'
         + (f', {d["a"]}' if d.get('a') else '') + '. Adres, ligging en cafés in de buurt.')
     if dicht:
@@ -647,7 +647,12 @@ def pagina(d, buren):
         f'<p class="plaats">{e(d["p"])}</p>' if d.get('p') else '')
     # Een korte beschrijving blijft in een stuk bovenaan, naast het praktische blok.
     # Alleen een lange tekst loopt verder onder de kop, met de eerste zin als opening.
-    lead, rest = lead_en_rest(d.get('i'))
+    # Staat er een eigen introductie in de kolom Kort, dan opent die de pagina en
+    # volgt de hele beschrijving eronder. Anders wordt de eerste zin de opening.
+    if d.get('k'):
+        lead, rest = d['k'], alineas(d.get('i'))
+    else:
+        lead, rest = lead_en_rest(d.get('i'))
     kort_verhaal = len(' '.join(alineas(d.get('i')))) <= KORT_VERHAAL
     verhaal = ''
     if kort_verhaal:
@@ -834,7 +839,7 @@ def schrijf_start(data):
         d = per_id.get(i)
         if d is None:
             continue
-        z = {k: d[k] for k in ('id', 'n', 'g', 'p', 't', 's', 'u', 'foto') if d.get(k)}
+        z = {k: d[k] for k in ('id', 'n', 'g', 'p', 't', 's', 'u', 'foto', 'k') if d.get(k)}
         if d.get('i'):
             z['i'] = d['i'].split('\n')[0][:600]
         zaken.append(z)
@@ -863,7 +868,7 @@ def laatste_ronde(data, per_id, open_):
         d = per_id.get(i)
         if d is None or d.get('s') != 'Gesloten' or not d.get('i'):
             continue
-        z = {k: d[k] for k in ('id', 'n', 'g', 'p', 't', 'u', 'z', 'foto') if d.get(k)}
+        z = {k: d[k] for k in ('id', 'n', 'g', 'p', 't', 'u', 'z', 'foto', 'k') if d.get(k)}
         z['i'] = d['i'].split('\n')[0][:600]
         gem = d.get('g', '')
         z['oproep'] = FOTO_FORMULIER + '?' + urllib.parse.urlencode(

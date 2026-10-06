@@ -146,7 +146,7 @@ function ballon(d) {
     + (d.u ? `<a class="bnaam" href="/${esc(d.u)}/">${esc(d.n)}</a>` : `<span class="bnaam">${esc(d.n)}</span>`)
     + `<span class="bmeta">${esc([d.t, [d.a, d.g].filter(Boolean).join(', ')].filter(Boolean).join(' · ') || 'adres nog aan te vullen')}</span>`
     + (mijnPlek ? `<span class="bafst">Op ${km(afstand(mijnPlek, [d.lat, d.lon]))} van jou</span>` : '')
-    + (d.i ? `<p>${esc(inkort(d.i, 160))}</p>` : '')
+    + (d.k || d.i ? `<p>${esc(inkort(d.k || d.i, 160))}</p>` : '')
     + `<p class="bstatus">${status}</p>`
     + `<div class="bacties">`
       + (d.u ? `<a class="bmeer" href="/${esc(d.u)}/">Meer info</a>` : '')

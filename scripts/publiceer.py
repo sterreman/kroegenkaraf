@@ -165,7 +165,7 @@ if len(rows) < 100:
 
 # Er werken ook andere handen in dit bestand, dus vertrouw de vorm niet blind.
 KERN = ('Naam', 'Gemeente', 'Provincie')
-VERWACHT = KERN + ('ID', 'Adres', 'Facebook', 'Instagram', 'Website', 'Soort', 'Info', 'Status',
+VERWACHT = KERN + ('ID', 'Adres', 'Facebook', 'Instagram', 'Website', 'Soort', 'Info', 'Kort', 'Status',
                    'Gesloten op', 'Datum toegevoegd', 'Geverifieerd op',
                    'Latitude', 'Longitude', 'Tags')
 kolommen = list(rows[0].keys())
@@ -299,7 +299,7 @@ data = []
 for r in rows:
     v_ = lambda k: (r.get(k) or '').strip()
     d = {'id': v_('ID'), 'n': v_('Naam'), 'g': v_('Gemeente'), 'p': v_('Provincie'),
-         'a': v_('Adres'), 't': v_('Soort'), 'i': v_('Info'),
+         'a': v_('Adres'), 't': v_('Soort'), 'i': v_('Info'), 'k': v_('Kort'),
          'tags': parse_tags(r.get('Tags', '')),
          's': v_('Status'), 'z': v_('Gesloten op'),
          'd': v_('Datum toegevoegd'), 'v': v_('Geverifieerd op'),
