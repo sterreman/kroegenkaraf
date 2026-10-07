@@ -38,6 +38,10 @@ def main():
         for link in sorted(set(re.findall(r'href="/(cafe/[^"#?]+?)/?"', Path('site', verhaal).read_text(encoding='utf-8')))):
             if not Path('site', link, 'index.html').is_file():
                 raise SystemExit(f'STOP: {verhaal} linkt naar een cafepagina die niet bestaat: /{link}/')
+        tekst = Path('site', verhaal).read_text(encoding='utf-8')
+        for beeld in sorted(set(re.findall(r'(/assets/verhalen/[^\s"]+)', tekst))):
+            if not Path('site', beeld.lstrip('/')).is_file():
+                raise SystemExit(f'STOP: {verhaal} toont een beeld dat ontbreekt: {beeld}')
     # Het blok Ontdek deze cafés: verwijst alleen naar ID's uit de CSV.
     pool = json.loads(Path('site/assets/ontdek.json').read_text(encoding='utf-8')).get('ids', [])
     per_id = {row.get('id'): row for row in data if row.get('id')}

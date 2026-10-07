@@ -41,3 +41,21 @@
   .praktisch dt{padding-top:10px}
   .praktisch dt:first-child{padding-top:0}
 }
+
+/* foto's: een brede herfstfoto onder de kop en één per uitstap, met bron en licentie */
+.foto{margin:22px 0 24px}
+.foto picture,.foto img{display:block;width:100%;height:auto}
+.foto img{background:var(--papier2);aspect-ratio:3/2;object-fit:cover}
+.foto figcaption{margin-top:8px;font-size:15px;line-height:1.4;color:var(--inkt2)}
+.foto .bron{display:block;margin-top:2px;font-family:var(--kop);font-stretch:92%;font-size:12.5px;color:var(--inkt3)}
+.foto .bron a{color:inherit;text-underline-offset:2px}
+.leeskolom h2+.foto{margin-top:10px}
+.heldwrap{padding-top:clamp(18px,3vw,32px)}
+.foto.held{margin:0}
+.foto.held img{aspect-ratio:16/9;max-height:min(70vh,560px)}
+
+@media(max-width:760px){
+  .heldwrap{padding-left:0;padding-right:0;padding-top:0}
+  .foto.held figcaption{padding:0 var(--sp)}
+  .foto figcaption{font-size:14.5px}
+}
