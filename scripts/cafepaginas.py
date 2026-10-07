@@ -918,7 +918,7 @@ def main():
     (SITE / REGISTER).write_text(json.dumps(nieuw_register(data, weg), ensure_ascii=False,
                                             separators=(',', ':')), encoding='utf-8')
     schrijf_start(data)
-    urls = ([f'{ORIGIN}/', f'{ORIGIN}/lijst.html', f'{ORIGIN}/kaart.html', f'{ORIGIN}/afspreken.html', f'{ORIGIN}/over.html']
+    urls = ([f'{ORIGIN}/', f'{ORIGIN}/lijst.html', f'{ORIGIN}/kaart.html', f'{ORIGIN}/afspreken.html', f'{ORIGIN}/over.html', f'{ORIGIN}/herfstwandelingen.html']
             + [f'{ORIGIN}/{d["u"]}/' for d in data])
     (SITE / 'sitemap.xml').write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'

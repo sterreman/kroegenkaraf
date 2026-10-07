@@ -1,0 +1,43 @@
+/* Verhalen en uitstappen (herfstwandelingen.html): de leeskolom van over.html,
+   met een overzicht om te kiezen, genummerde hoofdstukken en een praktisch blok. */
+
+.verhaalpagina .kop .rubriek{margin:0 0 10px;display:flex;align-items:center;gap:10px;font-family:var(--kop);
+ font-weight:700;font-stretch:85%;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--creme2)}
+.verhaalpagina .kop .rubriek::before{content:"";width:22px;height:2px;background:var(--roest-licht)}
+
+/* het overzicht: vijf regels om je zondag te kiezen */
+.wandelingen{list-style:none;margin:12px 0 8px;padding:0;border-top:2px solid var(--inkt)}
+.wandelingen a{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"naam km" "regio regio" "cafe cafe";
+ padding:12px 2px;border-bottom:1px solid var(--lijn);text-decoration:none;color:inherit}
+.wnaam{grid-area:naam;font-family:var(--kop);font-weight:800;font-stretch:72%;font-size:22px;line-height:1.1;color:var(--inkt)}
+.wkm{grid-area:km;align-self:baseline;font-family:var(--kop);font-stretch:90%;font-weight:700;font-size:15px;
+ color:var(--roest-tekst);font-variant-numeric:tabular-nums}
+.wregio{grid-area:regio;margin-top:2px;font-family:var(--kop);font-stretch:92%;font-size:15px;color:var(--inkt3)}
+.wcafe{grid-area:cafe;margin-top:2px;font-size:16px;color:var(--inkt2)}
+.wandelingen a:hover .wnaam{color:var(--roest-tekst);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:4px}
+.leeskolom .wandelingen a{color:inherit}
+
+/* de hoofdstukken */
+.verhaalpagina .leeskolom section[id]{scroll-margin-top:16px}
+/* een genummerd hoofdstuk: het cijfer neemt de plaats van het roestlijntje in */
+.verhaalpagina .leeskolom h2:has(.nr){display:block;line-height:1.12}
+.verhaalpagina .leeskolom h2:has(.nr)::before{display:none}
+.verhaalpagina .nr{display:block;width:max-content;margin:0 0 10px;padding:3px 9px 2px;background:var(--roest);
+ color:var(--papier);font-family:var(--kop);font-weight:800;font-stretch:80%;font-size:14px;letter-spacing:.08em}
+.verhaalpagina .nr::before{content:"Uitstap "}
+
+/* praktisch: een kaartje met vaste labels */
+.praktisch{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 18px;margin:18px 0 8px;
+ padding:16px 18px;background:var(--papier2);border-left:3px solid var(--roest)}
+.praktisch dt{font-family:var(--kop);font-weight:700;font-stretch:85%;font-size:13px;letter-spacing:.06em;
+ text-transform:uppercase;color:var(--inkt3);padding-top:3px}
+.praktisch dd{margin:0;font-size:16px;line-height:1.45;color:var(--inkt2)}
+
+.leeskolom .verantwoording{font-size:15px;color:var(--inkt3);font-style:italic}
+
+@media(max-width:600px){
+  .wnaam{font-size:20px}
+  .praktisch{grid-template-columns:1fr;gap:0;padding:14px 14px}
+  .praktisch dt{padding-top:10px}
+  .praktisch dt:first-child{padding-top:0}
+}

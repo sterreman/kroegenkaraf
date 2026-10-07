@@ -33,6 +33,13 @@
 .tegel:hover{background:var(--papier2)}
 .tegel:hover .tkop{color:var(--roest-tekst);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:4px}
 .tegel:focus-visible{outline:2px solid var(--inkt);outline-offset:2px}
+/* een uitgelichte tegel (een seizoensverhaal) over de volle breedte, met een knop */
+.tegels .breed{grid-column:1 / -1}
+.tegel.uitgelicht{grid-template-areas:"ico kop" "ico tekst" "ico knop";border-width:2px;border-left:6px solid var(--roest)}
+.tknop{grid-area:knop;justify-self:start;display:inline-flex;align-items:center;gap:8px;margin-top:12px;height:38px;padding:0 14px;
+ background:var(--marine);color:var(--creme);font-family:var(--kop);font-stretch:85%;font-weight:700;font-size:15.5px}
+.tknop::after{content:"\2192"}
+.tegel.uitgelicht:hover .tknop{background:var(--roest-tekst)}
 
 /* verhalen van aan de toog, met de laatste ronde: een verdwenen café, in marine,
    zodat ze niet verward wordt met een café waar je vandaag naartoe kunt */

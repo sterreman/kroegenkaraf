@@ -1,5 +1,6 @@
 """Additional gates before an artifact can be published."""
 import json
+import re
 from pathlib import Path
 
 def main():
@@ -28,10 +29,15 @@ def main():
         for name in ('index.html', 'deel.jpg'):
             if not Path('site', row['u'], name).is_file():
                 raise SystemExit(f"STOP: {name} ontbreekt voor {row['n']} ({row['u']}).")
-    for name in ('privacy.html', 'over.html', 'afspreken.html', 'assets/afspreken.js', 'lijst.html', 'data/start.json', 'assets/fonts/fonts.css', 'sitemap.xml', 'robots.txt', 'data/slugs.json', 'assets/cafe.css', 'assets/cafe.js'):
+    for name in ('privacy.html', 'over.html', 'herfstwandelingen.html', 'assets/verhaal.css', 'afspreken.html', 'assets/afspreken.js', 'lijst.html', 'data/start.json', 'assets/fonts/fonts.css', 'sitemap.xml', 'robots.txt', 'data/slugs.json', 'assets/cafe.css', 'assets/cafe.js'):
         if not Path('site', name).is_file():
             raise SystemExit(f'STOP: {name} ontbreekt.')
     print(f'{len(urls)} cafepaginas aanwezig.')
+    # Verhalen linken naar cafepaginas: die moeten echt bestaan.
+    for verhaal in ('herfstwandelingen.html',):
+        for link in sorted(set(re.findall(r'href="/(cafe/[^"#?]+?)/?"', Path('site', verhaal).read_text(encoding='utf-8')))):
+            if not Path('site', link, 'index.html').is_file():
+                raise SystemExit(f'STOP: {verhaal} linkt naar een cafepagina die niet bestaat: /{link}/')
     # Het blok Ontdek deze cafés: verwijst alleen naar ID's uit de CSV.
     pool = json.loads(Path('site/assets/ontdek.json').read_text(encoding='utf-8')).get('ids', [])
     per_id = {row.get('id'): row for row in data if row.get('id')}
