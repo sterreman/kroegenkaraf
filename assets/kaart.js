@@ -81,21 +81,67 @@ function meld(tekst) {
   meldKlok = setTimeout(() => { el.hidden = true; }, 7000);
 }
 
-/* Zoom zo dat de bezoeker en de acht dichtste zaken samen in beeld staan. In een
+/* De plek waar we rond zoeken: jouw locatie of een ingetypt adres. plekNaam
+   staat in de ballonnetjes ("op 300 m van jou") en boven de lijst eronder. */
+let plekNaam = 'jou';
+
+/* Zoom zo dat de plek en de acht dichtste zaken samen in beeld staan. In een
    stad is dat een paar straten, op het platteland een paar dorpen. Een vaste
    zoomstand zou op het platteland vaak een lege kaart geven. */
-function toonBuurt() {
-  const lijst = ZICHTBAAR.map(d => [afstand(mijnPlek, [d.lat, d.lon]), d])
+function dichtsteZaken() {
+  return ZICHTBAAR.map(d => [afstand(mijnPlek, [d.lat, d.lon]), d])
     .sort((x, y) => x[0] - y[0]);
+}
+function toonBuurt() {
+  const lijst = dichtsteZaken();
+  tekenBuurtlijst();
   if (!lijst.length) {
     kaart.setView(mijnPlek, 14);
     meld('Er staan geen zaken op de kaart die bij de filters passen.');
     return;
   }
   const dichtst = lijst.slice(0, 8);
+  /* bovenaan extra ruimte: daar liggen de knoppen en het label van de plek */
   kaart.fitBounds(L.latLngBounds([mijnPlek, ...dichtst.map(([, d]) => [d.lat, d.lon])]),
-                  {padding: [44, 44], maxZoom: 16});
+                  {paddingTopLeft: [44, 96], paddingBottomRight: [44, 44], maxZoom: 16});
   if (lijst[0][0] > 40) meld(`Het dichtste café uit de gids ligt op ${km(lijst[0][0])}.`);
+}
+
+/* Onder de kaart: de acht dichtste zaken als lijst, met hun afstand. Die volgt
+   de filters, dus ook na een andere keuze in Soort zaak of Meer filters. */
+function tekenBuurtlijst() {
+  const vak = $('buurtlijst');
+  if (!mijnPlek) { vak.hidden = true; return; }
+  const lijst = dichtsteZaken().slice(0, 8);
+  vak.hidden = false;
+  vak.innerHTML = `<h2>Dichtst bij ${plekNaam === 'jou' ? 'jou' : esc(plekNaam)}</h2>`
+    + (lijst.length ? '<ol class="zaken">' + lijst.map(([a, d]) => `<li class="zaak">`
+      + `<a class="rij" href="/${esc(d.u)}/"><span class="ztekst"><span class="znaam">${esc(d.n)}</span>`
+      + `<span class="zmeta">${esc([d.g, d.t].filter(Boolean).join(' · '))}</span></span>`
+      + `<span class="bafstand">${km(a)}</span></a></li>`).join('') + '</ol>'
+      : '<p>Geen zaak op de kaart past bij deze filters.</p>')
+    + '<p class="buurtvoet">Afstanden in vogelvlucht. Kijk voor je vertrekt even na of de zaak open is.</p>';
+}
+
+/* Zet de plek op de kaart: een blauwe stip voor jouw locatie, een donkere
+   speld met de naam erbij voor een adres of gemeente. */
+function zetPlek(ll, naam, nauwkeurigheid) {
+  mijnPlek = ll;
+  plekNaam = naam;
+  jijLaag.clearLayers();
+  if (naam === 'jou') {
+    L.circle(ll, {radius: Math.min(nauwkeurigheid || 0, 1500), pane: 'jij',
+      weight: 0, fillColor: '#2a7de1', fillOpacity: .12, interactive: false}).addTo(jijLaag);
+    L.circleMarker(ll, {radius: 7, weight: 2.5, color: '#ffffff', opacity: 1,
+      fillColor: '#2a7de1', fillOpacity: 1, pane: 'jij'})
+      .bindTooltip('Jij bent hier', {direction: 'top', offset: [0, -7]}).addTo(jijLaag);
+  } else {
+    L.circleMarker(ll, {radius: 8, weight: 3, color: '#fbf7f0', opacity: 1,
+      fillColor: '#132738', fillOpacity: 1, pane: 'jij'})
+      .bindTooltip(naam, {direction: 'top', offset: [0, -8], permanent: true, className: 'enkel'})
+      .addTo(jijLaag);
+  }
+  toonBuurt();
 }
 
 function zoekMij() {
@@ -107,14 +153,7 @@ function zoekMij() {
   knop.setAttribute('aria-busy', 'true');
   navigator.geolocation.getCurrentPosition(pos => {
     knop.removeAttribute('aria-busy');
-    mijnPlek = [pos.coords.latitude, pos.coords.longitude];
-    jijLaag.clearLayers();
-    L.circle(mijnPlek, {radius: Math.min(pos.coords.accuracy || 0, 1500), pane: 'jij',
-      weight: 0, fillColor: '#2a7de1', fillOpacity: .12, interactive: false}).addTo(jijLaag);
-    L.circleMarker(mijnPlek, {radius: 7, weight: 2.5, color: '#ffffff', opacity: 1,
-      fillColor: '#2a7de1', fillOpacity: 1, pane: 'jij'})
-      .bindTooltip('Jij bent hier', {direction: 'top', offset: [0, -7]}).addTo(jijLaag);
-    toonBuurt();
+    zetPlek([pos.coords.latitude, pos.coords.longitude], 'jou', pos.coords.accuracy);
   }, err => {
     knop.removeAttribute('aria-busy');
     meld(err.code === 1
@@ -123,6 +162,47 @@ function zoekMij() {
   }, {enableHighAccuracy: true, timeout: 12000, maximumAge: 60000});
 }
 document.getElementById('buurt').addEventListener('click', zoekMij);
+
+/* ---- rond een adres -------------------------------------------------------------
+   Een gemeente of deelgemeente uit de gids zoeken we zelf op: dat blijft in de
+   browser. Pas voor een echt adres vragen we de ligging aan Nominatim, de
+   adreszoeker van OpenStreetMap, en alleen als je op Zoek drukt. Het adres komt
+   niet in de url en wordt nergens bewaard. */
+async function vindAdres(tekst) {
+  const pl = vindPlaats(tekst);
+  if (pl) return {ll: pl.ll, naam: pl.label};
+  const u = 'https://nominatim.openstreetmap.org/search?' + new URLSearchParams({
+    q: tekst, format: 'jsonv2', countrycodes: 'be', limit: '1', 'accept-language': 'nl'});
+  const r = await fetch(u, {referrerPolicy: 'origin'});
+  if (!r.ok) throw new Error(r.status);
+  const j = await r.json();
+  return j.length ? {ll: [+j[0].lat, +j[0].lon], naam: tekst} : null;
+}
+
+$('adreszoek').addEventListener('submit', async e => {
+  e.preventDefault();
+  const tekst = $('adres').value.trim().replace(/\s+/g, ' ');
+  if (!tekst) { $('adres').focus(); return; }
+  const knop = $('adreszoek').querySelector('button');
+  if (knop.disabled) return;
+  knop.disabled = true;
+  knop.setAttribute('aria-busy', 'true');
+  try {
+    const plek = await vindAdres(tekst);
+    if (!plek) {
+      meld('Dit adres vonden we niet. Probeer met straat, huisnummer en gemeente.');
+      return;
+    }
+    $('adres').blur();
+    zetPlek(plek.ll, plek.naam);
+    $('kaartvak').scrollIntoView({behavior: 'smooth', block: 'start'});
+  } catch (err) {
+    meld('Het adres kon nu niet opgezocht worden. Probeer het straks opnieuw, of typ een gemeente.');
+  } finally {
+    /* Nominatim vraagt hoogstens één opzoeking per seconde */
+    setTimeout(() => { knop.disabled = false; knop.removeAttribute('aria-busy'); }, 1100);
+  }
+});
 
 /* Lange beschrijvingen staan volledig op de cafépagina; de ballon toont een begin. */
 function inkort(t, n = 220) {
@@ -145,7 +225,7 @@ function ballon(d) {
   return `<div class="ballon">`
     + (d.u ? `<a class="bnaam" href="/${esc(d.u)}/">${esc(d.n)}</a>` : `<span class="bnaam">${esc(d.n)}</span>`)
     + `<span class="bmeta">${esc([d.t, [d.a, d.g].filter(Boolean).join(', ')].filter(Boolean).join(' · ') || 'adres nog aan te vullen')}</span>`
-    + (mijnPlek ? `<span class="bafst">Op ${km(afstand(mijnPlek, [d.lat, d.lon]))} van jou</span>` : '')
+    + (mijnPlek ? `<span class="bafst">Op ${km(afstand(mijnPlek, [d.lat, d.lon]))} van ${plekNaam === 'jou' ? 'jou' : esc(plekNaam)}</span>` : '')
     + (d.k || d.i ? `<p>${esc(inkort(d.k || d.i, 160))}</p>` : '')
     + `<p class="bstatus">${status}</p>`
     + `<div class="bacties">`
@@ -157,6 +237,7 @@ function ballon(d) {
 function teken() {
   const res = DATA.filter(d => d.lat && d.s !== 'Gesloten' && match(d));
   ZICHTBAAR = res;
+  tekenBuurtlijst();
   cluster.clearLayers();
   spelden.clear();
   const laag = res.map(d => {
@@ -243,6 +324,8 @@ function gereed() {
   if (geladen) return;
   geladen = true;
   $('kaartladen').hidden = true;
+  bouwPlaatsen();
+  $('adreszoek').querySelector('button').disabled = false;
   $('foot').textContent = 'De gids telt ' + DATA.length.toLocaleString('nl-BE')
     + ' zaken, gesloten zaken staan alleen in de lijst · bijgewerkt ' + BIJGEWERKT;
   FB.basis = d => d.lat && d.s !== 'Gesloten';

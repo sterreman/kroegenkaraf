@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="assets/vendor/leaflet.css">
 <link rel="stylesheet" href="assets/vendor/MarkerCluster.css">
 <link rel="stylesheet" href="assets/lijst.css?v=toog-20261006">
-<link rel="stylesheet" href="assets/kaart.css?v=ontdek-20261001">
+<link rel="stylesheet" href="assets/kaart.css?v=adres-20261007">
 </head>
 <body class="kaartpagina">
 <a class="naarinhoud" href="#resultaten">Naar de resultaten</a>
@@ -98,7 +98,16 @@
   </nav>
  </div>
  <div class="actief" id="actief" hidden></div>
- <div class="kaartvak">
+ <form class="adreszoek" id="adreszoek" role="search">
+  <label for="adres">Cafés rond een adres</label>
+  <div class="adresrij">
+   <input type="search" id="adres" placeholder="Straat en huisnummer, gemeente" autocomplete="off"
+    spellcheck="false" enterkeyhint="search">
+   <button type="submit" class="toon" disabled>Zoek</button>
+  </div>
+  <p class="adreshulp">Een gemeente zoeken we zelf op. Voor een adres vragen we de ligging aan OpenStreetMap; we bewaren niets.</p>
+ </form>
+ <div class="kaartvak" id="kaartvak">
   <div class="kaartknoppen">
    <button class="buurtknop" id="buurt" type="button">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/>
@@ -118,6 +127,7 @@
   </p>
   <p class="zonderligging" id="zonderligging" hidden></p>
  </div>
+ <section class="buurtlijst" id="buurtlijst" aria-live="polite" hidden></section>
 </main>
 
 <footer class="voet">
@@ -130,8 +140,8 @@
 <script>const BIJGEWERKT = "11 september 2026";</script>
 <script src="assets/vendor/leaflet.js"></script>
 <script src="assets/vendor/leaflet.markercluster.js"></script>
-<script src="assets/gemeen.js?v=ontdek-20261001"></script>
+<script src="assets/gemeen.js?v=adres-20261007"></script>
 <script src="assets/filterbalk.js?v=ontdek-20261001"></script>
-<script src="assets/kaart.js?v=kort-20261006"></script>
+<script src="assets/kaart.js?v=adres-20261007"></script>
 </body>
 </html>

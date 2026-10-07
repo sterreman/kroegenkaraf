@@ -96,6 +96,26 @@
 
 .kaartpagina .voet{margin-top:32px}
 
+/* rond een adres: boven de kaart, en de dichtste zaken eronder */
+.adreszoek{margin-top:14px;max-width:640px}
+.adreszoek label{display:block;margin-bottom:5px;font-family:var(--kop);font-weight:700;font-stretch:85%;
+ font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--inkt2)}
+.adresrij{display:flex;gap:8px}
+.adresrij input{flex:1;min-width:0;height:46px;padding:0 14px;border:1.5px solid var(--inkt);border-radius:0;
+ background:#fff;color:var(--inkt);font-family:var(--kop);font-stretch:95%;font-size:17px;-webkit-appearance:none;appearance:none}
+.adresrij input::placeholder{color:var(--inkt3);opacity:1}
+.adresrij input:focus{outline:none;border-color:var(--roest);box-shadow:0 0 0 2px var(--roest-licht)}
+.adresrij .toon{flex:0 0 auto;height:46px;padding:0 22px}
+.adresrij .toon:disabled{opacity:.6;cursor:default}
+.adreshulp{margin:6px 0 0;font-family:var(--kop);font-stretch:92%;font-size:13.5px;color:var(--inkt3)}
+.buurtlijst{margin-top:26px;max-width:760px}
+.buurtlijst h2{margin:0;padding-bottom:6px;border-bottom:2px solid var(--inkt);font-family:var(--kop);
+ font-weight:800;font-stretch:70%;font-size:28px;line-height:1.05}
+.buurtlijst .rij{align-items:baseline}
+.bafstand{flex:0 0 auto;font-family:var(--kop);font-stretch:90%;font-weight:700;font-size:15px;
+ color:var(--roest-tekst);font-variant-numeric:tabular-nums}
+.buurtvoet{margin:10px 0 0;font-family:var(--kop);font-stretch:92%;font-size:14px;color:var(--inkt3)}
+
 @media(max-width:760px){
   #kaart{height:max(380px,calc(100vh - 190px))}
   .kaartknoppen{left:52px;top:10px;right:10px}

@@ -15,52 +15,11 @@ const PER_PLAATS = 3;       /* zoveel cafés per plaats in de uitslag */
 const LETTERS = 'ABCDEF';
 
 /* ---- de plaatsen ------------------------------------------------------------
-   Een plaats is een gemeente of deelgemeente zoals ze in de gids staat. Haar
-   ligging is de mediaan van de cafés die er liggen: zo trekt één verkeerde
-   coördinaat het punt niet scheef. Een hoofdgemeente zonder eigen cafés krijgt
-   de mediaan van de cafés in haar deelgemeenten. */
-const PLAATS = new Map();   /* label -> {label, p, ll: [lat, lon]} */
-
-const sleutel = s => norm(s).replace(/[^a-z0-9]/g, '');
-const mediaan = xs => {
-  const s = [...xs].sort((a, b) => a - b), m = s.length >> 1;
-  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
-};
-
-function bouwPlaatsen() {
-  const eigen = new Map(), binnen = new Map(), prov = new Map();
-  const voeg = (m, k, d) => { if (!m.has(k)) m.set(k, []); m.get(k).push([d.lat, d.lon]); };
-  for (const d of DATA) {
-    if (!d.lat || !d.g) continue;
-    voeg(eigen, d.g, d);
-    if (!prov.has(d.g)) prov.set(d.g, d.p);
-    const hoofd = (d.g.match(/\(([^)]+)\)\s*$/) || [])[1];
-    if (hoofd) {
-      voeg(binnen, hoofd.trim(), d);
-      if (!prov.has(hoofd.trim())) prov.set(hoofd.trim(), d.p);
-    }
-  }
-  for (const [label, pts] of [...binnen, ...eigen]) {
-    PLAATS.set(label, {label, p: prov.get(label),
-      ll: [mediaan(pts.map(x => x[0])), mediaan(pts.map(x => x[1]))]});
-  }
+   PLAATS, bouwPlaatsen() en vindPlaats() staan in gemeen.js; de kaart gebruikt
+   ze ook. Hier vullen we alleen de suggesties onder de invulvelden. */
+function vulPlaatslijst() {
   const labels = [...PLAATS.keys()].sort((a, b) => a.localeCompare(b, 'nl'));
   $('plaatsen').innerHTML = labels.map(l => `<option value="${esc(l)}">`).join('');
-}
-
-/* Wat iemand typt, terug naar een plaats uit de gids. Eerst de volledige naam,
-   dan de deelgemeente zonder haakjes ("Grembergen"), dan het begin van een naam
-   als dat maar op één plaats past ("Sint-Nik"). */
-function vindPlaats(tekst) {
-  const k = sleutel(tekst);
-  if (!k) return null;
-  const alle = [...PLAATS.values()];
-  const exact = alle.find(x => sleutel(x.label) === k);
-  if (exact) return exact;
-  const deel = alle.filter(x => sleutel(x.label.split('(')[0]) === k);
-  if (deel.length) return deel.sort((a, b) => a.label.length - b.label.length)[0];
-  const begin = alle.filter(x => sleutel(x.label).startsWith(k));
-  return begin.length === 1 ? begin[0] : null;
 }
 
 function dichtstePlaats(ll) {
@@ -401,6 +360,7 @@ function gereed() {
   if (geladen) return;
   geladen = true;
   bouwPlaatsen();
+  vulPlaatslijst();
   const u = new URLSearchParams(location.search);
   f.t = u.get('t') || '';
   f.tags = u.getAll('tag').filter(Boolean).slice(0, 1);
