@@ -826,22 +826,36 @@ def pagina(d, buren):
 
 # ---- de startpagina ------------------------------------------------------------
 
+ONTDEK_WOORDEN = 300
+
+
+def ontdek_pool(data):
+    """De pool van Ontdek deze cafés: de vaste ID's uit assets/ontdek.json plus
+    elke online gecontroleerde zaak met een beschrijving van minstens
+    ONTDEK_WOORDEN woorden. Zo groeit de pool vanzelf mee met elke Info die
+    wordt uitgeschreven. Gesorteerd op ID, zodat elke bezoeker dezelfde
+    volgorde ziet."""
+    vast = json.loads((SITE / 'assets/ontdek.json').read_text(encoding='utf-8')).get('ids', [])
+    per_id = {d.get('id'): d for d in data if d.get('id')}
+    ids = {i for i in vast if i in per_id}
+    ids |= {d['id'] for d in data if d.get('id') and d.get('s') == 'Geverifieerd'
+            and len((d.get('i') or '').split()) >= ONTDEK_WOORDEN}
+    return sorted(ids)
+
+
 def schrijf_start(data):
     """data/start.json: wat de startpagina nodig heeft, zonder de hele zaken.json
-    van een megabyte. De pool van Ontdek deze cafés (de ID's uit
-    assets/ontdek.json) met naam, plaats, foto en beschrijving, en de aantallen
+    van een megabyte. De pool van Ontdek deze cafés (zie ontdek_pool) met naam, plaats, foto en beschrijving, en de aantallen
     per provincie. Alleen de eerste alinea van de beschrijving gaat mee; de
     pagina haalt er zelf de eerste zin uit."""
-    pool = json.loads((SITE / 'assets/ontdek.json').read_text(encoding='utf-8')).get('ids', [])
     per_id = {d.get('id'): d for d in data if d.get('id')}
     zaken = []
-    for i in pool:
-        d = per_id.get(i)
-        if d is None:
-            continue
+    for i in ontdek_pool(data):
+        d = per_id[i]
         z = {k: d[k] for k in ('id', 'n', 'g', 'p', 't', 's', 'u', 'foto', 'k') if d.get(k)}
         if d.get('i'):
-            z['i'] = d['i'].split('\n')[0][:600]
+            # de pagina toont alleen de eerste zin (max. 160 tekens); meer hoeft niet mee
+            z['i'] = d['i'].split('\n')[0][:240]
         zaken.append(z)
     open_ = [d for d in data if d.get('s') != 'Gesloten']
     provincies = {}

@@ -55,8 +55,12 @@ def main():
                   'of heeft geen beschrijving; de homepage slaat ze over.')
         else:
             bruikbaar += 1
-    if bruikbaar < 6:
-        print(f'  LET OP: maar {bruikbaar} bruikbare zaken voor Ontdek deze cafés; de startpagina toont er zes.')
+    start = json.loads(Path('site/data/start.json').read_text(encoding='utf-8'))
+    pool_start = [z for z in start.get('zaken', []) if z.get('s') == 'Geverifieerd' and z.get('i')]
+    print(f'Ontdek deze cafés: {len(pool_start)} zaken in de pool ({bruikbaar} vaste uit ontdek.json, '
+          'de rest met een beschrijving van 300 woorden of meer).')
+    if len(pool_start) < 6:
+        print(f'  LET OP: maar {len(pool_start)} bruikbare zaken voor Ontdek deze cafés; de startpagina toont er zes.')
     # De tegel Laatste ronde: alleen gesloten zaken met een verhaal.
     for i in json.loads(Path('site/assets/laatsteronde.json').read_text(encoding='utf-8')).get('ids', []):
         row = per_id.get(i)

@@ -24,19 +24,45 @@ function weekNummer(d) {
   return t.getUTCFullYear() * 53 + Math.ceil(((t - Date.UTC(t.getUTCFullYear(), 0, 1)) / 864e5 + 1) / 7);
 }
 
-/* Elke week schuift de selectie op. Eerst zoveel mogelijk verschillende
-   provincies; zijn er te weinig, dan vullen we aan uit de rest van de pool. */
-function kies(zaken) {
-  const pool = zaken.filter(d => d.s === 'Geverifieerd' && d.u && d.i);
-  if (!pool.length) return [];
-  const start = (weekNummer(new Date()) * ZES) % pool.length;
-  const rij = pool.map((_, k) => pool[(start + k) % pool.length]);
-  const keuze = [], provincies = new Set();
-  for (const d of rij) {
-    if (keuze.length < ZES && !provincies.has(d.p)) { provincies.add(d.p); keuze.push(d); }
+/* Dagnummer in de eigen tijdzone van de bezoeker: om middernacht wisselt het. */
+function dagNummer(d) {
+  return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
+}
+
+/* Kleine voorspelbare toevalsgenerator: met hetzelfde zaadje krijgt elke
+   bezoeker dezelfde volgorde. */
+function toeval(zaad) {
+  let a = zaad >>> 0;
+  return () => {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function geschud(pool, ronde) {
+  const r = toeval(ronde * 2654435761), rij = pool.slice();
+  for (let k = rij.length - 1; k > 0; k--) {
+    const j = Math.floor(r() * (k + 1));
+    [rij[k], rij[j]] = [rij[j], rij[k]];
   }
-  for (const d of rij) {
-    if (keuze.length < ZES && !keuze.includes(d)) keuze.push(d);
+  return rij;
+}
+
+/* Elke dag zes andere zaken. De pool wordt per ronde geschud en dag na dag
+   afgelopen, zodat elke zaak aan de beurt komt voor er een terugkeert. Door het
+   schudden staan de provincies vanzelf door elkaar. */
+function kies(zaken) {
+  const pool = zaken.filter(d => d.s === 'Geverifieerd' && d.u && d.i)
+    .sort((x, y) => (x.id || x.u).localeCompare(y.id || y.u));
+  if (!pool.length) return [];
+  const n = pool.length, pos = dagNummer(new Date()) * ZES, keuze = [];
+  for (let k = 0; keuze.length < Math.min(n, ZES) && k < n * 2; k++) {
+    const p = pos + k;
+    const d = geschud(pool, Math.floor(p / n))[p % n];
+    if (!keuze.includes(d)) keuze.push(d);
   }
   return keuze;
 }
@@ -113,13 +139,13 @@ function terugval() {
     fetch('data/zaken.json').then(r => r.json()),
     fetch('assets/ontdek.json').then(r => r.json())
   ]).then(([data, ontdek]) => {
-    const perId = new Map(data.map(d => [d.id, d]));
     const tel = {};
     data.forEach(d => { if (d.s !== 'Gesloten') tel[d.p] = (tel[d.p] || 0) + 1; });
     return {
       aantal: data.length,
       provincies: Object.entries(tel).sort((a, b) => a[0].localeCompare(b[0], 'nl')),
-      zaken: (ontdek.ids || []).map(i => perId.get(i)).filter(Boolean)
+      zaken: data.filter(d => (ontdek.ids || []).includes(d.id)
+        || (d.s === 'Geverifieerd' && (d.i || '').split(/\s+/).filter(Boolean).length >= 300))
     };
   });
 }
