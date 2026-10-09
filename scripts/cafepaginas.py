@@ -826,7 +826,7 @@ def pagina(d, buren):
 
 # ---- de startpagina ------------------------------------------------------------
 
-ONTDEK_WOORDEN = 300
+ONTDEK_WOORDEN = 100
 
 
 def ontdek_pool(data):

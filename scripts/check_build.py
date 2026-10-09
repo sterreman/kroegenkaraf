@@ -58,7 +58,7 @@ def main():
     start = json.loads(Path('site/data/start.json').read_text(encoding='utf-8'))
     pool_start = [z for z in start.get('zaken', []) if z.get('s') == 'Geverifieerd' and z.get('i')]
     print(f'Ontdek deze cafés: {len(pool_start)} zaken in de pool ({bruikbaar} vaste uit ontdek.json, '
-          'de rest met een beschrijving van 300 woorden of meer).')
+          'de rest met een beschrijving van 100 woorden of meer).')
     if len(pool_start) < 6:
         print(f'  LET OP: maar {len(pool_start)} bruikbare zaken voor Ontdek deze cafés; de startpagina toont er zes.')
     # De tegel Laatste ronde: alleen gesloten zaken met een verhaal.

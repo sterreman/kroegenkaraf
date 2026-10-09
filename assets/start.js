@@ -145,7 +145,7 @@ function terugval() {
       aantal: data.length,
       provincies: Object.entries(tel).sort((a, b) => a[0].localeCompare(b[0], 'nl')),
       zaken: data.filter(d => (ontdek.ids || []).includes(d.id)
-        || (d.s === 'Geverifieerd' && (d.i || '').split(/\s+/).filter(Boolean).length >= 300))
+        || (d.s === 'Geverifieerd' && (d.i || '').split(/\s+/).filter(Boolean).length >= 100))
     };
   });
 }
