@@ -18,12 +18,6 @@ function eersteZin(info) {
   return zin;
 }
 
-function weekNummer(d) {
-  const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  t.setUTCDate(t.getUTCDate() + 4 - (t.getUTCDay() || 7));
-  return t.getUTCFullYear() * 53 + Math.ceil(((t - Date.UTC(t.getUTCFullYear(), 0, 1)) / 864e5 + 1) / 7);
-}
-
 /* Dagnummer in de eigen tijdzone van de bezoeker: om middernacht wisselt het. */
 function dagNummer(d) {
   return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
@@ -68,7 +62,8 @@ function kies(zaken) {
 }
 
 /* ---- laatste ronde -----------------------------------------------------------
-   Elke week één verdwenen café uit assets/laatsteronde.json. Een zaak komt pas
+   Elke dag één verdwenen café uit assets/laatsteronde.json, in een geschudde
+   volgorde zodat elke zaak aan de beurt komt voor er een terugkeert. Een zaak komt pas
    aan de beurt als ze minstens drie maanden dicht is: "Gesloten op" mag een
    datum, een maand of alleen een jaar zijn, en telt dan vanaf het einde ervan. */
 const MAANDEN = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli',
@@ -89,7 +84,9 @@ function tekenRonde(pool) {
   grens.setMonth(grens.getMonth() - 3);
   const kand = (pool || []).filter(d => d.u && d.i && sluiting(d.z).einde <= grens);
   if (!kand.length) return;
-  const d = kand[weekNummer(new Date()) % kand.length];
+  kand.sort((x, y) => (x.id || x.u).localeCompare(y.id || y.u));
+  const dag = dagNummer(new Date()), n = kand.length;
+  const d = geschud(kand, Math.floor(dag / n))[dag % n];
   $('ronde').innerHTML = `<div class="ronde">`
     + `<span class="rkop">Laatste ronde</span>`
     + (d.foto ? `<img class="rfoto" src="fotos/${esc(d.foto)}-klein.avif" alt="" width="64" height="64" loading="lazy" decoding="async">` : '')

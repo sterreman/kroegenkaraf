@@ -51,7 +51,7 @@
 .rkop{display:flex;align-items:center;gap:10px;font-family:var(--kop);font-weight:700;font-stretch:85%;
  font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--creme2)}
 .rkop::before{content:"";width:22px;height:2px;background:var(--roest-licht)}
-.rfoto{grid-column:2;grid-row:1 / span 3;width:72px;height:72px;object-fit:cover;filter:grayscale(1) sepia(.15)}
+.rfoto{grid-column:2;grid-row:1 / span 3;width:72px;height:72px;object-fit:cover;filter:grayscale(1) contrast(1.05)}
 .rnaam{margin:6px 0 0;font-family:var(--kop);font-weight:800;font-stretch:72%;font-size:28px;line-height:1.02}
 .rnaam a{color:var(--creme);text-decoration:none}
 .rnaam a:hover{text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:4px}

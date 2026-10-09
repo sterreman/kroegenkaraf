@@ -1,5 +1,5 @@
 {
-  "_uitleg": "Pool voor de tegel Laatste ronde op de startpagina: elke week één verdwenen café. Alleen ID's van gesloten zaken uit de CSV, met een verhaal in Info. Een zaak verschijnt pas als ze minstens drie maanden dicht is (volgens Gesloten op; staat er enkel een jaar, dan pas het jaar erna). Kies met zorg: laat sluitingen na een overlijden, ziekte of faillissement liever weg. Een ID toevoegen of schrappen volstaat.",
+  "_uitleg": "Pool voor de tegel Laatste ronde op de startpagina: elke dag één verdwenen café, in een geschudde volgorde zodat elke zaak aan de beurt komt voor er een terugkeert. De foto staat er in zwart-wit. Alleen ID's van gesloten zaken uit de CSV, met een verhaal in Info. Een zaak verschijnt pas als ze minstens drie maanden dicht is (volgens Gesloten op; staat er enkel een jaar, dan pas het jaar erna). Kies met zorg: laat sluitingen na een overlijden, ziekte of faillissement liever weg. Een ID toevoegen of schrappen volstaat.",
   "ids": [
     "KK02795", "KK02941", "KK01998", "KK01970",
     "KK00083", "KK00097",

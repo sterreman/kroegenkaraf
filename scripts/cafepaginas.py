@@ -871,7 +871,7 @@ def schrijf_start(data):
 def laatste_ronde(data, per_id, open_):
     """De pool van de tegel Laatste ronde (assets/laatsteronde.json): gesloten
     zaken met hun verhaal, de link om een oude foto in te sturen en het dichtste
-    café dat nog open is, als dat binnen 5 km ligt. Welke zaak deze week aan de
+    café dat nog open is, als dat binnen 5 km ligt. Welke zaak vandaag aan de
     beurt is en of ze al lang genoeg dicht is, beslist de pagina zelf."""
     pad = SITE / 'assets/laatsteronde.json'
     if not pad.exists():
