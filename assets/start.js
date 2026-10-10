@@ -48,11 +48,17 @@ function geschud(pool, ronde) {
 /* Elke dag zes andere zaken. De pool wordt per ronde geschud en dag na dag
    afgelopen, zodat elke zaak aan de beurt komt voor er een terugkeert. Door het
    schudden staan de provincies vanzelf door elkaar. */
-function kies(zaken) {
-  const pool = zaken.filter(d => d.s === 'Geverifieerd' && d.u && d.i)
+function ontdekPool(zaken) {
+  return zaken.filter(d => d.s === 'Geverifieerd' && d.u && d.i)
     .sort((x, y) => (x.id || x.u).localeCompare(y.id || y.u));
+}
+
+/* `verder` telt de klikken op "Toon zes andere": elke klik loopt verder in
+   dezelfde geschudde volgorde, dus je ziet de hele pool voor er een zaak
+   terugkeert. Zonder klik is het de keuze van de dag. */
+function kies(pool, verder = 0) {
   if (!pool.length) return [];
-  const n = pool.length, pos = dagNummer(new Date()) * ZES, keuze = [];
+  const n = pool.length, pos = (dagNummer(new Date()) + verder) * ZES, keuze = [];
   for (let k = 0; keuze.length < Math.min(n, ZES) && k < n * 2; k++) {
     const p = pos + k;
     const d = geschud(pool, Math.floor(p / n))[p % n];
@@ -102,20 +108,40 @@ function tekenRonde(pool) {
   $('verhalen').hidden = false;
 }
 
+function tekenOntdek(keuze) {
+  const lijst = $('ontdeklijst');
+  lijst.innerHTML = keuze.map(d =>
+    `<li class="ontdekzaak${d.foto ? ' metfoto' : ''}"><a href="/${esc(d.u)}/">`
+    + (d.foto ? `<img src="fotos/${esc(d.foto)}-klein.avif" alt="" width="64" height="64" loading="lazy" decoding="async">` : '')
+    + `<span class="osoort">${esc(d.t || 'Café')}</span>`
+    + `<span class="onaam">${esc(d.n)}</span>`
+    + `<span class="oplaats">${esc(d.g || d.p)}</span>`
+    + `<span class="oreden">${esc(d.k || eersteZin(d.i))}</span>`
+    + `<span class="olink">Naar de zaak</span></a></li>`).join('');
+}
+
 function toon(start) {
   tekenRonde(start.ronde);
-  const keuze = kies(start.zaken || []);
+  const pool = ontdekPool(start.zaken || []);
   const lijst = $('ontdeklijst');
   lijst.removeAttribute('aria-busy');
-  if (!keuze.length) { $('ontdek').hidden = true; } else {
-    lijst.innerHTML = keuze.map(d =>
-      `<li class="ontdekzaak${d.foto ? ' metfoto' : ''}"><a href="/${esc(d.u)}/">`
-      + (d.foto ? `<img src="fotos/${esc(d.foto)}-klein.avif" alt="" width="64" height="64" loading="lazy" decoding="async">` : '')
-      + `<span class="osoort">${esc(d.t || 'Café')}</span>`
-      + `<span class="onaam">${esc(d.n)}</span>`
-      + `<span class="oplaats">${esc(d.g || d.p)}</span>`
-      + `<span class="oreden">${esc(d.k || eersteZin(d.i))}</span>`
-      + `<span class="olink">Naar de zaak</span></a></li>`).join('');
+  if (!pool.length) { $('ontdek').hidden = true; } else {
+    tekenOntdek(kies(pool));
+    const knop = $('ontdekmeer');
+    if (pool.length > ZES) {
+      let verder = 0;
+      knop.hidden = false;
+      knop.addEventListener('click', () => {
+        verder++;
+        tekenOntdek(kies(pool, verder));
+        $('ontdekstatus').textContent = 'Zes andere cafés getoond.';
+        lijst.classList.remove('vers');
+        void lijst.offsetWidth;
+        lijst.classList.add('vers');
+        const kop = $('ontdekkop').getBoundingClientRect();
+        if (kop.top < 0) $('ontdekkop').scrollIntoView({block: 'start', behavior: 'smooth'});
+      });
+    }
   }
   const prov = start.provincies || [];
   if (prov.length) {

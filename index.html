@@ -20,7 +20,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="stylesheet" href="/assets/fonts/fonts.css">
 <link rel="stylesheet" href="assets/lijst.css?v=toog-20261006">
-<link rel="stylesheet" href="assets/start.css?v=herfst-20261007">
+<link rel="stylesheet" href="assets/start.css?v=meer-20261010">
 </head>
 <body class="startpagina">
 <a class="naarinhoud" href="#inhoud">Naar de inhoud</a>
@@ -47,7 +47,11 @@
  <section class="ontdek" id="ontdek" aria-labelledby="ontdekkop">
   <h2 id="ontdekkop">Ontdek deze Belgische cafés</h2>
   <ol class="ontdeklijst" id="ontdeklijst" aria-busy="true"></ol>
-  <p class="ontdekvoet">Elke dag een andere greep uit zaken die online gecontroleerd zijn. Kijk voor je vertrekt even na of ze open zijn.</p>
+  <div class="ontdekonder">
+   <p class="ontdekvoet">Elke dag een andere greep uit zaken die online gecontroleerd zijn. Kijk voor je vertrekt even na of ze open zijn.</p>
+   <button type="button" class="ontdekmeer" id="ontdekmeer" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>Toon zes andere</button>
+  </div>
+  <p class="sr" id="ontdekstatus" role="status"></p>
  </section>
 
  <section class="oppad" aria-labelledby="oppadkop">
@@ -88,6 +92,6 @@
 </footer>
 
 <script>const BIJGEWERKT = "11 september 2026";</script>
-<script src="assets/start.js?v=kort-20261006"></script>
+<script src="assets/start.js?v=meer-20261010"></script>
 </body>
 </html>
