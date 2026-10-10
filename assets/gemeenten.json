@@ -1,4 +1,11 @@
 {
-  "_uitleg": "Gemeenten met een eigen pagina op /gemeente/<naam>/. Een naam erbij zetten volstaat: de pagina haalt de cafés, deelgemeenten en gesloten zaken uit de csv (alles waarvan de hoofdgemeente in de kolom Gemeente deze naam is). Bewust een korte lijst, beginnend bij de gemeenten van de herfstcafés; voeg er alleen een toe als er genoeg te zeggen valt.",
-  "gemeenten": ["Zoersel", "Aalst", "Buggenhout", "Kluisbergen", "Vleteren"]
+  "_uitleg": "Elke hoofdgemeente met minstens 'drempel' zaken in de csv (open en gesloten samen) krijgt automatisch een pagina op /gemeente/<naam>/, en staat op het overzicht /gemeenten. Onder de drempel is een pagina niet meer dan een zoekopdracht. Namen onder 'gemeenten' krijgen altijd een pagina, ook onder de drempel.",
+  "drempel": 3,
+  "gemeenten": [
+    "Zoersel",
+    "Aalst",
+    "Buggenhout",
+    "Kluisbergen",
+    "Vleteren"
+  ]
 }

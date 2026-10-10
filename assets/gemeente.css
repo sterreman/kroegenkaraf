@@ -26,3 +26,9 @@
 .glijst p{margin:6px 0 0;font-size:16.5px;line-height:1.45}
 @media(max-width:600px){.glijst .gnaam{font-size:20px}}
 .glijst .gnaam{display:inline-block;padding:8px 0 4px}
+
+/* Overzicht /gemeenten */
+.gprov{display:flex;flex-wrap:wrap;gap:6px 14px;margin:14px 0 4px;font-family:var(--kop);font-weight:700;font-stretch:90%;font-size:16px}
+.gemeentepagina .govz li{padding:6px 2px 7px}
+.gemeentepagina .govz .gnaam{font-size:20px;padding:4px 0 0}
+.gemeentepagina .govz .gmeta{display:inline;margin-left:10px}

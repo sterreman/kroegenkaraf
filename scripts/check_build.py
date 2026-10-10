@@ -59,8 +59,18 @@ def main():
             if not Path('site', link, 'index.html').is_file():
                 raise SystemExit(f'STOP: gemeente {map_.name} linkt naar een cafepagina die niet bestaat: /{link}/')
         gemeenten += 1
-    if gemeenten != len(namen):
-        print(f'  LET OP: {len(namen)} gemeenten in gemeenten.json, {gemeenten} pagina\'s gebouwd.')
+    gebouwd = {m.name for m in Path('site/gemeente').glob('*/')}
+    for naam in namen:
+        if not any(m == naam.lower() or m.replace('-', ' ') == naam.lower() for m in gebouwd):
+            print(f'  LET OP: gemeenten.json noemt {naam}, maar er is geen pagina voor gebouwd.')
+    if gemeenten:
+        overzicht = Path('site/gemeenten.html')
+        if not overzicht.is_file():
+            raise SystemExit('STOP: het overzicht /gemeenten ontbreekt.')
+        gelinkt = set(re.findall(r'href="/gemeente/([^"/]+)/"', overzicht.read_text(encoding='utf-8')))
+        if gelinkt != gebouwd:
+            raise SystemExit(f'STOP: /gemeenten linkt niet naar precies de gebouwde gemeentepagina\'s '
+                             f'({len(gelinkt)} links, {len(gebouwd)} pagina\'s).')
     print(f"{gemeenten} gemeentepagina's gecontroleerd.")
     # Het blok Ontdek deze cafés: verwijst alleen naar ID's uit de CSV.
     pool = json.loads(Path('site/assets/ontdek.json').read_text(encoding='utf-8')).get('ids', [])

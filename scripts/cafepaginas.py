@@ -913,20 +913,44 @@ def verhaalblok(d):
 
 
 def laad_gemeenten(data):
-    """assets/gemeenten.json: voor welke gemeenten er een eigen pagina komt. Een
-    gemeente erbij zetten is genoeg; de pagina haalt alles uit de csv. Bewust een
-    korte lijst: een pagina is pas nuttig als ze meer biedt dan een zoekopdracht."""
+    """assets/gemeenten.json: welke gemeenten een eigen pagina op /gemeente/<naam>/ krijgen.
+
+    Elke hoofdgemeente met minstens 'drempel' zaken (open en gesloten samen) krijgt er
+    automatisch een. Daaronder is een pagina niet meer dan een zoekopdracht en blijft de
+    gemeente op de lijst gefilterd. Namen onder 'gemeenten' krijgen altijd een pagina,
+    ook onder de drempel. De pagina haalt alles uit de csv."""
     pad = SITE / 'assets/gemeenten.json'
-    if not pad.exists():
-        return {}
-    uit = {}
-    for naam in json.loads(pad.read_text(encoding='utf-8')).get('gemeenten', []):
-        leden = [d for d in data if d.get('g') and sleutel(hoofdgemeente(d['g'])) == sleutel(naam)]
-        if not leden:
-            print(f'  LET OP: gemeenten.json noemt {naam}, maar geen enkele zaak hoort erbij.')
+    cfg = json.loads(pad.read_text(encoding='utf-8')) if pad.exists() else {}
+    drempel = int(cfg.get('drempel', 3))
+    altijd = {sleutel(n): n for n in cfg.get('gemeenten', [])}
+
+    per = {}
+    for d in data:
+        if d.get('g'):
+            per.setdefault(sleutel(hoofdgemeente(d['g'])), []).append(d)
+    for k, n in altijd.items():
+        if k not in per:
+            print(f'  LET OP: gemeenten.json noemt {n}, maar geen enkele zaak hoort erbij.')
+
+    def meest(waarden):
+        tel = {}
+        for w in waarden:
+            if w:
+                tel[w] = tel.get(w, 0) + 1
+        return max(sorted(tel), key=lambda w: tel[w]) if tel else ''
+
+    uit, urls = {}, {}
+    for k, leden in per.items():
+        if len(leden) < drempel and k not in altijd:
             continue
-        uit[sleutel(naam)] = {'naam': naam, 'u': f'gemeente/{url_deel(naam)}', 'leden': leden}
-    return uit
+        naam = altijd.get(k) or meest(hoofdgemeente(d['g']) for d in leden)
+        u = f'gemeente/{url_deel(naam)}'
+        if u in urls:
+            print(f'  LET OP: {naam} en {urls[u]} krijgen dezelfde url {u}; {naam} overgeslagen.')
+            continue
+        urls[u] = naam
+        uit[k] = {'naam': naam, 'u': u, 'leden': leden, 'p': meest(d.get('p') for d in leden)}
+    return dict(sorted(uit.items(), key=lambda kv: (sleutel(kv[1]['p']), kv[0])))
 
 
 def lijst_regel(d):
@@ -944,7 +968,7 @@ def gemeente_pagina(g):
     naam, leden = g['naam'], g['leden']
     url = f'{ORIGIN}/{g["u"]}/'
     beeld = f'{url}deel.jpg'
-    prov = leden[0].get('p', '')
+    prov = g.get('p') or leden[0].get('p', '')
     actueel = sorted((d for d in leden if d.get('s') != 'Gesloten'), key=lambda d: sleutel(d['n']))
     dicht = sorted((d for d in leden if d.get('s') == 'Gesloten'), key=lambda d: sleutel(d['n']))
     n_gecontroleerd = sum(d.get('s') == 'Geverifieerd' for d in actueel)
@@ -965,9 +989,6 @@ def gemeente_pagina(g):
                       + ', '.join(deel_open[:-1]) + (' en ' if len(deel_open) > 1 else '') + deel_open[-1]
                       + (' horen' if len(deel_open) > 1 else ' hoort') + ' erbij en '
                       + ('staan' if len(deel_open) > 1 else 'staat') + ' onder een eigen kopje.')
-        soorten = sorted({d['t'] for d in actueel if d.get('t')})
-        if soorten:
-            intro += ' Soorten: ' + ', '.join(s.lower() for s in soorten) + '.'
     verhalen = []
     for d in leden:
         for v in VERHALEN.get(d.get('id'), []):
@@ -1047,7 +1068,7 @@ def gemeente_pagina(g):
 <main id="inhoud">
  <div class="kop">
   <div class="wrap">
-   <nav class="kruimel" aria-label="Kruimelpad"><a href="/lijst">Alle cafés</a> <span aria-hidden="true">/</span> <a href="/lijst?p={q(prov)}">{e(prov)}</a></nav>
+   <nav class="kruimel" aria-label="Kruimelpad"><a href="/lijst">Alle cafés</a> <span aria-hidden="true">/</span> <a href="/gemeenten#{e(url_deel(prov))}">{e(prov)}</a></nav>
    <h1>{e(titel)}</h1>
    <p class="ondertitel">{e(prov)}</p>
   </div>
@@ -1058,6 +1079,90 @@ def gemeente_pagina(g):
   {kaartlinks}
   {actueel_html}
   {dicht_html}
+ </div>
+</main>
+
+<footer class="voet">
+ <div class="wrap">
+  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a><a href="/over">Over</a><a href="/privacy">Privacy</a></nav>
+  <p>Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</p>
+ </div>
+</footer>
+</body>
+</html>
+'''
+
+
+def gemeenten_overzicht(gemeenten):
+    """/gemeenten: alle gemeentepagina's per provincie, met het aantal cafés. Dit is de
+    toegang voor wie bladert en de plek waar elke gemeentepagina een gewone link krijgt."""
+    url = f'{ORIGIN}/gemeenten'
+    beeld = f'{ORIGIN}/gemeente/deel.jpg'
+    per = {}
+    for g in gemeenten.values():
+        per.setdefault(g['p'] or 'Andere', []).append(g)
+    blokken, inhoud = '', []
+    for prov in sorted(per, key=sleutel):
+        items = ''
+        for g in sorted(per[prov], key=lambda g: sleutel(g['naam'])):
+            n_open = sum(d.get('s') != 'Gesloten' for d in g['leden'])
+            n_dicht = len(g['leden']) - n_open
+            tel = f'{n_open} {"café" if n_open == 1 else "cafés"}' + (f', {n_dicht} gesloten' if n_dicht else '')
+            items += f'<li><a class="gnaam" href="/{e(g["u"])}/">{e(g["naam"])}</a><span class="gmeta">{e(tel)}</span></li>'
+        anker = url_deel(prov)
+        inhoud.append(f'<a href="#{e(anker)}">{e(prov)}</a>')
+        blokken += (f'<section aria-labelledby="{e(anker)}"><h2 id="{e(anker)}">{e(prov)}</h2>'
+                    f'<ul class="glijst govz">{items}</ul></section>')
+    titel = 'Cafés per gemeente'
+    omschrijving = kort(f'{len(gemeenten)} Belgische gemeenten met hun cafés, volkscafés en verdwenen kroegen, '
+                        'per provincie. Met adres, soort en ligging op de kaart.', 158)
+    return f'''<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#132738">
+<title>{e(titel)} | Kroeg &amp; Karaf</title>
+<meta name="description" content="{e(omschrijving)}">
+<link rel="canonical" href="{e(url)}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Kroeg &amp; Karaf">
+<meta property="og:locale" content="nl_BE">
+<meta property="og:title" content="{e(titel)}">
+<meta property="og:description" content="{e(omschrijving)}">
+<meta property="og:url" content="{e(url)}">
+<meta property="og:image" content="{e(beeld)}">
+<meta property="og:image:width" content="{W}">
+<meta property="og:image:height" content="{H}">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/assets/fonts/fonts.css">
+<link rel="stylesheet" href="/assets/cafe.css?v={VERSIE}">
+<link rel="stylesheet" href="/assets/gemeente.css?v={VERSIE}">
+</head>
+<body class="cafepagina tekstpagina gemeentepagina">
+<a class="naarinhoud" href="#inhoud">Naar de inhoud</a>
+<header class="balk">
+ <div class="wrap">
+  <a class="merk" href="/"><img src="/assets/logo.png" alt="Kroeg &amp; Karaf, naar de startpagina" width="760" height="575"></a>
+  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a></nav>
+ </div>
+</header>
+
+<main id="inhoud">
+ <div class="kop">
+  <div class="wrap">
+   <nav class="kruimel" aria-label="Kruimelpad"><a href="/lijst">Alle cafés</a></nav>
+   <h1>{e(titel)}</h1>
+   <p class="ondertitel">{len(gemeenten)} gemeenten</p>
+  </div>
+ </div>
+ <div class="wrap leeskolom">
+  <p class="aanhef">Elke gemeente met minstens drie zaken in de gids heeft een eigen pagina, met de deelgemeenten onder een eigen kopje en de gesloten cafés als archief onderaan. Kleinere gemeenten vind je via de lijst of de kaart.</p>
+  <nav class="gprov" aria-label="Provincies">{' '.join(inhoud)}</nav>
+  {blokken}
  </div>
 </main>
 
@@ -1185,14 +1290,17 @@ def main():
         (map_ / 'index.html').write_text(gemeente_pagina(g), encoding='utf-8')
         kaartjes.maak({'n': f'Cafés in {g["naam"]}', 't': 'Gemeente', 'g': g['leden'][0].get('p', '')},
                       map_ / 'deel.jpg')
-    print(f"gemeentepagina's: {len(gemeenten)} ({', '.join(g['naam'] for g in gemeenten.values())})")
+    if gemeenten:
+        (SITE / 'gemeenten.html').write_text(gemeenten_overzicht(gemeenten), encoding='utf-8')
+        kaartjes.maak({'n': 'Cafés per gemeente', 't': 'Gemeenten', 'g': f'{len(gemeenten)} gemeenten'},
+                      SITE / 'gemeente' / 'deel.jpg')
+    print(f"gemeentepagina's: {len(gemeenten)} plus het overzicht /gemeenten")
     # De lijst wordt in de browser getekend. Wie geen script uitvoert (of een crawler
     # die niet wacht) ziet in de oorspronkelijke html toch rechtstreekse links.
     pad_lijst = SITE / 'lijst.html'
     if pad_lijst.exists():
         t = pad_lijst.read_text(encoding='utf-8')
-        links = ', '.join(f'<a href="/{g["u"]}/">{e(g["naam"])}</a>' for g in gemeenten.values())
-        blok = ('<p class="laden">Cafés per gemeente: ' + links + '. Of lees <a href="/herfstwandelingen">'
+        blok = ('<p class="laden">Bekijk de <a href="/gemeenten">cafés per gemeente</a>. Of lees <a href="/herfstwandelingen">'
                 'Eerst het bos in. Dan op café</a>.</p>') if gemeenten else ''
         pad_lijst.write_text(t.replace('<!--gemeentelinks-->', blok), encoding='utf-8')
 
@@ -1203,6 +1311,7 @@ def main():
                                             separators=(',', ':')), encoding='utf-8')
     schrijf_start(data)
     urls = ([f'{ORIGIN}/', f'{ORIGIN}/lijst', f'{ORIGIN}/kaart', f'{ORIGIN}/afspreken', f'{ORIGIN}/over', f'{ORIGIN}/herfstwandelingen']
+            + ([f'{ORIGIN}/gemeenten'] if gemeenten else [])
             + [f'{ORIGIN}/{g["u"]}/' for g in gemeenten.values()]
             + [f'{ORIGIN}/{d["u"]}/' for d in data])
     (SITE / 'sitemap.xml').write_text(

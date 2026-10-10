@@ -49,8 +49,10 @@ Drie kleine configuratiebestanden in `assets/` sturen de generator (`scripts/caf
 
 - `verhalen.json`: welke artikels welke zaken (ID's uit de csv) bespreken. Elke zaak krijgt
   daaruit een blokje Lees ook met een link naar het artikel.
-- `gemeenten.json`: voor welke gemeenten er een pagina op `/gemeente/<naam>/` komt. De pagina
-  haalt cafés, deelgemeenten en gesloten zaken uit de csv. Een naam erbij zetten volstaat.
+- `gemeenten.json`: elke hoofdgemeente met minstens `drempel` zaken (standaard 3, open en
+  gesloten samen) krijgt automatisch een pagina op `/gemeente/<naam>/` en staat op het overzicht
+  `/gemeenten`. Namen onder `gemeenten` krijgen altijd een pagina, ook onder de drempel. De pagina
+  haalt cafés, deelgemeenten en gesloten zaken uit de csv.
 - `fotos-extern.json`: foto's met een open licentie voor zaken zonder foto op Drive, met
   maker, licentie en bron (die staan onder de foto). Een foto van Drive gaat altijd voor.
 
