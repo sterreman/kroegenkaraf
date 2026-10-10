@@ -114,6 +114,9 @@ def afstand_tekst(x):
 
 
 def datum(t):
+    maand = re.fullmatch(r'(\d{4})-(\d{2})', (t or '').strip())
+    if maand and 1 <= int(maand.group(2)) <= 12:
+        return f'{MAANDEN[int(maand.group(2)) - 1]} {maand.group(1)}'
     m = re.fullmatch(r'(\d{4})-(\d{2})-(\d{2})', (t or '').strip())
     if not m:
         return (t or '').strip()
@@ -289,7 +292,8 @@ def doorverwijzingen(data, weg):
             elif kand and kand[0][0] < .015:   # zelfde adres, niet de buren
                 doel = f'/{kand[0][1]["u"]}/'
         if not doel:
-            doel = '/lijst.html?q=' + urllib.parse.quote(plaats(x.get('g')) or '')
+            doel = (GEMEENTE_URL.get(sleutel(hoofdgemeente(x.get('g'))))
+                    or '/lijst?q=' + urllib.parse.quote(plaats(x.get('g')) or ''))
         regels.append(f'/{x["u"]}/ {doel} 301')
         regels.append(f'/{x["u"]} {doel} 301')
     return regels
@@ -435,7 +439,7 @@ ICOON_DEEL = ('<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5
               '<circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/>'
               '<path d="m8.3 13.3 7.4 4.4M15.7 6.3l-7.4 4.4"/></svg>')
 
-VERSIE = 'pagina-20261006c'
+VERSIE = 'pagina-20261010'
 
 ICOON_WEB = ('<svg class="lijn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/>'
              '<path d="M2.8 12h18.4M12 2.8c2.6 2.6 3.8 5.7 3.8 9.2s-1.2 6.6-3.8 9.2c-2.6-2.6-3.8-5.7-3.8-9.2'
@@ -465,14 +469,22 @@ KORT_VERHAAL = 480   # tot zoveel tekens blijft de hele beschrijving bovenaan
 
 
 def status_blok(d):
-    if d.get('s') == 'Geverifieerd':
-        t = ('Online gecontroleerd' + (f' op {datum(d["v"])}' if d.get('v') else '')
-             + '. Openingsuren niet gecontroleerd.')
-        return f'<p class="controle">{e(t)}</p>'
+    """Drie dingen die niet door elkaar mogen lopen: is de zaak gecontroleerd
+    (de datum in Geverifieerd op), waar staan de openingsuren (altijd bij de
+    zaak zelf, ook als Info er enkele noemt) en is ze nu open (dat weten we niet)."""
     if d.get('s') == 'Gesloten':
         return ''
-    return ('<p class="controle">Status nog te bevestigen. Controleer voor je bezoek of de '
-            'zaak nog open is.</p>')
+    if d.get('s') != 'Geverifieerd':
+        return ('<p class="controle">Status nog te bevestigen. Controleer voor je bezoek of de '
+                'zaak nog open is.</p>')
+    zaak = ('Zaak online gecontroleerd' + (f' op {e(datum(d["v"]))}' if d.get('v') else '') + '.')
+    if d.get('w'):
+        uren = (f'Openingsuren: kijk op <a href="{e(d["w"])}" target="_blank" rel="noopener">'
+                f'de website van de zaak</a>.')
+    else:
+        uren = 'Openingsuren zijn niet apart gecontroleerd; kijk ze vooraf na bij de zaak of op Google Maps.'
+    return (f'<p class="controle">{zaak} {uren}</p>'
+            '<p class="controle">Of de zaak nu open is, tonen we niet.</p>')
 
 
 ZIN = re.compile(r"(?<=[a-zà-ÿ0-9)]{2}[.!?])\s+(?=[A-ZÀ-Ý'‘])")
@@ -559,8 +571,15 @@ def fotoblok(d):
 
     def dia(i, f):
         laden = 'eager' if i == 0 else 'lazy'
-        alt = f'Foto van {d["n"]}' + (f', {i + 1} van {len(fotos)}' if len(fotos) > 1 else '')
-        bij = (f'<figcaption>Foto: {e(f["c"])}</figcaption>' if f.get('c') else '')
+        alt = f.get('alt') or (f'Foto van {d["n"]}' + (f', {i + 1} van {len(fotos)}' if len(fotos) > 1 else ''))
+        if f.get('lic'):
+            # foto met vaste naamsvermelding: maker, licentie en bron als link
+            bron = (f'<a href="{e(f["bron"])}" rel="noopener">{e(f["c"])}</a>' if f.get('bron') else e(f['c']))
+            lic = (f'<a href="{e(f["licurl"])}" rel="license noopener">{e(f["lic"])}</a>'
+                   if f.get('licurl') else e(f['lic']))
+            bij = f'<figcaption>Foto: {bron}, {lic}</figcaption>'
+        else:
+            bij = (f'<figcaption>Foto: {e(f["c"])}</figcaption>' if f.get('c') else '')
         return (f'<img src="/fotos/{e(f["f"])}.avif" alt="{e(alt)}" width="1100" height="733" '
                 f'loading="{laden}" decoding="async">{bij}')
 
@@ -614,6 +633,43 @@ def voeg_inzendingen_toe(data):
     print(f"bezoekersfoto's: {gekoppeld} gekoppeld")
 
 
+def voeg_externe_fotos_toe(data):
+    """Foto's met een open licentie voor zaken zonder eigen foto, uit
+    assets/fotos-extern.json (per ID: bestand in assets/, alt, maker, licentie en
+    bron). Ze krijgen een naamsvermelding onder de foto. Een zaak die al een foto
+    van Drive heeft, houdt die."""
+    pad = SITE / 'assets/fotos-extern.json'
+    if not pad.exists():
+        return
+    per_id = {d.get('id'): d for d in data if d.get('id')}
+    geplaatst = 0
+    for i, it in json.loads(pad.read_text(encoding='utf-8')).get('fotos', {}).items():
+        d = per_id.get(i)
+        if d is None:
+            print(f'  LET OP: fotos-extern.json noemt {i}, maar die zaak staat niet (meer) in de lijst.')
+            continue
+        if d.get('foto'):
+            continue
+        naar = d['u'].removeprefix('cafe/').replace('/', '-') + '-e'
+        try:
+            im = ImageOps.exif_transpose(Image.open(SITE / it['bestand']))
+            im.load()
+        except Exception as exc:
+            print(f'  LET OP: foto voor {d["n"]} niet te openen: {exc}')
+            continue
+        (SITE / 'fotos').mkdir(exist_ok=True)
+        groot = im.copy()
+        groot.thumbnail((1100, 900), Image.LANCZOS)
+        groot.convert('RGB').save(SITE / 'fotos' / f'{naar}.avif', 'AVIF', quality=58)
+        ImageOps.fit(im, (92, 92), Image.LANCZOS).convert('RGB').save(
+            SITE / 'fotos' / f'{naar}-klein.avif', 'AVIF', quality=62)
+        d['foto'] = naar
+        d['fotos'] = [{'f': naar, 'alt': it['alt'], 'c': it['maker'], 'bron': it['bron'],
+                       'lic': it['licentie'], 'licurl': it['licentie_url']}]
+        geplaatst += 1
+    print(f"foto's met open licentie: {geplaatst} geplaatst")
+
+
 def pagina(d, buren):
     url = f'{ORIGIN}/{d["u"]}/'
     beeld = f'{ORIGIN}/{d["u"]}/deel.jpg'
@@ -629,11 +685,17 @@ def pagina(d, buren):
     deeltekst = f'{d["n"]} in {plaats(gem) or d.get("p", "")}, gevonden op Kroeg & Karaf'
     q = urllib.parse.quote
 
-    kruimel = ['<a href="/lijst.html">Alle cafés</a>']
+    kruimel = ['<a href="/lijst">Alle cafés</a>']
     if d.get('p'):
-        kruimel.append(f'<a href="/lijst.html?p={q(d["p"])}">{e(d["p"])}</a>')
-    if gem and sleutel(plaats(gem)) != sleutel(d.get('p')):
-        kruimel.append(f'<a href="/lijst.html?q={q(plaats(gem))}">{e(plaats(gem))}</a>')
+        kruimel.append(f'<a href="/lijst?p={q(d["p"])}">{e(d["p"])}</a>')
+    gem_url = GEMEENTE_URL.get(sleutel(hoofdgemeente(gem)))
+    if gem and gem_url:
+        # de gemeente heeft een eigen pagina; een deelgemeente verwijst naar haar kopje daarop
+        kruimel.append(f'<a href="{e(gem_url)}">{e(hoofdgemeente(gem))}</a>')
+        if sleutel(plaats(gem)) != sleutel(hoofdgemeente(gem)):
+            kruimel.append(f'<a href="{e(gem_url)}#{e(url_deel(plaats(gem)))}">{e(plaats(gem))}</a>')
+    elif gem and sleutel(plaats(gem)) != sleutel(d.get('p')):
+        kruimel.append(f'<a href="/lijst?q={q(plaats(gem))}">{e(plaats(gem))}</a>')
 
     # ---- de kop: naam, soort, plaats en de eerste zin
     lengte = len(d['n'])
@@ -701,13 +763,15 @@ def pagina(d, buren):
     oproep_url = (FOTO_FORMULIER + '?' + urllib.parse.urlencode(
         {'cafe': f'{d["n"]}, {gem}' if gem else d['n'], 'slug': d['u']}))
     oproep = (f'<p class="fotooproep"><a class="link" href="{e(oproep_url)}" target="_blank" '
-              f'rel="noopener">{ICOON_FOTO}Upload jouw eigen foto van deze zaak</a></p>')
+              f'rel="noopener">{ICOON_FOTO}Upload jouw eigen foto van {e(d["n"])}</a>'
+              f'<span class="fotohint">Het formulier koppelt je foto automatisch aan {e(d["n"])}'
+              f'{", " + e(plaats(gem)) if gem else ""}.</span></p>')
     # Een fout melden gaat gewoon per mail, met de zaak en de pagina al ingevuld.
     naam_gem = f'{d["n"]}, {gem}' if gem else d['n']
     correctie_url = (f'mailto:{CONTACT}?subject=' + urllib.parse.quote(f'Correctie: {naam_gem}')
                      + '&body=' + urllib.parse.quote(f'Pagina: {ORIGIN}/{d["u"]}/\n\nWat klopt er niet?\n'))
     oproep += (f'<p class="correctie"><a class="link" href="{e(correctie_url)}">{ICOON_PEN}'
-               'Klopt er iets niet? Laat het weten</a></p>')
+               f'Klopt er iets niet bij {e(d["n"])}? Laat het weten</a></p>')
     praktisch = (f'<div class="praktisch">{adresblok}{status_blok(d)}{archief}{"".join(acties)}'
                  f'<ul class="links">{"".join(links)}</ul>{deelpaneel}{oproep}</div>')
     sinds = (f'<p class="sinds">In de gids sinds {e(datum(d["d"]))}.</p>' if d.get('d') else '')
@@ -734,7 +798,7 @@ def pagina(d, buren):
         kaart = ('<section class="ligging" aria-labelledby="liggingkop"><h2 id="liggingkop">Ligging</h2>'
                  '<div id="minikaart" role="region" aria-label="Kaart met de ligging"></div>'
                  '<p class="kaartlinks">'
-                 + ('' if dicht else f'<a href="/kaart.html#{d["u"]}">Bekijk op de grote kaart</a>')
+                 + ('' if dicht else f'<a href="/kaart#{d["u"]}">Bekijk op de grote kaart</a>')
                  + f'<a href="{e(maps_zoek(d))}" target="_blank" rel="noopener">Open in Google Maps</a></p>'
                  '<script type="application/json" id="ligging">'
                  + json.dumps(ligging, ensure_ascii=False).replace('</', '<\\/') + '</script></section>')
@@ -748,7 +812,7 @@ def pagina(d, buren):
 
     tekstblok = f'<div class="tekst">{tekst}</div>' if tekst else ''
     romp = (f'<div class="romp wrap{" zonderbuurt" if not buurt else ""}">'
-            f'<div class="hoofdkolom">{tekstblok}{kaart}{sinds}</div>'
+            f'<div class="hoofdkolom">{tekstblok}{verhaalblok(d)}{kaart}{sinds}</div>'
             f'{buurt}</div>')
 
     klassen = ' '.join(k for k in ('zaak', 'dicht' if dicht else '', 'metfoto' if foto else '',
@@ -785,7 +849,7 @@ def pagina(d, buren):
 <header class="balk">
  <div class="wrap">
   <a class="merk" href="/"><img src="/assets/logo.png" alt="Kroeg &amp; Karaf, naar de startpagina" width="760" height="575"></a>
-  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/lijst.html">Alle cafés</a><a href="/kaart.html">Kaart</a></nav>
+  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a></nav>
  </div>
 </header>
 
@@ -814,11 +878,202 @@ def pagina(d, buren):
 
 <footer class="voet">
  <div class="wrap">
-  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/lijst.html">Alle cafés</a><a href="/kaart.html">Kaart</a><a href="/afspreken.html">Afspreken</a><a href="/over.html">Over</a><a href="/privacy.html">Privacy</a></nav>
+  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a><a href="/over">Over</a><a href="/privacy">Privacy</a></nav>
   <p>Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</p>
  </div>
 </footer>
 {leaflet_js}<script src="/assets/cafe.js?v={VERSIE}"></script>
+</body>
+</html>
+'''
+
+
+# ---- gemeentepagina's ------------------------------------------------------------
+
+GEMEENTE_URL = {}     # sleutel(hoofdgemeente) -> '/gemeente/aalst/', gevuld in main()
+VERHALEN = {}         # ID -> lijst met {url, titel, anker, label}, gevuld in main()
+
+
+def laad_verhalen():
+    """assets/verhalen.json: welke artikels welke zaken bespreken. Daaruit komt
+    de teruglink op de cafepagina en het blokje op de gemeentepagina."""
+    pad = SITE / 'assets/verhalen.json'
+    uit = {}
+    if not pad.exists():
+        return uit
+    for v in json.loads(pad.read_text(encoding='utf-8')).get('verhalen', []):
+        for i, c in v.get('cafes', {}).items():
+            uit.setdefault(i, []).append({'url': v['url'], 'titel': v['titel'],
+                                          'anker': c.get('anker', ''), 'label': c.get('label', '')})
+    return uit
+
+
+def verhaalblok(d):
+    items = VERHALEN.get(d.get('id'), [])
+    if not items:
+        return ''
+    regels = ''.join(
+        f'<p><a href="{e(v["url"] + ("#" + v["anker"] if v["anker"] else ""))}">{e(v["titel"])}</a>'
+        + (f'<span class="vlabel">{e(v["label"])}</span>' if v['label'] else '') + '</p>' for v in items)
+    return ('<aside class="verhaalblok" aria-labelledby="verhaalkop"><h2 id="verhaalkop">Lees ook</h2>'
+            f'{regels}</aside>')
+
+
+def laad_gemeenten(data):
+    """assets/gemeenten.json: voor welke gemeenten er een eigen pagina komt. Een
+    gemeente erbij zetten is genoeg; de pagina haalt alles uit de csv. Bewust een
+    korte lijst: een pagina is pas nuttig als ze meer biedt dan een zoekopdracht."""
+    pad = SITE / 'assets/gemeenten.json'
+    if not pad.exists():
+        return {}
+    uit = {}
+    for naam in json.loads(pad.read_text(encoding='utf-8')).get('gemeenten', []):
+        leden = [d for d in data if d.get('g') and sleutel(hoofdgemeente(d['g'])) == sleutel(naam)]
+        if not leden:
+            print(f'  LET OP: gemeenten.json noemt {naam}, maar geen enkele zaak hoort erbij.')
+            continue
+        uit[sleutel(naam)] = {'naam': naam, 'u': f'gemeente/{url_deel(naam)}', 'leden': leden}
+    return uit
+
+
+def lijst_regel(d):
+    tekst = d.get('k') or lead_en_rest(d.get('i'))[0]
+    meta = ' · '.join(x for x in (d.get('t'), d.get('a')) if x)
+    todo = '<span class="gstatus">Status nog te bevestigen</span>' if d.get('s') == 'Te checken' else ''
+    dicht = (f'<span class="gstatus">Gesloten{" sinds " + e(datum(d["z"])) if d.get("z") else ""}</span>'
+             if d.get('s') == 'Gesloten' else '')
+    return (f'<li><a class="gnaam" href="/{e(d["u"])}/">{e(d["n"])}</a>'
+            f'<span class="gmeta">{e(meta)}</span>{todo}{dicht}'
+            + (f'<p>{e(tekst)}</p>' if tekst else '') + '</li>')
+
+
+def gemeente_pagina(g):
+    naam, leden = g['naam'], g['leden']
+    url = f'{ORIGIN}/{g["u"]}/'
+    beeld = f'{url}deel.jpg'
+    prov = leden[0].get('p', '')
+    actueel = sorted((d for d in leden if d.get('s') != 'Gesloten'), key=lambda d: sleutel(d['n']))
+    dicht = sorted((d for d in leden if d.get('s') == 'Gesloten'), key=lambda d: sleutel(d['n']))
+    n_gecontroleerd = sum(d.get('s') == 'Geverifieerd' for d in actueel)
+    plaatsen = sorted({plaats(d['g']) for d in leden}, key=sleutel)
+    deel = [p for p in plaatsen if sleutel(p) != sleutel(naam)]
+    q = urllib.parse.quote
+
+    if not actueel:
+        intro = f'In {naam} staan geen open cafés in de gids; de gesloten zaken vind je onderaan.'
+    else:
+        intro = (f'In {naam} ({prov}) staan {len(actueel)} {"café" if len(actueel) == 1 else "cafés"} in de gids'
+                 + (f', waarvan {n_gecontroleerd} online gecontroleerd' if n_gecontroleerd != len(actueel) else
+                    ', allemaal online gecontroleerd') + '.')
+        deel_open = [p for p in plaatsen if sleutel(p) != sleutel(naam)
+                     and any(plaats(d['g']) == p for d in actueel)]
+        if deel_open:
+            intro += (' De deelgemeente' + ('n ' if len(deel_open) > 1 else ' ')
+                      + ', '.join(deel_open[:-1]) + (' en ' if len(deel_open) > 1 else '') + deel_open[-1]
+                      + (' horen' if len(deel_open) > 1 else ' hoort') + ' erbij en '
+                      + ('staan' if len(deel_open) > 1 else 'staat') + ' onder een eigen kopje.')
+        soorten = sorted({d['t'] for d in actueel if d.get('t')})
+        if soorten:
+            intro += ' Soorten: ' + ', '.join(s.lower() for s in soorten) + '.'
+    verhalen = []
+    for d in leden:
+        for v in VERHALEN.get(d.get('id'), []):
+            if v['url'] not in [x['url'] for x in verhalen]:
+                verhalen.append(v)
+    verhaal_html = ''.join(
+        f'<p class="gverhaal">Een café uit {e(naam)} komt voor in ons verhaal '
+        f'<a href="{e(v["url"])}">{e(v["titel"])}</a>{"" if v["titel"].endswith((".", "!", "?")) else "."}</p>'
+        for v in verhalen)
+
+    def groep(lijst, voorvoegsel=''):
+        per = {}
+        for d in lijst:
+            per.setdefault(plaats(d['g']), []).append(d)
+        if len(per) == 1 and sleutel(next(iter(per))) == sleutel(naam):
+            return '<ul class="glijst">' + ''.join(lijst_regel(d) for d in lijst) + '</ul>'
+        uit = ''
+        for p in sorted(per, key=lambda p: (sleutel(p) != sleutel(naam), sleutel(p))):
+            uit += (f'<h3 id="{voorvoegsel}{e(url_deel(p))}">{e(p)}</h3><ul class="glijst">'
+                    + ''.join(lijst_regel(d) for d in per[p]) + '</ul>')
+        return uit
+
+    actueel_html = (f'<section aria-labelledby="actueel"><h2 id="actueel">Cafés in {e(naam)}</h2>{groep(actueel)}</section>'
+                    if actueel else '')
+    dicht_html = (f'<section aria-labelledby="gesloten"><h2 id="gesloten">Gesloten cafés</h2>'
+                  '<p>Deze zaken zijn dicht en blijven als archief in de gids staan.</p>'
+                  f'{groep(dicht, "gesloten-")}</section>' if dicht else '')
+    kaartlinks = (f'<p class="gknoppen"><a class="gknop" href="/kaart?q={q(naam)}">Bekijk {e(naam)} op de kaart</a>'
+                  f'<a class="gknop stil" href="/lijst?q={q(naam)}">Zoek in de lijst</a></p>') if actueel else ''
+    namen = [d['n'] for d in actueel[:3]]
+    omschrijving = kort(f'{len(actueel)} {"café" if len(actueel) == 1 else "cafés"} in {naam}'
+                        + (f', onder meer {", ".join(namen[:-1])}{" en " if len(namen) > 1 else ""}{namen[-1]}.' if namen else '.')
+                        + ' Met adres, soort en ligging op de kaart.', 158)
+    titel = f'Cafés in {naam}'
+    ld = {'@context': 'https://schema.org', '@type': 'CollectionPage', 'name': titel, 'url': url,
+          'mainEntity': {'@type': 'ItemList', 'itemListElement': [
+              {'@type': 'ListItem', 'position': i + 1, 'url': f'{ORIGIN}/{d["u"]}/', 'name': d['n']}
+              for i, d in enumerate(actueel)]}}
+    blob = json.dumps(ld, ensure_ascii=False).replace('</', '<\\/')
+    return f'''<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#132738">
+<title>{e(titel)} | Kroeg &amp; Karaf</title>
+<meta name="description" content="{e(omschrijving)}">
+<link rel="canonical" href="{e(url)}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Kroeg &amp; Karaf">
+<meta property="og:locale" content="nl_BE">
+<meta property="og:title" content="{e(titel)}">
+<meta property="og:description" content="{e(omschrijving)}">
+<meta property="og:url" content="{e(url)}">
+<meta property="og:image" content="{e(beeld)}">
+<meta property="og:image:width" content="{W}">
+<meta property="og:image:height" content="{H}">
+<meta property="og:image:alt" content="{e(titel)}, Kroeg &amp; Karaf">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/assets/fonts/fonts.css">
+<link rel="stylesheet" href="/assets/cafe.css?v={VERSIE}">
+<link rel="stylesheet" href="/assets/gemeente.css?v={VERSIE}">
+<script type="application/ld+json">{blob}</script>
+</head>
+<body class="cafepagina tekstpagina gemeentepagina">
+<a class="naarinhoud" href="#inhoud">Naar de inhoud</a>
+<header class="balk">
+ <div class="wrap">
+  <a class="merk" href="/"><img src="/assets/logo.png" alt="Kroeg &amp; Karaf, naar de startpagina" width="760" height="575"></a>
+  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a></nav>
+ </div>
+</header>
+
+<main id="inhoud">
+ <div class="kop">
+  <div class="wrap">
+   <nav class="kruimel" aria-label="Kruimelpad"><a href="/lijst">Alle cafés</a> <span aria-hidden="true">/</span> <a href="/lijst?p={q(prov)}">{e(prov)}</a></nav>
+   <h1>{e(titel)}</h1>
+   <p class="ondertitel">{e(prov)}</p>
+  </div>
+ </div>
+ <div class="wrap leeskolom">
+  <p class="aanhef">{e(intro)}</p>
+  {verhaal_html}
+  {kaartlinks}
+  {actueel_html}
+  {dicht_html}
+ </div>
+</main>
+
+<footer class="voet">
+ <div class="wrap">
+  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a><a href="/over">Over</a><a href="/privacy">Privacy</a></nav>
+  <p>Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</p>
+ </div>
+</footer>
 </body>
 </html>
 '''
@@ -916,8 +1171,14 @@ def main():
         sys.exit('STOP: onbekend formaat van het register met vaste urls.')
     weg = ken_urls_toe(data, register)
     voeg_inzendingen_toe(data)
+    voeg_externe_fotos_toe(data)
+
+    VERHALEN.update(laad_verhalen())
+    gemeenten = laad_gemeenten(data)
+    GEMEENTE_URL.update({k: f'/{g["u"]}/' for k, g in gemeenten.items()})
 
     shutil.rmtree(SITE / 'cafe', ignore_errors=True)
+    shutil.rmtree(SITE / 'gemeente', ignore_errors=True)
     buren = zoek_buren(data)
     kaartjes = Kaartjes()
     for d in data:
@@ -925,6 +1186,22 @@ def main():
         map_.mkdir(parents=True, exist_ok=True)
         (map_ / 'index.html').write_text(pagina(d, buren.get(d['u'], [])), encoding='utf-8')
         kaartjes.maak(d, map_ / 'deel.jpg')
+    for g in gemeenten.values():
+        map_ = SITE / g['u']
+        map_.mkdir(parents=True, exist_ok=True)
+        (map_ / 'index.html').write_text(gemeente_pagina(g), encoding='utf-8')
+        kaartjes.maak({'n': f'Cafés in {g["naam"]}', 't': 'Gemeente', 'g': g['leden'][0].get('p', '')},
+                      map_ / 'deel.jpg')
+    print(f"gemeentepagina's: {len(gemeenten)} ({', '.join(g['naam'] for g in gemeenten.values())})")
+    # De lijst wordt in de browser getekend. Wie geen script uitvoert (of een crawler
+    # die niet wacht) ziet in de oorspronkelijke html toch rechtstreekse links.
+    pad_lijst = SITE / 'lijst.html'
+    if pad_lijst.exists():
+        t = pad_lijst.read_text(encoding='utf-8')
+        links = ', '.join(f'<a href="/{g["u"]}/">{e(g["naam"])}</a>' for g in gemeenten.values())
+        blok = ('<p class="laden">Cafés per gemeente: ' + links + '. Of lees <a href="/herfstwandelingen">'
+                'Eerst het bos in. Dan op café</a>.</p>') if gemeenten else ''
+        pad_lijst.write_text(t.replace('<!--gemeentelinks-->', blok), encoding='utf-8')
 
     # zaken.json met de url erbij, register, sitemap, robots, doorverwijzingen
     with open(pad, 'w', encoding='utf-8') as fp:
@@ -932,7 +1209,8 @@ def main():
     (SITE / REGISTER).write_text(json.dumps(nieuw_register(data, weg), ensure_ascii=False,
                                             separators=(',', ':')), encoding='utf-8')
     schrijf_start(data)
-    urls = ([f'{ORIGIN}/', f'{ORIGIN}/lijst.html', f'{ORIGIN}/kaart.html', f'{ORIGIN}/afspreken.html', f'{ORIGIN}/over.html', f'{ORIGIN}/herfstwandelingen.html']
+    urls = ([f'{ORIGIN}/', f'{ORIGIN}/lijst', f'{ORIGIN}/kaart', f'{ORIGIN}/afspreken', f'{ORIGIN}/over', f'{ORIGIN}/herfstwandelingen']
+            + [f'{ORIGIN}/{g["u"]}/' for g in gemeenten.values()]
             + [f'{ORIGIN}/{d["u"]}/' for d in data])
     (SITE / 'sitemap.xml').write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'

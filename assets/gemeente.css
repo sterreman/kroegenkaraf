@@ -1,0 +1,28 @@
+/* Gemeentepagina's (/gemeente/<naam>/): de leeskolom met een lijst cafés. */
+
+.gemeentepagina .leeskolom{max-width:46em}
+.gemeentepagina .leeskolom h2{margin-top:36px}
+.gemeentepagina .leeskolom h3{margin:26px 0 4px;font-family:var(--kop);font-weight:800;font-stretch:78%;
+ font-size:21px;color:var(--inkt);scroll-margin-top:16px}
+.gemeentepagina .gverhaal{font-size:17px}
+
+.gknoppen{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 6px}
+.gknop{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;background:var(--roest);color:#fff;
+ font-family:var(--kop);font-weight:700;font-stretch:90%;font-size:16px;text-decoration:none}
+.gemeentepagina .leeskolom a.gknop{color:#fff}
+.gknop:hover{background:var(--roest-tekst)}
+.gknop.stil,.gemeentepagina .leeskolom a.gknop.stil{background:none;color:var(--inkt);box-shadow:inset 0 0 0 1.5px var(--inkt)}
+.gknop.stil:hover{background:var(--papier2)}
+
+.gemeentepagina .glijst{list-style:none;margin:8px 0 0;padding:0;border-top:2px solid var(--inkt)}
+.gemeentepagina .glijst li{padding:12px 2px 13px;border-bottom:1px solid var(--lijn);margin:0}
+.glijst .gnaam{font-family:var(--kop);font-weight:800;font-stretch:72%;font-size:22px;line-height:1.1;text-decoration:none;
+ color:var(--inkt)}
+.gemeentepagina .leeskolom .glijst a.gnaam{color:var(--inkt)}
+.glijst .gnaam:hover{color:var(--roest-tekst);text-decoration:underline;text-underline-offset:4px}
+.gmeta{display:block;margin-top:2px;font-family:var(--kop);font-stretch:92%;font-size:15px;color:var(--inkt3)}
+.gstatus{display:inline-block;margin-top:4px;padding:1px 8px;font-family:var(--kop);font-weight:700;font-size:12.5px;
+ letter-spacing:.05em;text-transform:uppercase;color:var(--inkt2);box-shadow:inset 0 0 0 1px var(--lijn)}
+.glijst p{margin:6px 0 0;font-size:16.5px;line-height:1.45}
+@media(max-width:600px){.glijst .gnaam{font-size:20px}}
+.glijst .gnaam{display:inline-block;padding:8px 0 4px}

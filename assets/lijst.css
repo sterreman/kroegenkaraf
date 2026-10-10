@@ -237,8 +237,8 @@ a.rij:focus-visible{outline:2px solid var(--inkt);outline-offset:-2px;background
 .voet{margin-top:56px;background:var(--marine);color:var(--creme2)}
 .voet .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 24px;
  padding-top:22px;padding-bottom:30px;font-family:var(--kop);font-stretch:90%;font-size:14px}
-.voet nav{display:flex;gap:20px}
-.voet a{color:var(--creme);text-underline-offset:4px}
+.voet nav{display:flex;flex-wrap:wrap;gap:0 20px}
+.voet a{display:inline-block;padding:11px 0;color:var(--creme);text-underline-offset:4px}
 .voet p{margin:0}
 
 @media(max-width:760px){

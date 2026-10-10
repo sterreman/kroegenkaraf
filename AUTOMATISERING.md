@@ -42,3 +42,19 @@ om twee gelijktijdige publicatiesystemen te vermijden.
 
 De geplande tijd is 02:17 UTC (04:17 Belgische zomertijd, 03:17 wintertijd).
 Rapporten staan in Actions, niet in een dagelijks chatbericht.
+
+## Verhalen, gemeentepagina's en foto's met open licentie (10 oktober 2026)
+
+Drie kleine configuratiebestanden in `assets/` sturen de generator (`scripts/cafepaginas.py`):
+
+- `verhalen.json`: welke artikels welke zaken (ID's uit de csv) bespreken. Elke zaak krijgt
+  daaruit een blokje Lees ook met een link naar het artikel.
+- `gemeenten.json`: voor welke gemeenten er een pagina op `/gemeente/<naam>/` komt. De pagina
+  haalt cafés, deelgemeenten en gesloten zaken uit de csv. Een naam erbij zetten volstaat.
+- `fotos-extern.json`: foto's met een open licentie voor zaken zonder foto op Drive, met
+  maker, licentie en bron (die staan onder de foto). Een foto van Drive gaat altijd voor.
+
+Lokaal bouwen en bekijken zonder te publiceren: `python scripts/bouw_lokaal.py <werkmap>`
+(standaard met de csv en foto's in `G:\Mijn Drive\Volkscafés`), daarna `<werkmap>\site` serveren.
+De site draait op Cloudflare met schone urls (`/lijst`, niet `/lijst.html`); canonical en
+sitemap gebruiken daarom de schone vorm.

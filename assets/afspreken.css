@@ -112,3 +112,8 @@
   .vertrek input{font-size:17px}
   .erbij{margin-left:34px}
 }
+
+.privacyregel a{color:var(--roest-tekst);text-underline-offset:2px}
+.uitleg-afstand strong{color:var(--inkt)}
+
+.linkknop.erbij{min-height:44px}

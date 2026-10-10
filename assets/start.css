@@ -91,3 +91,7 @@
   .rfoto{width:56px;height:56px}
   .rreden{font-size:15.5px}
 }
+
+/* aanraakdoelen: links in de tegel Laatste ronde minstens 44 px hoog */
+.racties a,.rnaam a,.rbuur a{display:inline-block;padding:10px 0}
+.rnaam a{padding:6px 0}

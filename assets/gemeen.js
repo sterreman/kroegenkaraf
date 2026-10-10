@@ -14,7 +14,9 @@ let DATA = [];
 /* Alle gemeenten en deelgemeenten, genormaliseerd, voor de zoekfunctie. */
 const PLAATSEN = new Set();
 
-const norm = s => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+/* Accenten en apostrofs vallen weg, zodat "'t Boshuisje", "\u2019t boshuisje" en "t boshuisje"
+   hetzelfde zoeken (de apostrof staat in de data recht, op een gsm vaak gekruld). */
+const norm = s => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f'\u2019\u2018`\u00b4]/g, '');
 const esc = s => (s || '').replace(/[&<>"]/g, c =>
   ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
 

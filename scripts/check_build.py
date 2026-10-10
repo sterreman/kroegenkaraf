@@ -29,7 +29,7 @@ def main():
         for name in ('index.html', 'deel.jpg'):
             if not Path('site', row['u'], name).is_file():
                 raise SystemExit(f"STOP: {name} ontbreekt voor {row['n']} ({row['u']}).")
-    for name in ('privacy.html', 'over.html', 'herfstwandelingen.html', 'assets/verhaal.css', 'afspreken.html', 'assets/afspreken.js', 'lijst.html', 'data/start.json', 'assets/fonts/fonts.css', 'sitemap.xml', 'robots.txt', 'data/slugs.json', 'assets/cafe.css', 'assets/cafe.js'):
+    for name in ('privacy.html', 'over.html', 'herfstwandelingen.html', 'assets/verhaal.css', 'assets/gemeente.css', 'assets/verhalen.json', 'assets/gemeenten.json', 'afspreken.html', 'assets/afspreken.js', 'lijst.html', 'data/start.json', 'assets/fonts/fonts.css', 'sitemap.xml', 'robots.txt', 'data/slugs.json', 'assets/cafe.css', 'assets/cafe.js'):
         if not Path('site', name).is_file():
             raise SystemExit(f'STOP: {name} ontbreekt.')
     print(f'{len(urls)} cafepaginas aanwezig.')
@@ -42,6 +42,26 @@ def main():
         for beeld in sorted(set(re.findall(r'(/assets/verhalen/[^\s"]+)', tekst))):
             if not Path('site', beeld.lstrip('/')).is_file():
                 raise SystemExit(f'STOP: {verhaal} toont een beeld dat ontbreekt: {beeld}')
+    # Gemeentepagina's: eigen titel, canonical, deelkaartje, en elke link naar een cafe klopt.
+    namen = json.loads(Path('site/assets/gemeenten.json').read_text(encoding='utf-8')).get('gemeenten', [])
+    titels, gemeenten = set(), 0
+    for map_ in sorted(Path('site/gemeente').glob('*/')):
+        pagina = (map_ / 'index.html').read_text(encoding='utf-8')
+        titel = re.search(r'<title>(.*?)</title>', pagina).group(1)
+        if titel in titels:
+            raise SystemExit(f'STOP: twee gemeentepagina\'s met dezelfde titel: {titel}')
+        titels.add(titel)
+        if f'<link rel="canonical" href="https://kroegenkaraf.be/gemeente/{map_.name}/">' not in pagina:
+            raise SystemExit(f'STOP: canonical klopt niet op {map_.name}')
+        if not (map_ / 'deel.jpg').is_file():
+            raise SystemExit(f'STOP: deelkaartje ontbreekt voor gemeente {map_.name}')
+        for link in set(re.findall(r'href="/(cafe/[^"#?]+?)/"', pagina)):
+            if not Path('site', link, 'index.html').is_file():
+                raise SystemExit(f'STOP: gemeente {map_.name} linkt naar een cafepagina die niet bestaat: /{link}/')
+        gemeenten += 1
+    if gemeenten != len(namen):
+        print(f'  LET OP: {len(namen)} gemeenten in gemeenten.json, {gemeenten} pagina\'s gebouwd.')
+    print(f"{gemeenten} gemeentepagina's gecontroleerd.")
     # Het blok Ontdek deze cafés: verwijst alleen naar ID's uit de CSV.
     pool = json.loads(Path('site/assets/ontdek.json').read_text(encoding='utf-8')).get('ids', [])
     per_id = {row.get('id'): row for row in data if row.get('id')}

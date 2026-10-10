@@ -1,3 +1,4 @@
 Pillow>=11.3,<13
 google-auth>=2.38,<3
 requests>=2.32,<3
+tzdata; sys_platform == 'win32'

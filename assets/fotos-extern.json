@@ -1,0 +1,21 @@
+{
+  "_uitleg": "Foto's met een open licentie voor zaken zonder eigen foto op Drive (per ID uit de csv). Bestand is een pad binnen assets/. Een zaak met een foto van Drive houdt die. Maker, licentie en bron staan onder de foto.",
+  "fotos": {
+    "KK00663": {
+      "bestand": "assets/verhalen/herfst/zoersel-1200.avif",
+      "alt": "Het lage bakstenen huis van 't Boshuisje in Zoersel, met groene luiken en een pannendak, aan de Boshuisweg",
+      "maker": "Aukje de Haan, Beeldbank Onroerend Erfgoed (2015)",
+      "bron": "https://id.erfgoed.net/afbeeldingen/230104",
+      "licentie": "CC BY 4.0",
+      "licentie_url": "https://creativecommons.org/licenses/by/4.0/deed.nl"
+    },
+    "KK03066": {
+      "bestand": "assets/verhalen/herfst/opdorp-1200.avif",
+      "alt": "Gevel van eetcafé Drytoren aan de Dries in Opdorp, met het opschrift Drytoren boven de ramen",
+      "maker": "Funkyxian, Wikimedia Commons (2015)",
+      "bron": "https://commons.wikimedia.org/wiki/File:Dries_65,_Opdorp.JPG",
+      "licentie": "CC BY-SA 4.0",
+      "licentie_url": "https://creativecommons.org/licenses/by-sa/4.0/deed.nl"
+    }
+  }
+}

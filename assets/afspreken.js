@@ -1,10 +1,10 @@
 /* Afspreken in het midden. Twee tot zes mensen vullen in waar ze vertrekken; de
    pagina zoekt plaatsen met cafés die voor iedereen ongeveer even ver liggen.
 
-   Alles gebeurt hier in de browser: de plaatsen, de afstanden en de keuze. Er
-   gaat niets naar een server. Wie "Mijn plek" gebruikt, krijgt de dichtste
-   plaats uit de gids ingevuld; de coördinaten zelf blijven in de pagina en komen
-   niet in de url.
+   De plaatsen, de afstanden (hemelsbreed) en de keuze worden in de browser
+   berekend. De ingevulde plaatsen komen wel in de url, zodat je de uitslag kunt
+   delen. Wie "Mijn plek" gebruikt, krijgt de dichtste plaats uit de gids
+   ingevuld; de coördinaten zelf blijven in de pagina en komen niet in de url.
 
    De url bewaart de keuze, zodat je ze kunt doorsturen:
    afspreken.html?van=Aalst&van=Sint-Niklaas&t=Volkscafé&tag=Terras&s=Geverifieerd */
@@ -253,8 +253,10 @@ function tekenUitslag(vertrek, plaatsen) {
         + (n > PER_PLAATS ? `<p class="meer"><a href="${zoek}">Alle ${n} cafés in ${esc(pl.g.split(' (')[0])}</a></p>` : '')
         + '</li>';
     }).join('') + '</ol>'
-    + '<p class="uitleg-afstand">Afstanden in vogelvlucht, naar het eerste café van elke plaats. '
-    + 'Wie over de Schelde of met de trein moet, is soms langer onderweg. '
+    + '<p class="uitleg-afstand"><strong>Hoe we rekenen.</strong> De afstanden zijn hemelsbreed: de rechte lijn '
+    + 'tussen de vertrekplaats en het eerste café van elke plaats. Het is geen rijafstand en geen reistijd. '
+    + 'De plaatsen staan gerangschikt naar de langste afstand die iemand moet afleggen. '
+    + 'Met de auto, de trein of over een rivier ben je soms een stuk langer onderweg. '
     + 'Kijk voor je vertrekt even na of de zaak open is.</p>';
 }
 
@@ -352,13 +354,17 @@ function laadfout() {
   $('laadmelding').innerHTML = '<p class="leegkop">De lijst kwam niet binnen.</p>'
     + '<p>Controleer je verbinding en probeer het opnieuw.</p>'
     + '<p class="leegknoppen"><button type="button" class="knop" id="opnieuw">Opnieuw proberen</button></p>';
-  $('opnieuw').addEventListener('click', () => { $('laadmelding').hidden = true; laadData(gereed, laadfout); });
+  $('opnieuw').addEventListener('click', () => {
+    $('laadmelding').innerHTML = '<p>De plaatsen worden geladen.</p>';
+    laadData(gereed, laadfout);
+  });
 }
 
 let geladen = false;
 function gereed() {
   if (geladen) return;
   geladen = true;
+  $('laadmelding').hidden = true;
   bouwPlaatsen();
   vulPlaatslijst();
   const u = new URLSearchParams(location.search);

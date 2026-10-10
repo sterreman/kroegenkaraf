@@ -1,0 +1,4 @@
+{
+  "_uitleg": "Gemeenten met een eigen pagina op /gemeente/<naam>/. Een naam erbij zetten volstaat: de pagina haalt de cafés, deelgemeenten en gesloten zaken uit de csv (alles waarvan de hoofdgemeente in de kolom Gemeente deze naam is). Bewust een korte lijst, beginnend bij de gemeenten van de herfstcafés; voeg er alleen een toe als er genoeg te zeggen valt.",
+  "gemeenten": ["Zoersel", "Aalst", "Buggenhout", "Kluisbergen", "Vleteren"]
+}

@@ -1,0 +1,16 @@
+{
+  "_uitleg": "Welke artikels welke zaken bespreken (ID's uit de csv). Bij de bouw krijgt elke genoemde cafepagina een blokje Lees ook en elke gemeentepagina een zin met een link naar het artikel. Anker is het id van de passage in het artikel.",
+  "verhalen": [
+    {
+      "url": "/herfstwandelingen",
+      "titel": "Eerst het bos in. Dan op café.",
+      "cafes": {
+        "KK00663": {"anker": "zoersel", "label": "Uitstap 1: de Boshuiswandeling, 5,8 km"},
+        "KK01238": {"anker": "meldert", "label": "Uitstap 2: de Kravaalbos wandelroute, 7,8 km"},
+        "KK03066": {"anker": "opdorp", "label": "Uitstap 3: de Lippelobos wandelroute, 8,9 km"},
+        "KK03067": {"anker": "kluisbergen", "label": "Uitstap 4: de Kluisbos wandelroute, 6,3 km"},
+        "KK02756": {"anker": "westvleteren", "label": "Uitstap 5: de Sint-Sixtuswandelroute, circa 8 km"}
+      }
+    }
+  ]
+}
