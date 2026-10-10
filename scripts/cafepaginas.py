@@ -469,22 +469,15 @@ KORT_VERHAAL = 480   # tot zoveel tekens blijft de hele beschrijving bovenaan
 
 
 def status_blok(d):
-    """Drie dingen die niet door elkaar mogen lopen: is de zaak gecontroleerd
-    (de datum in Geverifieerd op), waar staan de openingsuren (altijd bij de
-    zaak zelf, ook als Info er enkele noemt) en is ze nu open (dat weten we niet)."""
+    """Alleen of de zaak gecontroleerd is (de datum in Geverifieerd op).
+    Openingsuren staan, als we ze kennen, in de Info van de zaak."""
     if d.get('s') == 'Gesloten':
         return ''
     if d.get('s') != 'Geverifieerd':
         return ('<p class="controle">Status nog te bevestigen. Controleer voor je bezoek of de '
                 'zaak nog open is.</p>')
     zaak = ('Zaak online gecontroleerd' + (f' op {e(datum(d["v"]))}' if d.get('v') else '') + '.')
-    if d.get('w'):
-        uren = (f'Openingsuren: kijk op <a href="{e(d["w"])}" target="_blank" rel="noopener">'
-                f'de website van de zaak</a>.')
-    else:
-        uren = 'Openingsuren zijn niet apart gecontroleerd; kijk ze vooraf na bij de zaak of op Google Maps.'
-    return (f'<p class="controle">{zaak} {uren}</p>'
-            '<p class="controle">Of de zaak nu open is, tonen we niet.</p>')
+    return f'<p class="controle">{zaak}</p>'
 
 
 ZIN = re.compile(r"(?<=[a-zà-ÿ0-9)]{2}[.!?])\s+(?=[A-ZÀ-Ý'‘])")
