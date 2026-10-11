@@ -1301,7 +1301,7 @@ def main():
     if pad_lijst.exists():
         t = pad_lijst.read_text(encoding='utf-8')
         blok = ('<p class="laden">Bekijk de <a href="/gemeenten">cafés per gemeente</a>. Of lees <a href="/herfstwandelingen">'
-                'Eerst het bos in. Dan op café</a>.</p>') if gemeenten else ''
+                'Eerst het bos in. Dan op café</a> of <a href="/decaporgels-cafes">Een pint met een heel orkest</a>.</p>') if gemeenten else ''
         pad_lijst.write_text(t.replace('<!--gemeentelinks-->', blok), encoding='utf-8')
 
     # zaken.json met de url erbij, register, sitemap, robots, doorverwijzingen
@@ -1310,7 +1310,7 @@ def main():
     (SITE / REGISTER).write_text(json.dumps(nieuw_register(data, weg), ensure_ascii=False,
                                             separators=(',', ':')), encoding='utf-8')
     schrijf_start(data)
-    urls = ([f'{ORIGIN}/', f'{ORIGIN}/lijst', f'{ORIGIN}/kaart', f'{ORIGIN}/afspreken', f'{ORIGIN}/over', f'{ORIGIN}/herfstwandelingen']
+    urls = ([f'{ORIGIN}/', f'{ORIGIN}/lijst', f'{ORIGIN}/kaart', f'{ORIGIN}/afspreken', f'{ORIGIN}/over', f'{ORIGIN}/herfstwandelingen', f'{ORIGIN}/decaporgels-cafes']
             + ([f'{ORIGIN}/gemeenten'] if gemeenten else [])
             + [f'{ORIGIN}/{g["u"]}/' for g in gemeenten.values()]
             + [f'{ORIGIN}/{d["u"]}/' for d in data])
