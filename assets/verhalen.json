@@ -2,6 +2,32 @@
   "_uitleg": "Welke artikels welke zaken bespreken (ID's uit de csv). Bij de bouw krijgt elke genoemde cafepagina een blokje Lees ook en elke gemeentepagina een zin met een link naar het artikel. Anker is het id van de passage in het artikel.",
   "verhalen": [
     {
+      "url": "/bij-de-kachel",
+      "titel": "Bij de kachel",
+      "cafes": {
+        "KK02298": {
+          "anker": "brugge",
+          "label": "Halte 1: de Leuvense stoof van Vlissinghe"
+        },
+        "KK03127": {
+          "anker": "kortrijk",
+          "label": "Halte 2: een woonkamer met een kachel"
+        },
+        "KK01791": {
+          "anker": "bellingen",
+          "label": "Halte 3: lambiek uit de kruik, de stoof aan"
+        },
+        "KK00773": {
+          "anker": "ukkel",
+          "label": "Halte 4: de kachel van de spijtige duivel"
+        },
+        "KK03128": {
+          "anker": "francorchamps",
+          "label": "Halte 5: een houtkachel tussen de racefoto's"
+        }
+      }
+    },
+    {
       "url": "/decaporgels-cafes",
       "titel": "Een pint met een heel orkest",
       "cafes": {
