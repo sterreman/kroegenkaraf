@@ -60,3 +60,17 @@
   .foto.held figcaption{padding:0 var(--sp)}
   .foto figcaption{font-size:14.5px}
 }
+
+/* delen: een knop in de kop en een blok onderaan, met hetzelfde paneel als op een cafépagina */
+.verhaalpagina .kop .deelrij{margin:16px 0 0}
+.verhaalpagina .kop .deelrij .link{padding:8px 0}
+.deelknop svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+.verhaalpagina .kop .deelpaneel{border-bottom:0;margin-top:4px}
+.deelonder{margin:36px 0 0;padding:18px 18px 16px;background:var(--marine);color:var(--creme)}
+.leeskolom .deelonder h2{margin:0 0 4px;color:var(--creme);font-size:22px}
+.leeskolom .deelonder h2::before{display:none}
+.leeskolom .deelonder p{margin:0 0 10px;font-size:16px;color:var(--creme2)}
+.deelonder .deelpaneel{margin-top:0;padding:6px 0 0;border:0}
+.deelonder .deelpaneel a{color:var(--creme)}
+.deelonder :focus-visible{outline-color:var(--creme)}
+.verhaalpagina .deelpaneel a,.verhaalpagina .deelpaneel button{line-height:1.4}
