@@ -12,7 +12,7 @@
    startpagina op lijst.html. Die sturen we meteen door, voor er iets getekend wordt. */
 (function () {
   var s = location.search, h = location.hash;
-  if (/[?&](q|p|t|s|tag)=/.test(s) || /^#(cafe\/|\d)/.test(h)) location.replace('lijst.html' + s + h);
+  if (/[?&](q|p|t|s|tag)=/.test(s) || /^#(cafe\/|\d)/.test(h)) location.replace('/lijst' + s + h);
 })();
 </script>
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
@@ -29,7 +29,7 @@
  <div class="wrap kopraster">
   <a class="merk" href="/"><img src="assets/logo.png" alt="Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen" width="760" height="575"></a>
   <h1>Waar gaan we iets drinken?</h1>
-  <form class="zoek" role="search" action="lijst.html" method="get">
+  <form class="zoek" role="search" action="/lijst" method="get">
    <label class="sr" for="q">Zoek een gemeente of café</label>
    <div class="zoekveld">
     <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M12.8 12.8 17 17"/></svg>
@@ -38,7 +38,7 @@
    </div>
   </form>
   <nav class="kopknoppen" aria-label="Weergaven">
-   <a href="lijst.html">Alle cafés</a><a href="kaart.html">Kaart</a><a href="afspreken.html">Afspreken</a>
+   <a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a>
   </nav>
  </div>
 </header>
@@ -57,20 +57,20 @@
  <section class="oppad" aria-labelledby="oppadkop">
   <h2 id="oppadkop">Op pad</h2>
   <ul class="tegels">
-   <li class="breed"><a class="tegel uitgelicht" href="decaporgels-cafes.html">
+   <li class="breed"><a class="tegel uitgelicht" href="/decaporgels-cafes">
     <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M7.5 15V9M10.5 15V7.5M13.5 15V7.5M16.5 15V9"/></svg>
     <span class="tkop">Een pint met een heel orkest</span>
     <span class="ttekst">Een accordeon die vanzelf speelt en jij met een pint erbij. Ontdek de cafés, danszalen en verzamelaars waar het Decap-verhaal verdergaat.</span>
     <span class="tknop">Ontdek het orgelverhaal</span></a></li>
-   <li class="breed"><a class="tegel" href="herfstwandelingen.html">
+   <li class="breed"><a class="tegel" href="/herfstwandelingen">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c3.6 3 5.4 6.2 5.4 9.2A5.4 5.4 0 0 1 12 17.6a5.4 5.4 0 0 1-5.4-5.4C6.6 9.2 8.4 6 12 3Z"/><path d="M12 7.5v14M12 12l2.4-2.2M12 14.8l-2.6-2.4"/></svg>
     <span class="tkop">Eerst het bos in. Dan op café.</span>
     <span class="ttekst">Vijf herfstwandelingen met een café onderweg of aan het eind. Van het Zoerselbos tot Westvleteren: kies je uitstap voor zondag.</span></a></li>
-   <li><a class="tegel" href="afspreken.html">
+   <li><a class="tegel" href="/afspreken">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="4.5" cy="12" r="2.2"/><circle cx="19.5" cy="12" r="2.2"/><path d="M7.5 12h2.5M14 12h2.5M12 8.5v7"/></svg>
     <span class="tkop">Afspreken in het midden</span>
     <span class="ttekst">Vul in waar iedereen vertrekt. We zoeken cafés die voor iedereen ongeveer even ver liggen.</span></a></li>
-   <li><a class="tegel" href="kaart.html#buurt">
+   <li><a class="tegel" href="/kaart#buurt">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6"/><path d="M12 2.5v2.8M12 18.7v2.8M2.5 12h2.8M18.7 12h2.8"/></svg>
     <span class="tkop">Cafés in de buurt</span>
     <span class="ttekst">De kaart toont de zaken rond de plek waar je nu bent, of rond een adres dat je intypt.</span></a></li>
@@ -90,7 +90,7 @@
 
 <footer class="voet">
  <div class="wrap">
-  <nav aria-label="Onderaan"><a href="/" aria-current="page">Start</a><a href="lijst.html">Alle cafés</a><a href="kaart.html">Kaart</a><a href="afspreken.html">Afspreken</a><a href="/over.html">Over</a><a href="/privacy.html">Privacy</a></nav>
+  <nav aria-label="Onderaan"><a href="/" aria-current="page">Start</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a><a href="/over">Over</a><a href="/privacy">Privacy</a></nav>
   <p id="foot">Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</p>
  </div>
 </footer>

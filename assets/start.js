@@ -146,7 +146,7 @@ function toon(start) {
   const prov = start.provincies || [];
   if (prov.length) {
     $('provlijst').innerHTML = prov.map(([p, n]) =>
-      `<li><a href="lijst.html?p=${encodeURIComponent(p)}"><span>${esc(p)}</span>`
+      `<li><a href="/lijst?p=${encodeURIComponent(p)}"><span>${esc(p)}</span>`
       + `<span class="n">${n.toLocaleString('nl-BE')}</span></a></li>`).join('');
     $('provincies').hidden = false;
   }
