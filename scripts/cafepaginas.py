@@ -1302,7 +1302,17 @@ def main():
         t = pad_lijst.read_text(encoding='utf-8')
         blok = ('<p class="laden">Bekijk de <a href="/gemeenten">cafés per gemeente</a>. Of lees <a href="/herfstwandelingen">'
                 'Eerst het bos in. Dan op café</a>, <a href="/decaporgels-cafes">Een pint met een heel orkest</a> of <a href="/bij-de-kachel">Bij de kachel</a>.</p>') if gemeenten else ''
-        pad_lijst.write_text(t.replace('<!--gemeentelinks-->', blok), encoding='utf-8')
+        t = t.replace('<!--gemeentelinks-->', blok)
+        # welke hoofdgemeenten een eigen pagina hebben, zodat de plaatsnaam boven elke
+        # groep in de lijst ernaar kan linken (gids.js); de sleutel is die van sleutel()
+        kaart = json.dumps({k: g['u'] for k, g in gemeenten.items()},
+                           ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
+        t, n = re.subn(r'const GEMEENTEPAGINAS = \{[^<]*?\};',
+                       lambda m: f'const GEMEENTEPAGINAS = {kaart};', t, count=1)
+        if n != 1:
+            print('  LET OP: GEMEENTEPAGINAS niet gevonden in lijst.html; de plaatsnamen in de '
+                  'lijst linken dan alleen naar een zoekopdracht.')
+        pad_lijst.write_text(t, encoding='utf-8')
 
     # zaken.json met de url erbij, register, sitemap, robots, doorverwijzingen
     with open(pad, 'w', encoding='utf-8') as fp:

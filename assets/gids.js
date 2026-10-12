@@ -45,6 +45,37 @@ function rij(d) {
     + '</li>';
 }
 
+/* De plaatsnaam boven een groep linkt door. Heeft de hoofdgemeente een eigen
+   pagina (GEMEENTEPAGINAS, door cafepaginas.py in lijst.html gezet), dan gaat
+   de link daarheen; een deelgemeente springt naar haar kopje op die pagina,
+   zoals de kruimel op een cafepagina. Zonder pagina filtert de link de lijst op
+   die plaats. Staat de lijst al op die plaats gefilterd, dan is er geen link. */
+const urlDeel = t => norm(t).replace(/&/g, ' en ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'zaak';
+const hoofdVan = g => ((g || '').match(/\(([^)]+)\)/) || [, g || ''])[1].trim();
+const plaatsVan = g => (g || '').split(' (')[0].trim();
+const OPENPLAATS = new Set();
+function gemeenteLink(g) {
+  if (!g) return '';
+  const pagina = typeof GEMEENTEPAGINAS === 'object' && GEMEENTEPAGINAS
+    ? GEMEENTEPAGINAS[sleutel(hoofdVan(g))] : '';
+  const p = plaatsVan(g);
+  if (pagina) {
+    if (sleutel(p) === sleutel(hoofdVan(g))) return `/${pagina}/`;
+    /* op de gemeentepagina staan gesloten zaken onder hun eigen kopjes */
+    return `/${pagina}/#${OPENPLAATS.has(g) ? '' : 'gesloten-'}${urlDeel(p)}`;
+  }
+  if (f.q && f.q.trim() === norm(p)) return '';
+  return '/lijst?q=' + encodeURIComponent(p);
+}
+function plaatsNaam(g) {
+  if (!g) return '<span class="pnaam">Gemeente nog te bepalen</span>';
+  const u = gemeenteLink(g);
+  const pagina = u && !u.startsWith('/lijst');
+  return u
+    ? `<a class="pnaam" href="${esc(u)}"${pagina ? ` title="Alle cafés in ${esc(hoofdVan(g))}"` : ''}>${esc(g)}</a>`
+    : `<span class="pnaam">${esc(g)}</span>`;
+}
+
 function render() {
   const res = selectie();
   const dicht = geslotenTreffers();
@@ -76,7 +107,7 @@ function render() {
     const k = d.p + '|' + d.g;
     if (k !== groep) {
       sluitGroep();
-      html += `<section class="plaats"><h2 class="plaatskop"><span class="pnaam">${esc(d.g || 'Gemeente nog te bepalen')}</span>`
+      html += `<section class="plaats"><h2 class="plaatskop">${plaatsNaam(d.g)}`
         + `<span class="pprov">${esc(d.p)}</span><span class="pn" aria-label="${telwoord(perGroep[k])}">${perGroep[k]}</span></h2>`;
       groep = k; items = '';
     }
@@ -144,6 +175,7 @@ function gereed() {
   if (geladen) return;
   geladen = true;
   telKenmerken();
+  DATA.forEach(d => { if (d.g && d.s !== 'Gesloten') OPENPLAATS.add(d.g); });
   $('foot').textContent = 'De gids telt ' + DATA.length.toLocaleString('nl-BE')
     + ' zaken · bijgewerkt ' + BIJGEWERKT;
   FB.teken = render;
