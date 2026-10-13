@@ -101,7 +101,7 @@
   .afspraak{max-width:none}
 }
 @media(max-width:760px){
-  .kopraster{grid-template-areas:"merk titel" "zoek zoek"}
+  .kopraster{grid-template-areas:"titel" "zoek"}
   .kopuitleg{font-size:16.5px;margin-top:10px}
   .afspreekpagina .kaartvak{margin-left:calc(-1 * var(--sp));margin-right:calc(-1 * var(--sp));
    border-left:0;border-right:0}

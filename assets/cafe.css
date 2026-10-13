@@ -34,11 +34,13 @@ a{color:inherit}
 
 /* ---- navigatie: een smalle balk, de zaak komt meteen in beeld ---- */
 .balk{background:var(--marine);color:var(--creme);border-bottom:1px solid var(--lijn-m)}
-.balk .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;
+.balk .wrap{display:flex;align-items:center;gap:6px 18px;
  padding-top:6px;padding-bottom:6px}
+.merkzin{margin:0;font-family:var(--kop);font-stretch:85%;font-weight:600;font-size:13px;letter-spacing:.1em;
+ text-transform:uppercase;color:var(--creme2)}
 .merk{display:block;line-height:0}
 .merk img{display:block;height:50px;width:auto}
-.hoofdnav{display:flex;gap:4px}
+.hoofdnav{margin-left:auto;display:flex}
 .hoofdnav a{font-family:var(--kop);font-stretch:85%;font-weight:600;font-size:15px;
  letter-spacing:.01em;color:var(--creme);text-decoration:none;padding:12px 10px}
 .hoofdnav a:hover{color:var(--roest-licht);text-decoration:underline;text-underline-offset:5px;
@@ -207,6 +209,7 @@ h2::before{content:"";width:34px;height:5px;background:var(--roest)}
   .kopfoto{margin:0 calc(-1 * var(--sp))}
   .kopfoto img{min-height:0;aspect-ratio:3/2}
 }
+@media(max-width:900px){.merkzin{display:none}}
 @media(max-width:560px){
   body{font-size:16.5px}
   .merk img{height:44px}
