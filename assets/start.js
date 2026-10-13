@@ -1,4 +1,4 @@
-/* De startpagina. Vier zaken om te ontdekken (met een knop voor vier andere), de artikels van Op pad
+/* De startpagina. Zes zaken om te ontdekken (met een knop voor zes andere), de artikels van Op pad
    uit assets/oppad.json (via oppad.js), en de provincies;
    de zoekbalk is een gewoon formulier naar /lijst.
 
@@ -6,7 +6,7 @@
    kilobyte in plaats van de hele zaken.json. Ontbreekt dat bestand (een lokale
    kopie zonder bouw), dan valt de pagina terug op zaken.json en assets/ontdek.json. */
 
-const VIER = 4;
+const ZES = 6;
 const $ = id => document.getElementById(id);
 const esc = s => (s || '').replace(/[&<>"]/g, c =>
   ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
@@ -46,7 +46,7 @@ function geschud(pool, ronde) {
   return rij;
 }
 
-/* Elke dag vier andere zaken. De pool wordt per ronde geschud en dag na dag
+/* Elke dag zes andere zaken. De pool wordt per ronde geschud en dag na dag
    afgelopen, zodat elke zaak aan de beurt komt voor er een terugkeert. Door het
    schudden staan de provincies vanzelf door elkaar. */
 function ontdekPool(zaken) {
@@ -54,13 +54,13 @@ function ontdekPool(zaken) {
     .sort((x, y) => (x.id || x.u).localeCompare(y.id || y.u));
 }
 
-/* `verder` telt de klikken op "Toon vier andere": elke klik loopt verder in
+/* `verder` telt de klikken op "Toon zes andere": elke klik loopt verder in
    dezelfde geschudde volgorde, dus je ziet de hele pool voor er een zaak
    terugkeert. Zonder klik is het de keuze van de dag. */
 function kies(pool, verder = 0) {
   if (!pool.length) return [];
-  const n = pool.length, pos = (dagNummer(new Date()) + verder) * VIER, keuze = [];
-  for (let k = 0; keuze.length < Math.min(n, VIER) && k < n * 2; k++) {
+  const n = pool.length, pos = (dagNummer(new Date()) + verder) * ZES, keuze = [];
+  for (let k = 0; keuze.length < Math.min(n, ZES) && k < n * 2; k++) {
     const p = pos + k;
     const d = geschud(pool, Math.floor(p / n))[p % n];
     if (!keuze.includes(d)) keuze.push(d);
@@ -147,13 +147,13 @@ function toon(start) {
   if (!pool.length) { $('ontdek').hidden = true; } else {
     tekenOntdek(kies(pool));
     const knop = $('ontdekmeer');
-    if (pool.length > VIER) {
+    if (pool.length > ZES) {
       let verder = 0;
       knop.hidden = false;
       knop.addEventListener('click', () => {
         verder++;
         tekenOntdek(kies(pool, verder));
-        $('ontdekstatus').textContent = 'Vier andere cafés getoond.';
+        $('ontdekstatus').textContent = 'Zes andere cafés getoond.';
         lijst.classList.remove('vers');
         void lijst.offsetWidth;
         lijst.classList.add('vers');

@@ -37,7 +37,7 @@
 
 /* cafés: compacte kaartjes in twee bij twee, met een kleine foto waar die er is */
 .cafelijst{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 26px}
-.cafelijst[aria-busy="true"]{min-height:520px}
+.cafelijst[aria-busy="true"]{min-height:640px}
 .cafekaart{border-top:1px solid var(--lijn)}
 .cafekaart a{display:block;height:100%;padding:14px 4px 16px 0;text-decoration:none;color:inherit}
 .cafefoto{float:right;margin:2px 0 8px 12px}
@@ -128,7 +128,19 @@
 @media(min-width:900px){
   .hoofdraster{grid-template-columns:minmax(0,55fr) minmax(0,45fr);grid-template-rows:auto 1fr;
    grid-template-areas:"cafes oppad" "cafes rest";column-gap:clamp(36px,4.5vw,64px);row-gap:0;align-items:start}
-  .cafes{grid-area:cafes}
+  .cafes{grid-area:cafes;align-self:stretch;display:flex;flex-direction:column}
+  /* de onderste rij van beide kolommen (Bekijk alle cafés / Bekijk alle uitstappen) staat op dezelfde lijn */
+  .cafevoet{margin-top:auto}
+  .cafes .ontdekvoet{margin:14px 0 18px}
+  .op-rest{align-self:stretch;display:flex;flex-direction:column;padding-top:0}
+  .op-meer{margin-bottom:18px}
+  .op-alle{margin:auto 0 0;padding-top:14px;border-top:2px solid var(--inkt);min-height:60px;display:flex;align-items:center}
+  .cafekaart a{padding:18px 6px 20px 0}
+  .cafenaam{font-size:27px}
+  .caferede{font-size:17px;-webkit-line-clamp:5;line-clamp:5}
+  .op-groot .opfoto img{aspect-ratio:2 / 1}
+  .op-groot .optekst{padding-top:12px}
+  .op-meer .op-klein{padding:10px 0}
   .op-hoofd{grid-area:oppad}
   .op-rest{grid-area:rest;padding-top:6px}
   .kolintro{min-height:2.85em}
@@ -160,7 +172,7 @@
 }
 @media(max-width:599px){
   .cafelijst{grid-template-columns:1fr}
-  .cafelijst[aria-busy="true"]{min-height:560px}
+  .cafelijst[aria-busy="true"]{min-height:800px}
   .cafekaart a{padding:12px 2px 14px 0}
   .cafenaam{font-size:23px}
 }
