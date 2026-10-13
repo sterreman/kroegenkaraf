@@ -36,6 +36,9 @@
 .op-klein .opfoto img{aspect-ratio:4/3}
 .op-klein .opbron{margin-top:4px}
 .op-klein .optitel{font-size:24px}
+.op-klein .oprubriek{flex-wrap:wrap;gap:0 6px;letter-spacing:.06em}
+.op-klein .oprubriek::before{display:none}
+.oprubriek time{white-space:nowrap}
 .op-klein .optekst{align-self:center}
 
 /* overzichtspagina */

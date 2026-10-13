@@ -13,13 +13,18 @@ window.OpPad = (() => {
       .then(d => (d.artikels || []).filter(a => a.url && a.titel));
   }
 
-  /* Seizoensartikels voor in deze maand eerst; daarna de volgorde van het bestand. */
-  function ordenen(artikels, datum) {
-    const m = (datum || new Date()).getMonth() + 1;
-    const past = a => (a.maanden || []).includes(m) ? 0 : 1;
-    return artikels.map((a, i) => [a, i]).sort((x, y) => past(x[0]) - past(y[0]) || x[1] - y[1]).map(x => x[0]);
+  /* Het recentste artikel eerst (op 'datum'); artikels zonder datum komen achteraan, in bestandsvolgorde. */
+  function ordenen(artikels) {
+    return artikels.map((a, i) => [a, i])
+      .sort((x, y) => (y[0].datum || '').localeCompare(x[0].datum || '') || x[1] - y[1]).map(x => x[0]);
   }
 
+  const MAANDEN = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus',
+    'september', 'oktober', 'november', 'december'];
+  function datum(a) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(a.datum || '');
+    return m ? `<time datetime="${a.datum}">${+m[3]} ${MAANDEN[+m[2] - 1]} ${m[1]}</time>` : '';
+  }
   function beeld(a, sizes, eerste) {
     const b = a.beeld;
     if (!b || !(b.bestanden || []).length) return '';
@@ -48,7 +53,7 @@ window.OpPad = (() => {
       + beeld(a, sizes, eerste)
       + (variant === 'klein' ? '' : credit(a))
       + `<div class="optekst">`
-      + (a.rubriek ? `<p class="oprubriek">${esc(a.rubriek)}</p>` : '')
+      + (a.rubriek || a.datum ? `<p class="oprubriek">${[a.rubriek ? esc(a.rubriek) : '', datum(a)].filter(Boolean).join('<span aria-hidden="true"> · </span>')}</p>` : '')
       + `<h3 class="optitel"><a href="${esc(a.url)}">${esc(a.titel)}</a></h3>`
       + (variant === 'klein' ? '' : (a.omschrijving ? `<p class="opomschrijving">${esc(a.omschrijving)}</p>` : '') + feiten)
       + (variant === 'klein' ? credit(a) : `<p class="oplees" aria-hidden="true">Lees het artikel</p>`)

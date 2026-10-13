@@ -1,14 +1,14 @@
 {
-  "_uitleg": "De artikels van Op pad: de bron voor de startpagina en voor het overzicht op /oppad. Een artikel erbij zetten volstaat; er staat niets anders in de pagina's. 'url' is het pad van het artikel, 'titel' en 'omschrijving' staan als tekst op de kaart, 'rubriek' is het label boven de titel en 'feiten' zijn korte, controleerbare gegevens uit het artikel zelf (streek, thema, afstand): verzin er geen. 'maanden' (1 tot 12) zegt in welke maanden het artikel seizoensgebonden uitgelicht mag worden; het eerste artikel dat past komt vooraan, anders geldt de volgorde in deze lijst. De startpagina toont het eerste artikel groot en de volgende twee compact. 'beeld' verwijst naar echte bestanden onder assets/ met 'bestanden' per breedte (avif en webp), de afmetingen van de standaardversie ('breed' is de breedte van de standaardversie), een beschrijving voor 'alt' en eventueel 'bron' met de naam en licentie van de maker.",
+  "_uitleg": "De artikels van Op pad: de bron voor de startpagina en voor het overzicht op /oppad. Een artikel erbij zetten volstaat; er staat niets anders in de pagina's. 'url' is het pad van het artikel, 'titel' en 'omschrijving' staan als tekst op de kaart, 'rubriek' is het label boven de titel en 'feiten' zijn korte, controleerbare gegevens uit het artikel zelf (streek, thema, afstand): verzin er geen. 'datum' (jjjj-mm-dd) is de publicatiedatum; het recentste artikel komt vooraan. De startpagina toont het eerste artikel groot en de volgende twee compact. 'beeld' verwijst naar echte bestanden onder assets/ met 'bestanden' per breedte (avif en webp), de afmetingen van de standaardversie ('breed' is de breedte van de standaardversie), een beschrijving voor 'alt' en eventueel 'bron' met de naam en licentie van de maker.",
   "artikels": [
     {
       "id": "herfstwandelingen",
+      "datum": "2026-10-07",
       "url": "/herfstwandelingen",
-      "rubriek": "Wandelingen · Herfst 2026",
+      "rubriek": "Wandelingen",
       "titel": "Eerst het bos in. Dan op café.",
       "omschrijving": "Vijf herfstwandelingen met een café onderweg of aan het eind. Kies je uitstap voor zondag.",
       "feiten": ["5 wandelingen", "6 tot 9 km", "Van Zoersel tot Westvleteren"],
-      "maanden": [9, 10, 11],
       "beeld": {
         "bestanden": [
           {"w": 800, "avif": "/assets/verhalen/herfst/held-800.avif", "webp": "/assets/verhalen/herfst/held-800.webp"},
@@ -22,12 +22,12 @@
     },
     {
       "id": "bij-de-kachel",
+      "datum": "2026-10-12",
       "url": "/bij-de-kachel",
       "rubriek": "Caféverhalen",
       "titel": "Bij de kachel",
       "omschrijving": "Vijf cafés waar in de winter nog een stoof brandt, van de Brugse reien tot de Ardennen.",
       "feiten": ["5 cafés", "Van Brugge tot Francorchamps"],
-      "maanden": [11, 12, 1, 2, 3],
       "beeld": {
         "bestanden": [
           {"w": 800, "avif": "/assets/verhalen/kachel/held-800.avif", "webp": "/assets/verhalen/kachel/held-800.webp"},
@@ -41,6 +41,7 @@
     },
     {
       "id": "decaporgels-cafes",
+      "datum": "2026-10-11",
       "url": "/decaporgels-cafes",
       "rubriek": "Caféverhalen",
       "titel": "Een pint met een heel orkest",
@@ -58,6 +59,7 @@
     },
     {
       "id": "grenscafes-belgie-nederland",
+      "datum": "2026-10-13",
       "url": "/grenscafes-belgie-nederland",
       "rubriek": "Caféverhalen",
       "titel": "Op café langs de grens",

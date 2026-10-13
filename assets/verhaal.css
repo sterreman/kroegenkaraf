@@ -91,3 +91,6 @@
 .verhaalpagina .kop .rubriek a:hover{color:#fff}
 .leeskolom .terugnaar{margin:18px 0 0;font-family:var(--kop);font-stretch:90%;font-weight:700;font-size:16px}
 .leeskolom .terugnaar a::before{content:"\2190  ";text-decoration:none;display:inline-block}
+
+/* publicatiedatum onder de ondertitel van een artikel */
+.verhaalpagina .kop .datum{margin:10px 0 0;font-family:var(--kop);font-stretch:90%;font-weight:600;font-size:14px;letter-spacing:.02em;color:var(--creme2)}
