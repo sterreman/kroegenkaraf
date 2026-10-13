@@ -61,6 +61,3 @@
 @media(max-width:519px){
   .op-klein:has(.opfoto){grid-template-columns:96px minmax(0,1fr);column-gap:14px}
 }
-
-/* de huidige pagina in de hoofdnavigatie van tekstpagina's */
-.hoofdnav a[aria-current="page"]{text-decoration:underline;text-decoration-color:var(--roest-licht);text-decoration-thickness:2px;text-underline-offset:5px}

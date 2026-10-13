@@ -34,18 +34,17 @@ a{color:inherit}
 
 /* ---- navigatie: een smalle balk, de zaak komt meteen in beeld ---- */
 .balk{background:var(--marine);color:var(--creme);border-bottom:1px solid var(--lijn-m)}
-.balk .wrap{display:flex;align-items:center;gap:6px 18px;
- padding-top:6px;padding-bottom:6px}
-.merkzin{margin:0;font-family:var(--kop);font-stretch:85%;font-weight:600;font-size:13px;letter-spacing:.1em;
- text-transform:uppercase;color:var(--creme2)}
+.balk .wrap{display:flex;align-items:center;gap:6px 18px;padding-top:8px;padding-bottom:6px}
 .merk{display:block;line-height:0}
 .merk img{display:block;height:50px;width:auto}
-.hoofdnav{margin-left:auto;display:flex}
-.hoofdnav a{font-family:var(--kop);font-stretch:85%;font-weight:600;font-size:15px;
- letter-spacing:.01em;color:var(--creme);text-decoration:none;padding:12px 10px}
-.hoofdnav a:hover{color:var(--roest-licht);text-decoration:underline;text-underline-offset:5px;
- text-decoration-thickness:2px}
-
+.balk .merk img{height:64px}
+.merkzin{margin:0;font-family:var(--kop);font-stretch:85%;font-weight:600;font-size:13px;letter-spacing:.1em;
+ text-transform:uppercase;color:var(--creme2)}
+.hoofdnav{margin-left:auto;display:flex;flex-wrap:wrap;gap:0 6px}
+.hoofdnav a{display:inline-flex;align-items:center;min-height:44px;padding:0 10px;color:var(--creme);text-decoration:none;
+ font-family:var(--kop);font-stretch:85%;font-weight:700;font-size:16px;border-bottom:3px solid transparent}
+.hoofdnav a:hover{color:#fff;border-bottom-color:var(--creme)}
+.hoofdnav a[aria-current="page"]{border-bottom-color:var(--roest-licht)}
 /* ---- de kop ---- */
 .kop{background:var(--marine);color:var(--creme);padding:10px 0 0}
 .kruimel{font-family:var(--kop);font-stretch:90%;font-size:13px;color:var(--creme2)}
@@ -212,8 +211,8 @@ h2::before{content:"";width:34px;height:5px;background:var(--roest)}
 @media(max-width:900px){.merkzin{display:none}}
 @media(max-width:560px){
   body{font-size:16.5px}
-  .merk img{height:44px}
-  .hoofdnav a{padding:12px 6px}
+  .balk .merk img{height:48px}
+  .hoofdnav a{padding:0 7px;font-size:15.5px}
   .kop{padding-top:12px}
   .praktisch{max-width:none}
   .route{padding:14px 18px}
