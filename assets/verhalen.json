@@ -2,6 +2,28 @@
   "_uitleg": "Welke artikels welke zaken bespreken (ID's uit de csv). Bij de bouw krijgt elke genoemde cafepagina een blokje Lees ook en elke gemeentepagina een zin met een link naar het artikel. Anker is het id van de passage in het artikel.",
   "verhalen": [
     {
+      "url": "/grenscafes-belgie-nederland",
+      "titel": "Op café langs de grens",
+      "cafes": {
+        "KK01692": {
+          "anker": "overslag",
+          "label": "Halte 2: Nederland aan de overkant van de straat"
+        },
+        "KK01548": {
+          "anker": "koewacht",
+          "label": "Halte 3: een naam voor de hele buurt"
+        },
+        "KK00361": {
+          "anker": "putte",
+          "label": "Halte 5: een pint in België, Nederland aan de overkant"
+        },
+        "KK00458": {
+          "anker": "moskes",
+          "label": "Halte 6: Moskes, achter een gesloten deur"
+        }
+      }
+    },
+    {
       "url": "/bij-de-kachel",
       "titel": "Bij de kachel",
       "cafes": {

@@ -1301,7 +1301,7 @@ def main():
     if pad_lijst.exists():
         t = pad_lijst.read_text(encoding='utf-8')
         blok = ('<p class="laden">Bekijk de <a href="/gemeenten">cafés per gemeente</a>. Of lees <a href="/herfstwandelingen">'
-                'Eerst het bos in. Dan op café</a>, <a href="/decaporgels-cafes">Een pint met een heel orkest</a> of <a href="/bij-de-kachel">Bij de kachel</a>.</p>') if gemeenten else ''
+                'Eerst het bos in. Dan op café</a>, <a href="/decaporgels-cafes">Een pint met een heel orkest</a>, <a href="/bij-de-kachel">Bij de kachel</a> of <a href="/grenscafes-belgie-nederland">Op café langs de grens</a>.</p>') if gemeenten else ''
         t = t.replace('<!--gemeentelinks-->', blok)
         # welke hoofdgemeenten een eigen pagina hebben, zodat de plaatsnaam boven elke
         # groep in de lijst ernaar kan linken (gids.js); de sleutel is die van sleutel()
@@ -1320,7 +1320,7 @@ def main():
     (SITE / REGISTER).write_text(json.dumps(nieuw_register(data, weg), ensure_ascii=False,
                                             separators=(',', ':')), encoding='utf-8')
     schrijf_start(data)
-    urls = ([f'{ORIGIN}/', f'{ORIGIN}/lijst', f'{ORIGIN}/kaart', f'{ORIGIN}/afspreken', f'{ORIGIN}/over', f'{ORIGIN}/herfstwandelingen', f'{ORIGIN}/decaporgels-cafes', f'{ORIGIN}/bij-de-kachel']
+    urls = ([f'{ORIGIN}/', f'{ORIGIN}/lijst', f'{ORIGIN}/kaart', f'{ORIGIN}/afspreken', f'{ORIGIN}/over', f'{ORIGIN}/herfstwandelingen', f'{ORIGIN}/decaporgels-cafes', f'{ORIGIN}/bij-de-kachel', f'{ORIGIN}/grenscafes-belgie-nederland']
             + ([f'{ORIGIN}/gemeenten'] if gemeenten else [])
             + [f'{ORIGIN}/{g["u"]}/' for g in gemeenten.values()]
             + [f'{ORIGIN}/{d["u"]}/' for d in data])
