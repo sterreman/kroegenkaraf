@@ -88,6 +88,8 @@ def main():
             name = meta['name']
             if name == 'lees-mij.txt':
                 continue
+            if meta.get('mimeType') == 'application/vnd.google-apps.folder':
+                continue  # submappen (bv. foto's voor een artikel) horen niet bij de caféfoto's
             if Path(name).name != name or name in ('.','..') or name in seen:
                 raise RuntimeError('Ongeldige of dubbele fotobestandsnaam')
             seen.add(name)
