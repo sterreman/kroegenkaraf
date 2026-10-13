@@ -1,59 +1,91 @@
-/* De startpagina. De kop, de voet en het blok Ontdek komen uit lijst.css; hier
-   staat wat deze pagina anders doet: zes zaken in twee rijen, de tegels om op
-   pad te gaan en de provincies. */
+/* De startpagina. De kop, de voet en de basis komen uit lijst.css, de artikelkaarten
+   uit oppad.css; hier staat wat deze pagina anders doet: een compacte kop, twee
+   gelijkwaardige kolommen (cafés links, Op pad rechts), de strook met
+   hulpmiddelen, de laatste ronde en de provincies.
 
-/* de knoppen onder de zoekbalk, licht op donker */
-.kopknoppen{grid-area:link;justify-self:start;display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-.kopknoppen a{display:inline-flex;align-items:center;height:40px;padding:0 16px;border:1.5px solid var(--creme);
- color:var(--creme);text-decoration:none;font-family:var(--kop);font-stretch:85%;font-weight:700;font-size:16px}
-.kopknoppen a:hover{background:var(--creme);color:var(--marine)}
+   De volgorde in de html is de leesvolgorde op de gsm: Op pad (uitgelicht), de vier
+   cafés, de overige artikels. Op de computer zetten we de cafés met grid-areas in
+   de linkerkolom; de tabvolgorde blijft die van de html. */
 
-#inhoud{padding-top:26px}
+/* ---- de kop: compact, zodat de kolommen meteen in beeld komen ---- */
+.startkop .wrap{padding-top:8px;padding-bottom:22px}
+.startbalk{display:flex;align-items:center;gap:6px 18px;flex-wrap:wrap}
+.startkop .merk{display:block;line-height:0}
+.startkop .merk img{display:block;height:64px;width:auto}
+.merkzin{margin:0;font-family:var(--kop);font-stretch:85%;font-weight:600;font-size:13px;letter-spacing:.1em;
+ text-transform:uppercase;color:var(--creme2)}
+.kopknoppen{margin-left:auto;display:flex;flex-wrap:wrap;gap:0 6px}
+.kopknoppen a{display:inline-flex;align-items:center;min-height:44px;padding:0 10px;color:var(--creme);text-decoration:none;
+ font-family:var(--kop);font-stretch:85%;font-weight:700;font-size:16px;border-bottom:3px solid transparent}
+.kopknoppen a:first-child{border-bottom-color:var(--roest-licht)}
+.kopknoppen a:hover{color:#fff;border-bottom-color:var(--creme)}
+.startintro{padding-top:8px;max-width:780px}
+.startkop h1{margin:0;font-family:var(--kop);font-weight:800;font-stretch:66%;
+ font-size:clamp(34px,4.4vw,50px);line-height:.98;letter-spacing:-.005em;color:var(--creme)}
+.intro{margin:10px 0 0;max-width:68ch;font-size:18px;line-height:1.42;color:var(--creme)}
+.startkop .zoek{margin:16px 0 0;max-width:640px}
+
+#inhoud{padding-top:30px}
 #inhoud:focus{outline:none}
 .startpagina h2{margin:0 0 4px;font-family:var(--kop);font-weight:800;font-stretch:70%;font-size:30px;line-height:1.05}
 
-/* zes zaken: drie naast elkaar, zonder verticale lijnen die bij de tweede rij
-   op de verkeerde plek zouden vallen */
-.startpagina .ontdek{margin:0 0 34px;padding-bottom:0;border-bottom:0}
-.startpagina .ontdeklijst{column-gap:32px;border-top:2px solid var(--inkt)}
-.startpagina .ontdeklijst[aria-busy="true"]{min-height:420px}
-.startpagina .ontdekzaak+.ontdekzaak{border-left:0}
-.startpagina .ontdekzaak{border-bottom:1px solid var(--lijn)}
-.startpagina .ontdekzaak a,.startpagina .ontdekzaak+.ontdekzaak a{padding:16px 6px 16px 0}
-/* onder de zes: de uitleg en de knop om zes andere te tonen */
-.ontdekonder{display:flex;align-items:center;justify-content:space-between;gap:12px 24px;margin-top:12px}
-.ontdekonder .ontdekvoet{margin:0}
+/* ---- twee kolommen ---- */
+.hoofdraster{display:grid;grid-template-columns:minmax(0,1fr);row-gap:30px}
+.kolom{border-top:2px solid var(--inkt);padding-top:14px;min-width:0}
+.kolom h2{font-size:clamp(28px,3vw,36px)}
+.kolintro{margin:6px 0 18px;font-size:17.5px;line-height:1.4;color:var(--inkt2)}
+
+/* cafés: compacte kaartjes in twee bij twee, met een kleine foto waar die er is */
+.cafelijst{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 26px}
+.cafelijst[aria-busy="true"]{min-height:520px}
+.cafekaart{border-top:1px solid var(--lijn)}
+.cafekaart a{display:block;height:100%;padding:14px 4px 16px 0;text-decoration:none;color:inherit}
+.cafefoto{float:right;margin:2px 0 8px 12px}
+.cafefoto img{display:block;width:88px;height:88px;object-fit:cover;background:var(--papier2)}
+.cafenaam{display:block;font-family:var(--kop);font-weight:800;font-stretch:72%;font-size:25px;line-height:1.04;overflow-wrap:break-word}
+.cafeplaats{display:block;margin-top:3px;font-family:var(--kop);font-stretch:92%;font-weight:600;font-size:14.5px;color:var(--roest-tekst)}
+.caferede{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;line-clamp:4;overflow:hidden;clear:both;
+ margin-top:8px;font-size:16px;line-height:1.42;color:var(--inkt2)}
+.cafekaart.metfoto .caferede{clear:none}
+.cafekaart a:hover{background:var(--papier2)}
+.cafekaart a:hover .cafenaam{color:var(--roest-tekst);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:4px}
+.cafekaart a:focus-visible{outline:2px solid var(--inkt);outline-offset:-2px;background:var(--papier2)}
+
+.cafevoet{display:flex;flex-wrap:wrap;align-items:center;gap:4px 24px;margin-top:16px;padding-top:14px;border-top:2px solid var(--inkt)}
+.cafevoet a,.op-alle a{display:inline-block;padding:10px 0;font-family:var(--kop);font-stretch:90%;font-weight:700;font-size:16px;
+ color:var(--roest-tekst);text-decoration-thickness:1.5px;text-underline-offset:4px}
+.cafevoet a:hover,.op-alle a:hover{color:var(--inkt)}
 .ontdekmeer{display:inline-flex;align-items:center;gap:9px;flex:0 0 auto;height:44px;padding:0 16px;
  border:1.5px solid var(--inkt);background:var(--papier);cursor:pointer;
- font-family:var(--kop);font-stretch:85%;font-weight:700;font-size:16px}
+ font-family:var(--kop);font-stretch:85%;font-weight:700;font-size:16px;color:var(--inkt)}
 .ontdekmeer svg{width:17px;height:17px;fill:none;stroke:var(--roest);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;
  transition:transform .35s ease}
 .ontdekmeer:hover{background:var(--marine);border-color:var(--marine);color:var(--creme)}
 .ontdekmeer:hover svg{stroke:var(--creme);transform:rotate(90deg)}
 .ontdekmeer:focus-visible{outline:2px solid var(--inkt);outline-offset:2px}
-.ontdeklijst.vers{animation:vers .3s ease}
+.cafelijst.vers{animation:vers .3s ease}
 @keyframes vers{from{opacity:.25}to{opacity:1}}
-@media(prefers-reduced-motion:reduce){.ontdeklijst.vers{animation:none}.ontdekmeer svg{transition:none}}
+@media(prefers-reduced-motion:reduce){.cafelijst.vers{animation:none}.ontdekmeer svg{transition:none}}
+.ontdekvoet{margin:6px 0 0;font-family:var(--kop);font-stretch:92%;font-size:14px;color:var(--inkt3)}
 
-/* op pad */
-.oppad{margin-bottom:34px}
-.tegels{list-style:none;margin:10px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-.tegel{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"ico kop" "ico tekst";
- column-gap:16px;height:100%;padding:18px 20px;border:1.5px solid var(--inkt);text-decoration:none;color:inherit}
-.tegel svg{grid-area:ico;width:34px;height:34px;margin-top:2px;fill:none;stroke:var(--roest);stroke-width:1.9;
- stroke-linecap:round;stroke-linejoin:round}
-.tkop{grid-area:kop;font-family:var(--kop);font-weight:800;font-stretch:72%;font-size:25px;line-height:1.05}
-.ttekst{grid-area:tekst;margin-top:6px;font-size:16px;line-height:1.42;color:var(--inkt2)}
-.tegel:hover{background:var(--papier2)}
-.tegel:hover .tkop{color:var(--roest-tekst);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:4px}
-.tegel:focus-visible{outline:2px solid var(--inkt);outline-offset:2px}
-/* een uitgelichte tegel (een seizoensverhaal) over de volle breedte, met een knop */
-.tegels .breed{grid-column:1 / -1}
-.tegel.uitgelicht{grid-template-areas:"ico kop" "ico tekst" "ico knop";border-width:2px;border-left:6px solid var(--roest)}
-.tknop{grid-area:knop;justify-self:start;display:inline-flex;align-items:center;gap:8px;margin-top:12px;height:38px;padding:0 14px;
- background:var(--marine);color:var(--creme);font-family:var(--kop);font-stretch:85%;font-weight:700;font-size:15.5px}
-.tknop::after{content:"\2192"}
-.tegel.uitgelicht:hover .tknop{background:var(--roest-tekst)}
+/* op pad: groter beeld, meer verhaal */
+.op-uitgelicht[aria-busy="true"]{min-height:440px}
+.op-rest{min-width:0}
+.op-meer{list-style:none;margin:0;padding:0;border-top:1px solid var(--lijn)}
+.op-alle{margin:10px 0 0}
+
+/* hulpmiddelen: een smalle strook onder de kolommen */
+.hulp{margin:40px 0 36px;border-top:2px solid var(--inkt);border-bottom:1px solid var(--lijn)}
+.hulp ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.hulp li+li{border-left:1px solid var(--lijn)}
+.hulp a{display:block;height:100%;padding:16px 20px 16px 0;text-decoration:none;color:inherit}
+.hulp li+li a{padding-left:26px}
+.hulpnaam{display:block;font-family:var(--kop);font-weight:800;font-stretch:72%;font-size:23px;line-height:1.1}
+.hulpnaam::after{content:" \2192";color:var(--roest-tekst)}
+.hulptekst{display:block;margin-top:3px;font-size:16.5px;color:var(--inkt2)}
+.hulp a:hover{background:var(--papier2)}
+.hulp a:hover .hulpnaam{color:var(--roest-tekst);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:4px}
+.hulp a:focus-visible{outline:2px solid var(--inkt);outline-offset:-2px;background:var(--papier2)}
 
 /* verhalen van aan de toog, met de laatste ronde: een verdwenen café, in marine,
    zodat ze niet verward wordt met een café waar je vandaag naartoe kunt */
@@ -88,26 +120,47 @@
 .provlijst a:hover span:first-child{color:var(--roest-tekst);text-decoration:underline;text-underline-offset:4px}
 .provlijst .n{font-family:var(--kop);font-stretch:90%;font-size:14px;color:var(--inkt3);font-variant-numeric:tabular-nums}
 
+/* aanraakdoelen: links in de tegel Laatste ronde minstens 44 px hoog */
+.racties a,.rnaam a,.rbuur a{display:inline-block;padding:10px 0}
+.rnaam a{padding:6px 0}
+
+/* ---- computer: cafés links (55%), Op pad rechts (45%), titels op dezelfde hoogte ---- */
+@media(min-width:900px){
+  .hoofdraster{grid-template-columns:minmax(0,55fr) minmax(0,45fr);grid-template-rows:auto 1fr;
+   grid-template-areas:"cafes oppad" "cafes rest";column-gap:clamp(36px,4.5vw,64px);row-gap:0;align-items:start}
+  .cafes{grid-area:cafes}
+  .op-hoofd{grid-area:oppad}
+  .op-rest{grid-area:rest;padding-top:6px}
+  .kolintro{min-height:2.85em}
+}
+
+/* ---- tablet en gsm ---- */
 @media(max-width:760px){
-  .kopknoppen{margin-top:12px;width:100%;gap:6px}
-  .kopknoppen a{flex:1 1 0;justify-content:center;padding:0 8px;height:42px;font-size:15px}
-  #inhoud{padding-top:20px}
+  .startkop .wrap{padding-bottom:16px}
+  .startkop .merk img{height:48px}
+  .startbalk{gap:0 12px}
+  .merkzin{font-size:12px;letter-spacing:.08em}
+  .kopknoppen{margin-left:-10px;width:calc(100% + 10px);justify-content:space-between}
+  .kopknoppen a{padding:0 10px;font-size:15.5px}
+  .startkop h1{font-size:clamp(30px,8.4vw,38px)}
+  .intro{font-size:17px}
+  .startkop .zoek{margin-top:14px}
+  .startkop .zoek input{height:52px;font-size:18px}
+  #inhoud{padding-top:22px}
   .startpagina h2{font-size:25px}
-  .startpagina .ontdeklijst[aria-busy="true"]{min-height:600px}
-  .startpagina .ontdekzaak a,.startpagina .ontdekzaak+.ontdekzaak a{padding:12px 2px}
-  .ontdekonder{flex-direction:column;align-items:stretch}
-  .ontdekmeer{justify-content:center}
-  .tegels{grid-template-columns:1fr;gap:10px}
-  .tegel{padding:14px 16px;column-gap:14px}
-  .tegel svg{width:28px;height:28px}
-  .tkop{font-size:22px}
-  .ttekst{font-size:15.5px}
+  .kolom h2{font-size:28px}
+  .op-uitgelicht[aria-busy="true"]{min-height:380px}
+  .hulp ul{grid-template-columns:1fr}
+  .hulp li+li{border-left:0;border-top:1px solid var(--lijn)}
+  .hulp li+li a{padding-left:0}
   .ronde{padding:16px 16px 14px}
   .rnaam{font-size:24px}
   .rfoto{width:56px;height:56px}
   .rreden{font-size:15.5px}
 }
-
-/* aanraakdoelen: links in de tegel Laatste ronde minstens 44 px hoog */
-.racties a,.rnaam a,.rbuur a{display:inline-block;padding:10px 0}
-.rnaam a{padding:6px 0}
+@media(max-width:599px){
+  .cafelijst{grid-template-columns:1fr}
+  .cafelijst[aria-busy="true"]{min-height:560px}
+  .cafekaart a{padding:12px 2px 14px 0}
+  .cafenaam{font-size:23px}
+}

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#132738">
+<title>Op pad langs Belgische cafés · Kroeg &amp; Karaf</title>
+<meta name="description" content="Wandelingen, bijzondere kroegen en verhalen om voor buiten te komen: alle uitstappen en verhalen van Kroeg &amp; Karaf op een rij.">
+<link rel="canonical" href="https://kroegenkaraf.be/oppad">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Op pad langs Belgische cafés">
+<meta property="og:description" content="Wandelingen, bijzondere kroegen en verhalen om voor buiten te komen.">
+<meta property="og:url" content="https://kroegenkaraf.be/oppad">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/assets/fonts/fonts.css">
+<link rel="stylesheet" href="/assets/cafe.css?v=over-20261006">
+<link rel="stylesheet" href="/assets/verhaal.css?v=delen-20261012">
+<link rel="stylesheet" href="/assets/oppad.css?v=oppad-20261013">
+</head>
+<body class="cafepagina tekstpagina verhaalpagina oppadpagina">
+<a class="naarinhoud" href="#inhoud">Naar de inhoud</a>
+<header class="balk">
+ <div class="wrap">
+  <a class="merk" href="/"><img src="/assets/logo.png" alt="Kroeg &amp; Karaf, naar de startpagina" width="760" height="575"></a>
+  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/oppad" aria-current="page">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a></nav>
+ </div>
+</header>
+
+<main id="inhoud">
+ <div class="kop">
+  <div class="wrap">
+   <p class="rubriek">Uitstappen en verhalen</p>
+   <h1>Op pad langs Belgische cafés</h1>
+   <p class="ondertitel">Wandelingen, bijzondere kroegen en verhalen om voor buiten te komen.</p>
+  </div>
+ </div>
+
+ <div class="wrap oppadwrap">
+  <ul class="opoverzicht" id="opoverzicht" aria-busy="true"></ul>
+  <noscript><p class="opleeg">Voor dit overzicht is JavaScript nodig.</p></noscript>
+  <p class="opleeg" id="opleeg" hidden>De uitstappen konden niet geladen worden. Probeer het later opnieuw.</p>
+ </div>
+</main>
+
+<footer class="voet">
+ <div class="wrap">
+  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/oppad" aria-current="page">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a><a href="/over">Over</a><a href="/privacy">Privacy</a></nav>
+  <p>Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</p>
+ </div>
+</footer>
+
+<script src="/assets/oppad.js?v=oppad-20261013"></script>
+<script>
+OpPad.laad().then(function (artikels) {
+  var rij = OpPad.ordenen(artikels), lijst = document.getElementById('opoverzicht');
+  if (!rij.length) throw new Error('geen artikels');
+  lijst.innerHTML = rij.map(function (a, i) { return '<li>' + OpPad.kaart(a, 'lijst', i === 0) + '</li>'; }).join('');
+  lijst.removeAttribute('aria-busy');
+}).catch(function (err) {
+  console.error('Op pad kreeg zijn artikels niet binnen:', err);
+  document.getElementById('opoverzicht').hidden = true;
+  document.getElementById('opleeg').hidden = false;
+});
+</script>
+</body>
+</html>

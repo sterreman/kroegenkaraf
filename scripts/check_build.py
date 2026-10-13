@@ -29,7 +29,7 @@ def main():
         for name in ('index.html', 'deel.jpg'):
             if not Path('site', row['u'], name).is_file():
                 raise SystemExit(f"STOP: {name} ontbreekt voor {row['n']} ({row['u']}).")
-    for name in ('privacy.html', 'over.html', 'herfstwandelingen.html', 'decaporgels-cafes.html', 'bij-de-kachel.html', 'grenscafes-belgie-nederland.html', 'assets/verhaal.css', 'assets/verhaal.js', 'assets/verhaalkaart.js', 'assets/gemeente.css', 'assets/verhalen.json', 'assets/gemeenten.json', 'afspreken.html', 'assets/afspreken.js', 'lijst.html', 'data/start.json', 'assets/fonts/fonts.css', 'sitemap.xml', 'robots.txt', 'data/slugs.json', 'assets/cafe.css', 'assets/cafe.js'):
+    for name in ('privacy.html', 'over.html', 'herfstwandelingen.html', 'decaporgels-cafes.html', 'bij-de-kachel.html', 'grenscafes-belgie-nederland.html', 'oppad.html', 'assets/oppad.json', 'assets/oppad.js', 'assets/oppad.css', 'assets/verhaal.css', 'assets/verhaal.js', 'assets/verhaalkaart.js', 'assets/gemeente.css', 'assets/verhalen.json', 'assets/gemeenten.json', 'afspreken.html', 'assets/afspreken.js', 'lijst.html', 'data/start.json', 'assets/fonts/fonts.css', 'sitemap.xml', 'robots.txt', 'data/slugs.json', 'assets/cafe.css', 'assets/cafe.js'):
         if not Path('site', name).is_file():
             raise SystemExit(f'STOP: {name} ontbreekt.')
     print(f'{len(urls)} cafepaginas aanwezig.')
@@ -42,6 +42,19 @@ def main():
         for beeld in sorted(set(re.findall(r'(/assets/verhalen/[^\s"]+)', tekst))):
             if not Path('site', beeld.lstrip('/')).is_file():
                 raise SystemExit(f'STOP: {verhaal} toont een beeld dat ontbreekt: {beeld}')
+    # Op pad: de artikels in assets/oppad.json voeden de startpagina en /oppad; elk artikel
+    # en elk beeld moet echt bestaan.
+    artikels = json.loads(Path('site/assets/oppad.json').read_text(encoding='utf-8')).get('artikels', [])
+    if not artikels:
+        raise SystemExit('STOP: assets/oppad.json bevat geen artikels; de startpagina en /oppad blijven leeg.')
+    for art in artikels:
+        if not Path('site', art['url'].strip('/') + '.html').is_file():
+            raise SystemExit(f"STOP: oppad.json verwijst naar een artikel dat niet bestaat: {art['url']}")
+        for bestand in art.get('beeld', {}).get('bestanden', []):
+            for soort in ('avif', 'webp'):
+                if not Path('site', bestand[soort].lstrip('/')).is_file():
+                    raise SystemExit(f"STOP: oppad.json toont een beeld dat ontbreekt: {bestand[soort]}")
+    print(f"Op pad: {len(artikels)} artikel(s) gecontroleerd.")
     # Gemeentepagina's: eigen titel, canonical, deelkaartje, en elke link naar een cafe klopt.
     namen = json.loads(Path('site/assets/gemeenten.json').read_text(encoding='utf-8')).get('gemeenten', [])
     titels, gemeenten = set(), 0

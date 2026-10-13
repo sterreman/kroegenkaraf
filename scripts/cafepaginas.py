@@ -842,7 +842,7 @@ def pagina(d, buren):
 <header class="balk">
  <div class="wrap">
   <a class="merk" href="/"><img src="/assets/logo.png" alt="Kroeg &amp; Karaf, naar de startpagina" width="760" height="575"></a>
-  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a></nav>
+  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a></nav>
  </div>
 </header>
 
@@ -871,7 +871,7 @@ def pagina(d, buren):
 
 <footer class="voet">
  <div class="wrap">
-  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a><a href="/over">Over</a><a href="/privacy">Privacy</a></nav>
+  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a><a href="/over">Over</a><a href="/privacy">Privacy</a></nav>
   <p>Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</p>
  </div>
 </footer>
@@ -1061,7 +1061,7 @@ def gemeente_pagina(g):
 <header class="balk">
  <div class="wrap">
   <a class="merk" href="/"><img src="/assets/logo.png" alt="Kroeg &amp; Karaf, naar de startpagina" width="760" height="575"></a>
-  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a></nav>
+  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a></nav>
  </div>
 </header>
 
@@ -1084,7 +1084,7 @@ def gemeente_pagina(g):
 
 <footer class="voet">
  <div class="wrap">
-  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a><a href="/over">Over</a><a href="/privacy">Privacy</a></nav>
+  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a><a href="/over">Over</a><a href="/privacy">Privacy</a></nav>
   <p>Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</p>
  </div>
 </footer>
@@ -1147,7 +1147,7 @@ def gemeenten_overzicht(gemeenten):
 <header class="balk">
  <div class="wrap">
   <a class="merk" href="/"><img src="/assets/logo.png" alt="Kroeg &amp; Karaf, naar de startpagina" width="760" height="575"></a>
-  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a></nav>
+  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a></nav>
  </div>
 </header>
 
@@ -1168,7 +1168,7 @@ def gemeenten_overzicht(gemeenten):
 
 <footer class="voet">
  <div class="wrap">
-  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a><a href="/over">Over</a><a href="/privacy">Privacy</a></nav>
+  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a><a href="/over">Over</a><a href="/privacy">Privacy</a></nav>
   <p>Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</p>
  </div>
 </footer>
@@ -1320,7 +1320,7 @@ def main():
     (SITE / REGISTER).write_text(json.dumps(nieuw_register(data, weg), ensure_ascii=False,
                                             separators=(',', ':')), encoding='utf-8')
     schrijf_start(data)
-    urls = ([f'{ORIGIN}/', f'{ORIGIN}/lijst', f'{ORIGIN}/kaart', f'{ORIGIN}/afspreken', f'{ORIGIN}/over', f'{ORIGIN}/herfstwandelingen', f'{ORIGIN}/decaporgels-cafes', f'{ORIGIN}/bij-de-kachel', f'{ORIGIN}/grenscafes-belgie-nederland']
+    urls = ([f'{ORIGIN}/', f'{ORIGIN}/lijst', f'{ORIGIN}/kaart', f'{ORIGIN}/afspreken', f'{ORIGIN}/over', f'{ORIGIN}/oppad', f'{ORIGIN}/herfstwandelingen', f'{ORIGIN}/decaporgels-cafes', f'{ORIGIN}/bij-de-kachel', f'{ORIGIN}/grenscafes-belgie-nederland']
             + ([f'{ORIGIN}/gemeenten'] if gemeenten else [])
             + [f'{ORIGIN}/{g["u"]}/' for g in gemeenten.values()]
             + [f'{ORIGIN}/{d["u"]}/' for d in data])

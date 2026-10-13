@@ -85,3 +85,9 @@
 .haltepin.dicht{background:#8a939c}
 .haltekaart .uitleg{margin-top:8px;font-size:15px;color:var(--inkt3)}
 @media(max-width:760px){#verhaalkaart{height:440px}}
+
+/* de terugweg naar het overzicht Op pad: in de rubriekregel en onderaan het artikel */
+.verhaalpagina .kop .rubriek a{color:inherit;text-decoration:underline;text-decoration-color:var(--roest-licht);text-decoration-thickness:1.5px;text-underline-offset:4px}
+.verhaalpagina .kop .rubriek a:hover{color:#fff}
+.leeskolom .terugnaar{margin:18px 0 0;font-family:var(--kop);font-stretch:90%;font-weight:700;font-size:16px}
+.leeskolom .terugnaar a::before{content:"\2190  ";text-decoration:none;display:inline-block}

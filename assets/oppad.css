@@ -1,0 +1,63 @@
+/* De artikelkaarten van Op pad, op de startpagina en op het overzicht (oppad.html).
+   Ze gebruiken het palet en de letters van lijst.css en cafe.css (dezelfde
+   variabelen). De hele kaart is klikbaar via de titel: één link, één tabstop. */
+
+.opkaart{position:relative;min-width:0}
+.opfoto{display:block}
+.opfoto picture,.opfoto img{display:block;width:100%;height:auto}
+.opfoto img{aspect-ratio:16/9;object-fit:cover;background:var(--papier2)}
+.opbron{display:block;margin-top:5px;font-family:var(--kop);font-stretch:92%;font-size:12.5px;line-height:1.3;color:var(--inkt3)}
+.opbron a{position:relative;z-index:2;color:inherit;text-underline-offset:2px}
+
+.oprubriek{margin:0 0 6px;display:flex;align-items:center;gap:10px;font-family:var(--kop);font-weight:700;
+ font-stretch:85%;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--roest-tekst)}
+.oprubriek::before{content:"";flex:0 0 auto;width:22px;height:2px;background:var(--roest)}
+.optitel{margin:0;font-family:var(--kop);font-weight:800;font-stretch:72%;line-height:1.04;font-size:26px;overflow-wrap:break-word}
+.optitel a{color:inherit;text-decoration:none}
+.optitel a::after{content:"";position:absolute;inset:0}
+.optitel a:focus-visible{outline:none}
+.opkaart:has(.optitel a:focus-visible){outline:2px solid var(--roest-tekst);outline-offset:4px}
+.opkaart:hover .optitel a{color:var(--roest-tekst);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:4px}
+.opomschrijving{margin:8px 0 0;font-size:17px;line-height:1.45;color:var(--inkt2);max-width:60ch}
+.opfeiten{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-wrap:wrap;font-family:var(--kop);font-stretch:92%;
+ font-weight:600;font-size:14.5px;line-height:1.5;color:var(--inkt)}
+.opfeiten{gap:2px 20px}
+.oplees{margin:12px 0 0;font-family:var(--kop);font-stretch:90%;font-weight:700;font-size:15.5px;color:var(--roest-tekst);
+ text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:4px}
+.oplees::after{content:" \2192";text-decoration:none;display:inline-block}
+
+/* groot: de foto bovenaan, het verhaal eronder */
+.op-groot .optekst{padding-top:16px}
+.op-groot .optitel{font-size:clamp(32px,3.4vw,42px)}
+
+/* compact: een kleine foto naast de titel */
+.op-klein{display:grid;grid-template-columns:minmax(0,1fr);align-items:start;column-gap:16px;padding:14px 0;border-bottom:1px solid var(--lijn)}
+.op-klein:has(.opfoto){grid-template-columns:120px minmax(0,1fr)}
+.op-klein .opfoto img{aspect-ratio:4/3}
+.op-klein .opbron{margin-top:4px}
+.op-klein .optitel{font-size:24px}
+.op-klein .optekst{align-self:center}
+
+/* overzichtspagina */
+.opoverzicht{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:40px clamp(24px,3vw,40px)}
+.opoverzicht>li{min-width:0}
+.opoverzicht>li:first-child{grid-column:1 / -1}
+.op-lijst .optekst{padding-top:14px}
+.op-lijst .optitel{font-size:clamp(28px,3vw,36px)}
+.opoverzicht>li:first-child .op-lijst{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);column-gap:clamp(24px,4vw,48px);align-items:center}
+.opoverzicht>li:first-child .op-lijst .opbron{grid-column:1}
+.opoverzicht>li:first-child .op-lijst .optekst{padding-top:0;grid-column:2;grid-row:1 / span 2}
+.opoverzicht>li:first-child .op-lijst .optitel{font-size:clamp(34px,4vw,48px)}
+.opleeg{margin:20px 0;font-size:18px;color:var(--inkt2)}
+
+@media(max-width:760px){
+  .opoverzicht>li:first-child .op-lijst{display:block}
+  .opoverzicht>li:first-child .op-lijst .optekst{padding-top:14px}
+  .op-klein .optitel{font-size:22px}
+}
+@media(max-width:519px){
+  .op-klein:has(.opfoto){grid-template-columns:96px minmax(0,1fr);column-gap:14px}
+}
+
+/* de huidige pagina in de hoofdnavigatie van tekstpagina's */
+.hoofdnav a[aria-current="page"]{text-decoration:underline;text-decoration-color:var(--roest-licht);text-decoration-thickness:2px;text-underline-offset:5px}

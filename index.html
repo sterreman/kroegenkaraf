@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#132738">
-<title>Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</title>
-<meta name="description" content="Een gids voor Belgische volkscafés, bruine kroegen en biercafés. 2797 zaken, met adres, soort en beschrijving.">
+<title>Kroeg &amp; Karaf · Je gids voor Belgische cafés en uitstappen</title>
+<meta name="description" content="Vind een Belgisch café uit 2797 zaken, ontdek een streek langs bijzondere kroegen en lees de verhalen achter de toog.">
 <link rel="canonical" href="https://kroegenkaraf.be/">
 <script>
 /* Oude links naar de lijst (/?q=haacht, index.html#cafe/...) staan sinds de
@@ -20,68 +20,68 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="stylesheet" href="/assets/fonts/fonts.css">
 <link rel="stylesheet" href="assets/lijst.css?v=toog-20261006">
-<link rel="stylesheet" href="assets/start.css?v=meer-20261010">
+<link rel="stylesheet" href="assets/oppad.css?v=oppad-20261014">
+<link rel="stylesheet" href="assets/start.css?v=oppad-20261014">
 </head>
 <body class="startpagina">
 <a class="naarinhoud" href="#inhoud">Naar de inhoud</a>
 
-<header class="kop">
- <div class="wrap kopraster">
-  <a class="merk" href="/"><img src="assets/logo.png" alt="Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen" width="760" height="575"></a>
-  <h1>Waar gaan we iets drinken?</h1>
-  <form class="zoek" role="search" action="/lijst" method="get">
-   <label class="sr" for="q">Zoek een gemeente of café</label>
-   <div class="zoekveld">
-    <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M12.8 12.8 17 17"/></svg>
-    <input type="search" id="q" name="q" placeholder="Zoek een gemeente of café" autocomplete="off"
-     spellcheck="false" enterkeyhint="search">
-   </div>
-  </form>
-  <nav class="kopknoppen" aria-label="Weergaven">
-   <a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a>
-  </nav>
+<header class="kop startkop">
+ <div class="wrap">
+  <div class="startbalk">
+   <a class="merk" href="/"><img src="assets/logo.png" alt="Kroeg &amp; Karaf" width="760" height="575"></a>
+   <p class="merkzin">Voor schoon volk en dorstige zielen</p>
+   <nav class="kopknoppen" aria-label="Hoofdmenu">
+    <a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a>
+   </nav>
+  </div>
+  <div class="startintro">
+   <h1>Je gids voor Belgische cafés en uitstappen</h1>
+   <p class="intro">Van een dorpscafé om de hoek tot een uitstap langs bijzondere kroegen. Vind een café, ontdek een streek en lees de verhalen achter de toog.</p>
+   <form class="zoek" role="search" action="/lijst" method="get">
+    <label class="sr" for="q">Zoek een gemeente of café</label>
+    <div class="zoekveld">
+     <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5.5"/><path d="M12.8 12.8 17 17"/></svg>
+     <input type="search" id="q" name="q" placeholder="Zoek een gemeente of café" autocomplete="off"
+      spellcheck="false" enterkeyhint="search">
+    </div>
+   </form>
+  </div>
  </div>
 </header>
 
 <main class="wrap" id="inhoud" tabindex="-1">
- <section class="ontdek" id="ontdek" aria-labelledby="ontdekkop">
-  <h2 id="ontdekkop">Ontdek deze Belgische cafés</h2>
-  <ol class="ontdeklijst" id="ontdeklijst" aria-busy="true"></ol>
-  <div class="ontdekonder">
-   <p class="ontdekvoet">Elke dag een andere greep uit zaken die online gecontroleerd zijn. Kijk voor je vertrekt even na of ze open zijn.</p>
-   <button type="button" class="ontdekmeer" id="ontdekmeer" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>Toon zes andere</button>
-  </div>
-  <p class="sr" id="ontdekstatus" role="status"></p>
- </section>
+ <div class="hoofdraster">
+  <section class="kolom op-hoofd" id="oppad" aria-labelledby="oppadkop">
+   <h2 id="oppadkop">Op pad langs Belgische cafés</h2>
+   <p class="kolintro">Wandelingen, bijzondere kroegen en verhalen om voor buiten te komen.</p>
+   <div class="op-uitgelicht" id="op-uitgelicht" aria-busy="true"></div>
+  </section>
 
- <section class="oppad" aria-labelledby="oppadkop">
-  <h2 id="oppadkop">Op pad</h2>
-  <ul class="tegels">
-   <li class="breed"><a class="tegel uitgelicht" href="/grenscafes-belgie-nederland">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18" stroke-dasharray="2.2 2"/><path d="M4 8.5h5.5M4 12h5.5M14.5 12H20M14.5 15.5H20"/><path d="M7.5 6 9.5 8.5 7.5 11M16.5 9.5 14.5 12l2 2.5"/></svg>
-    <span class="tkop">Op café langs de grens</span>
-    <span class="ttekst">Nederland aan de overkant van de straat, een terras op de landsgrens en een pint bij de Maas. Ontdek de cafés en verhalen tussen twee landen.</span>
-    <span class="tknop">Trek de grens over</span></a></li>
-   <li class="breed"><a class="tegel" href="/bij-de-kachel">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 21h10M8.5 21v-2.5h7V21"/><path d="M7.5 18.5c-.8-1.2-1.2-2.6-1.2-4.1C6.3 11 9 9.5 9 6.5c1.6 1 2.5 2.4 2.6 4 1-.9 1.5-2.3 1.4-4 2.7 1.8 4.7 4.6 4.7 7.9 0 1.5-.4 2.9-1.2 4.1"/><path d="M10.2 18.5c-.4-.6-.6-1.2-.6-1.9 0-1.6 1.2-2.4 2.4-3.6 1.2 1.2 2.4 2 2.4 3.6 0 .7-.2 1.3-.6 1.9"/></svg>
-    <span class="tkop">Bij de kachel</span>
-    <span class="ttekst">Buiten wordt het vroeg donker, binnen tikt de stoof. Vijf cafés waar in de winter het vuur nog brandt, van Brugge tot Francorchamps.</span></a></li>
-   <li class="breed"><a class="tegel" href="/decaporgels-cafes">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M7.5 15V9M10.5 15V7.5M13.5 15V7.5M16.5 15V9"/></svg>
-    <span class="tkop">Een pint met een heel orkest</span>
-    <span class="ttekst">Een accordeon die vanzelf speelt en jij met een pint erbij. Ontdek de cafés, danszalen en verzamelaars waar het Decap-verhaal verdergaat.</span></a></li>
-   <li class="breed"><a class="tegel" href="/herfstwandelingen">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c3.6 3 5.4 6.2 5.4 9.2A5.4 5.4 0 0 1 12 17.6a5.4 5.4 0 0 1-5.4-5.4C6.6 9.2 8.4 6 12 3Z"/><path d="M12 7.5v14M12 12l2.4-2.2M12 14.8l-2.6-2.4"/></svg>
-    <span class="tkop">Eerst het bos in. Dan op café.</span>
-    <span class="ttekst">Vijf herfstwandelingen met een café onderweg of aan het eind. Van het Zoerselbos tot Westvleteren: kies je uitstap voor zondag.</span></a></li>
-   <li><a class="tegel" href="/afspreken">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="4.5" cy="12" r="2.2"/><circle cx="19.5" cy="12" r="2.2"/><path d="M7.5 12h2.5M14 12h2.5M12 8.5v7"/></svg>
-    <span class="tkop">Afspreken in het midden</span>
-    <span class="ttekst">Vul in waar iedereen vertrekt. We zoeken cafés die voor iedereen ongeveer even ver liggen.</span></a></li>
-   <li><a class="tegel" href="/kaart#buurt">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.6"/><path d="M12 2.5v2.8M12 18.7v2.8M2.5 12h2.8M18.7 12h2.8"/></svg>
-    <span class="tkop">Cafés in de buurt</span>
-    <span class="ttekst">De kaart toont de zaken rond de plek waar je nu bent, of rond een adres dat je intypt.</span></a></li>
+  <section class="kolom cafes" id="ontdek" aria-labelledby="ontdekkop">
+   <h2 id="ontdekkop">Ontdek Belgische cafés</h2>
+   <p class="kolintro">Een nieuwe stamkroeg of een adres om voor om te rijden.</p>
+   <ol class="cafelijst" id="ontdeklijst" aria-busy="true"></ol>
+   <div class="cafevoet">
+    <button type="button" class="ontdekmeer" id="ontdekmeer" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>Toon vier andere</button>
+    <a href="/lijst">Bekijk alle cafés</a>
+    <a href="/kaart">Ontdek de kaart</a>
+   </div>
+   <p class="ontdekvoet">Elke dag een andere greep uit zaken die online gecontroleerd zijn. Kijk voor je vertrekt even na of ze open zijn.</p>
+   <p class="sr" id="ontdekstatus" role="status"></p>
+  </section>
+
+  <div class="op-rest" id="op-rest">
+   <ul class="op-meer" id="op-meer" aria-label="Meer uitstappen en verhalen" hidden></ul>
+   <p class="op-alle"><a href="/oppad">Bekijk alle uitstappen en verhalen</a></p>
+  </div>
+ </div>
+
+ <section class="hulp" aria-labelledby="hulpkop">
+  <h2 id="hulpkop" class="sr">Handige hulpmiddelen</h2>
+  <ul>
+   <li><a href="/afspreken"><span class="hulpnaam">Afspreken in het midden</span><span class="hulptekst">Vind een café dat voor iedereen handig ligt.</span></a></li>
+   <li><a href="/kaart#buurt"><span class="hulpnaam">Cafés in de buurt</span><span class="hulptekst">Ontdek een adres dichtbij.</span></a></li>
   </ul>
  </section>
 
@@ -98,12 +98,13 @@
 
 <footer class="voet">
  <div class="wrap">
-  <nav aria-label="Onderaan"><a href="/" aria-current="page">Start</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a><a href="/over">Over</a><a href="/privacy">Privacy</a></nav>
+  <nav aria-label="Onderaan"><a href="/" aria-current="page">Start</a><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a><a href="/over">Over</a><a href="/privacy">Privacy</a></nav>
   <p id="foot">Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</p>
  </div>
 </footer>
 
 <script>const BIJGEWERKT = "11 september 2026";</script>
-<script src="assets/start.js?v=meer-20261010"></script>
+<script src="assets/oppad.js?v=oppad-20261014"></script>
+<script src="assets/start.js?v=oppad-20261014"></script>
 </body>
 </html>
