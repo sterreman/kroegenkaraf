@@ -5,14 +5,6 @@
       "url": "/grenscafes-belgie-nederland",
       "titel": "Op café langs de grens",
       "cafes": {
-        "KK01692": {
-          "anker": "overslag",
-          "label": "Halte 2: Nederland aan de overkant van de straat"
-        },
-        "KK01548": {
-          "anker": "koewacht",
-          "label": "Halte 3: een naam voor de hele buurt"
-        },
         "KK00361": {
           "anker": "putte",
           "label": "Halte 5: een pint in België, Nederland aan de overkant"
@@ -20,6 +12,34 @@
         "KK00458": {
           "anker": "moskes",
           "label": "Halte 6: Moskes, achter een gesloten deur"
+        },
+        "KK01548": {
+          "anker": "koewacht",
+          "label": "Halte 3: een naam voor de hele buurt"
+        },
+        "KK01692": {
+          "anker": "overslag",
+          "label": "Halte 2: Nederland aan de overkant van de straat"
+        },
+        "KK03131": {
+          "anker": "klinge",
+          "label": "Halte 4: de grens op rails"
+        },
+        "KK03132": {
+          "anker": "poppel",
+          "label": "Halte 9: de grens over met een smokkelpakketje"
+        },
+        "KK03133": {
+          "anker": "veldwezelt",
+          "label": "Halte 12: een Belgisch bier aan de rand van Maastricht"
+        },
+        "KK03134": {
+          "anker": "deplank",
+          "label": "Halte 13: een hoeve bij de oude grensovergang"
+        },
+        "KK03135": {
+          "anker": "ulvend",
+          "label": "Halte 14: de grens smaakt naar hoeve-ijs"
         }
       }
     },

@@ -21,6 +21,5 @@ Bron: aangeleverd door Steven op 13 oktober 2026 in Google Drive, Volkscafés/fo
 | maasoever-* | TerrasMaasoever.jpeg | Uitzicht op de Maas en het veer |
 | grensstube-* | GrensstubeLanaken.jpg | Grensstube |
 | deplank-* | BoerenhofVoeren.webp | Poort van Het Boerenhof |
+| bakhuis-* | BakhuisVoeren.jpg | 't Bakhuis in Ulvend |
 | drielandenpunt-* | Drielandenpuntr.png | Grenspaal op het Drielandenpunt |
-
-Open: geen foto van 't Bakhuis in Ulvend.
