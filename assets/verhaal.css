@@ -74,3 +74,14 @@
 .deelonder .deelpaneel a{color:var(--creme)}
 .deelonder :focus-visible{outline-color:var(--creme)}
 .verhaalpagina .deelpaneel a,.verhaalpagina .deelpaneel button{line-height:1.4}
+
+/* kaartje bij een verhaal: genummerde haltes in roest, gesloten zaken in grijs */
+.haltekaart{margin:18px 0 6px}
+#verhaalkaart{height:520px;border-top:2px solid var(--inkt);background:var(--papier2)}
+#verhaalkaart .leaflet-tile-pane{filter:grayscale(.65) sepia(.12) brightness(1.02) contrast(.95)}
+#verhaalkaart.leaflet-container{font-family:var(--kop);font-size:14px}
+.haltepin{display:flex;align-items:center;justify-content:center;background:var(--roest,#cf4521);color:#fff;
+ border:2px solid #fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,.35);font-family:var(--kop);font-weight:800;font-size:13px}
+.haltepin.dicht{background:#8a939c}
+.haltekaart .uitleg{margin-top:8px;font-size:15px;color:var(--inkt3)}
+@media(max-width:760px){#verhaalkaart{height:440px}}

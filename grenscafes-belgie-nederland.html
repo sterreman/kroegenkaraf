@@ -18,7 +18,8 @@
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="stylesheet" href="/assets/fonts/fonts.css">
 <link rel="stylesheet" href="/assets/cafe.css?v=over-20261006">
-<link rel="stylesheet" href="/assets/verhaal.css?v=delen-20261012">
+<link rel="stylesheet" href="/assets/vendor/leaflet.css">
+<link rel="stylesheet" href="/assets/verhaal.css?v=kaart-20261013">
 </head>
 <body class="cafepagina tekstpagina verhaalpagina">
 <a class="naarinhoud" href="#inhoud">Naar de inhoud</a>
@@ -72,6 +73,13 @@
     <li><a href="#ulvend"><span class="wnaam">'t Bakhuis</span><span class="wkm">BE</span><span class="wregio">Ulvend, Voeren</span><span class="wcafe">Hoeve-ijs in een gehucht dat de grens deelt</span></a></li>
     <li><a href="#drielandenpunt"><span class="wnaam">Het Drielandenpunt</span><span class="wkm">NL</span><span class="wregio">Vaalserberg, Vaals</span><span class="wcafe">Waar ook Duitsland aanschuift</span></a></li>
    </ol>
+  </section>
+
+  <section class="haltekaart" id="kaart" aria-labelledby="kaartkop">
+   <h2 id="kaartkop">De haltes op de kaart</h2>
+   <div id="verhaalkaart" role="region" aria-label="Kaart met de vijftien haltes langs de grens"></div>
+   <p class="uitleg">Tik op een nummer voor de halte. Grijs is gesloten.</p>
+   <script type="application/json" id="haltes">[{"nr": 1, "n": "De Tol", "g": "Eede (NL)", "a": "eede", "lat": 51.2582361, "lon": 3.4187731}, {"nr": 2, "n": "D'n Overslagh", "g": "Overslag, Lochristi", "a": "overslag", "lat": 51.2007326, "lon": 3.8882693, "u": "cafe/wachtebeke/cafe-dn-overslagh"}, {"nr": 3, "n": "Café Benelux", "g": "Koewacht, Lokeren", "a": "koewacht", "lat": 51.2251288, "lon": 3.9773481, "u": "cafe/lokeren/cafe-benelux"}, {"nr": 4, "n": "De Oude Statie", "g": "De Klinge, Sint-Gillis-Waas", "a": "klinge", "lat": 51.2518672, "lon": 4.0802595, "u": "cafe/de-klinge/oude-statie"}, {"nr": 5, "n": "Het Witte Paard", "g": "Putte, Kapellen", "a": "putte", "lat": 51.356053, "lon": 4.395971, "u": "cafe/kapellen/cafe-het-witte-paard"}, {"nr": 6, "n": "Moskes", "g": "Meersel-Dreef, Hoogstraten", "a": "moskes", "lat": 51.5044457, "lon": 4.7787701, "u": "cafe/meerle/moskes", "dicht": true}, {"nr": 7, "n": "Café In Holland", "g": "Castelré (NL)", "a": "castelre", "lat": 51.4106505, "lon": 4.7924248}, {"nr": 8, "n": "Den Engel", "g": "Baarle-Nassau (NL)", "a": "baarle", "lat": 51.4430051, "lon": 4.9309651}, {"nr": 9, "n": "'t Jachthuis", "g": "Poppel, Ravels", "a": "poppel", "lat": 51.446312, "lon": 5.091938, "u": "cafe/poppel/t-jachthuis"}, {"nr": 10, "n": "'t Grenscafé", "g": "Reusel (NL)", "a": "reusel", "lat": 51.349812, "lon": 5.127438}, {"nr": 11, "n": "Terras Maasoever", "g": "Berg aan de Maas (NL)", "a": "maas", "lat": 51.0059141, "lon": 5.7680451}, {"nr": 12, "n": "GrensStube", "g": "Veldwezelt, Lanaken", "a": "veldwezelt", "lat": 50.8588128, "lon": 5.6432238, "u": "cafe/veldwezelt/grensstube"}, {"nr": 13, "n": "Het Boerenhof", "g": "De Plank, Voeren", "a": "deplank", "lat": 50.7533463, "lon": 5.8488034, "u": "cafe/voeren/het-boerenhof-de-plank"}, {"nr": 14, "n": "'t Bakhuis", "g": "Ulvend, Voeren", "a": "ulvend", "lat": 50.758312, "lon": 5.830313, "u": "cafe/sint-martens-voeren/t-bakhuis"}, {"nr": 15, "n": "Drielandenpunt", "g": "Vaalserberg, Vaals (NL)", "a": "drielandenpunt", "lat": 50.7559802, "lon": 6.0192154}]</script>
   </section>
 
   <section id="eede">
@@ -219,8 +227,8 @@
    <p>Smokkelaars wisten de weg ook te vinden, zelfs toen de Duitsers tijdens de oorlog een grenspost recht tegenover het café hadden. Die verhalen leven verder in het <strong>Smokkelmuseumke</strong>, een kleine verzameling over het grensleven van de negentiende en twintigste eeuw. In 2012, precies honderd jaar na de start, ging het café opnieuw open, en sinds 2024 zit het achter de poort, ingericht in oude stijl met oud meubilair. Op tafel komen koffie, gebak en de huisspecialiteiten: het Grensplenkske en het Smokkellikeurtje.</p>
    <p>Dit is geen café waar je zomaar binnenloopt. Het opent maar één zaterdagnamiddag per maand, en een rondleiding vraag je vooraf aan. Plan je fietstocht door de Kempen dus rond die dag, en je drinkt een likeurtje op de plek waar het vroeger echt spannend was.</p>
    <dl class="praktisch">
-    <dt>Adres</dt><dd>'t Grenscafé, Turnhoutseweg in Reusel (Nederland), op de grens met Arendonk</dd>
-    <dt>Goed om te weten</dt><dd>Alleen op de eerste zaterdag van de maand open. Kijk de <a href="https://www.grenscafereusel.nl/" rel="noopener">eigen website</a> na voor je vertrekt.</dd>
+    <dt>Adres</dt><dd>'t Grenscafé, Turnhoutseweg 56 in Reusel (Nederland), op de grens met Arendonk</dd>
+    <dt>Goed om te weten</dt><dd>Alleen op de eerste zaterdag van de maand open. Google Maps vermeldt de zaak nog als tijdelijk gesloten, dus kijk de <a href="https://www.grenscafereusel.nl/" rel="noopener">eigen website</a> na of neem contact op voor je vertrekt.</dd>
    </dl>
   </section>
 
@@ -324,5 +332,7 @@
  </div>
 </footer>
 <script src="/assets/verhaal.js?v=delen-20261012" defer></script>
+<script src="/assets/vendor/leaflet.js" defer></script>
+<script src="/assets/verhaalkaart.js?v=20261013" defer></script>
 </body>
 </html>
