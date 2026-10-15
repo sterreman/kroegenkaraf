@@ -73,6 +73,24 @@
         "hoog": 300,
         "alt": "Rode straatstenen met een witte grenslijn vol kruisjes, links een tegel met NL en rechts een tegel met B"
       }
+    },
+    {
+      "id": "op-cafe-in-alveringem",
+      "datum": "2026-10-15",
+      "url": "/op-cafe-in-alveringem",
+      "rubriek": "Caféverhalen",
+      "titel": "Op café in Alveringem",
+      "omschrijving": "Dertien cafés voor nog geen vijfduizend inwoners. Van de museumherberg in Fortem tot de picon van Leisele.",
+      "feiten": ["5 haltes", "Met kaart", "Westhoek"],
+      "beeld": {
+        "bestanden": [
+          {"w": 800, "avif": "/assets/verhalen/alveringem/held-800.avif", "webp": "/assets/verhalen/alveringem/held-800.webp"},
+          {"w": 1600, "avif": "/assets/verhalen/alveringem/held-1600.avif", "webp": "/assets/verhalen/alveringem/held-1600.webp"}
+        ],
+        "breed": 800,
+        "hoog": 450,
+        "alt": "Witgekalkt hoekcafé De Vette Os met bruine luiken en een terras op de kasseien van het dorpsplein van Leisele"
+      }
     }
   ]
 }

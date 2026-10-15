@@ -124,6 +124,60 @@
           "label": "Uitstap 5: de Sint-Sixtuswandelroute, circa 8 km"
         }
       }
+    },
+    {
+      "url": "/op-cafe-in-alveringem",
+      "titel": "Op café in Alveringem",
+      "cafes": {
+        "KK02223": {
+          "anker": "fortem",
+          "label": "Halte 1: een pint naast de brouwketels"
+        },
+        "KK02224": {
+          "anker": "dorp",
+          "label": "Halte 2: twee cafés die het dorp laten draaien"
+        },
+        "KK03160": {
+          "anker": "dorp",
+          "label": "Halte 2: twee cafés die het dorp laten draaien"
+        },
+        "KK02502": {
+          "anker": "leisele",
+          "label": "Halte 3: de picon van Jeanne"
+        },
+        "KK03163": {
+          "anker": "leisele",
+          "label": "Halte 3: meer cafés in Leisele"
+        },
+        "KK03164": {
+          "anker": "leisele",
+          "label": "Halte 3: meer cafés in Leisele"
+        },
+        "KK03162": {
+          "anker": "leisele",
+          "label": "Halte 3: de kermis van Izenberge"
+        },
+        "KK02250": {
+          "anker": "beveren",
+          "label": "Halte 4: een ronde toog en een motor in de zaal"
+        },
+        "KK03161": {
+          "anker": "beveren",
+          "label": "Halte 4: nog een adres in Beveren"
+        },
+        "KK02691": {
+          "anker": "stavele",
+          "label": "Halte 5: een glas aan de IJzer"
+        },
+        "KK02692": {
+          "anker": "stavele",
+          "label": "Halte 5: in de zomer in Stavele"
+        },
+        "KK03165": {
+          "anker": "stavele",
+          "label": "Halte 5: in de zomer in Stavele"
+        }
+      }
     }
   ]
 }
