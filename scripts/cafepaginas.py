@@ -55,6 +55,7 @@ REPO = Path(__file__).resolve().parents[1]
 FONTS = Path(__file__).resolve().parent / 'fonts'
 REGISTER = 'data/slugs.json'
 
+DUN_WOORDEN = 15     # Info korter dan dit: pagina krijgt noindex en staat niet in de sitemap
 BUREN = 5            # zoveel zaken in het blok In de buurt
 BUREN_MAX_KM = 15    # verder weg telt niet meer als in de buurt
 
@@ -111,6 +112,31 @@ def afstand_tekst(x):
     if x < 1:
         return f'{max(10, round(x * 100) * 10)} m'
     return (f'{x:.1f}' if x < 10 else f'{x:.0f}').replace('.', ',') + ' km'
+
+
+def dun(d):
+    """Een pagina met (bijna) geen Info is voor een zoekmachine een sjabloon met een
+    adres. Zulke pagina's blijven bereikbaar en gedeelde links werken, maar ze vragen
+    Google niet om ze op te nemen tot er een echte beschrijving is."""
+    return len((d.get('i') or '').split()) < DUN_WOORDEN
+
+
+def iso_dag(t):
+    m = re.fullmatch(r'(\d{4})-(\d{2})-(\d{2})', (t or '').strip())
+    return m.group(0) if m else ''
+
+
+def laatst_gewijzigd(d):
+    return max(iso_dag(d.get('v')), iso_dag(d.get('z')), iso_dag(d.get('d')))
+
+
+def sitemap_bestand(items):
+    """items: (url, lastmod of '')"""
+    return ('<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+            + ''.join(f'<url><loc>{e(u)}</loc>' + (f'<lastmod>{m}</lastmod>' if m else '') + '</url>\n'
+                      for u, m in items)
+            + '</urlset>\n')
 
 
 def datum(t):
@@ -811,6 +837,7 @@ def pagina(d, buren):
     klassen = ' '.join(k for k in ('zaak', 'dicht' if dicht else '', 'metfoto' if foto else '',
                                    'metverhaal' if verhaal else '') if k)
 
+    robots = '\n<meta name="robots" content="noindex,follow">' if dun(d) else ''
     return f'''<!doctype html>
 <html lang="nl">
 <head>
@@ -819,7 +846,7 @@ def pagina(d, buren):
 <meta name="theme-color" content="#132738">
 <title>{e(titel)} | Kroeg &amp; Karaf</title>
 <meta name="description" content="{e(omschrijving)}">
-<link rel="canonical" href="{e(url)}">
+<link rel="canonical" href="{e(url)}">{robots}
 <meta property="og:type" content="place">
 <meta property="og:site_name" content="Kroeg &amp; Karaf">
 <meta property="og:locale" content="nl_BE">
@@ -872,7 +899,7 @@ def pagina(d, buren):
 
 <footer class="voet">
  <div class="wrap">
-  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a><a href="/over">Over</a><a href="/privacy">Privacy</a></nav>
+  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a><a href="/gemeenten">Gemeenten</a><a href="/over">Over</a><a href="/privacy">Privacy</a></nav>
   <p>Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</p>
  </div>
 </footer>
@@ -1086,7 +1113,7 @@ def gemeente_pagina(g):
 
 <footer class="voet">
  <div class="wrap">
-  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a><a href="/over">Over</a><a href="/privacy">Privacy</a></nav>
+  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a><a href="/gemeenten">Gemeenten</a><a href="/over">Over</a><a href="/privacy">Privacy</a></nav>
   <p>Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</p>
  </div>
 </footer>
@@ -1171,7 +1198,7 @@ def gemeenten_overzicht(gemeenten):
 
 <footer class="voet">
  <div class="wrap">
-  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a><a href="/over">Over</a><a href="/privacy">Privacy</a></nav>
+  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a><a href="/gemeenten">Gemeenten</a><a href="/over">Over</a><a href="/privacy">Privacy</a></nav>
   <p>Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</p>
  </div>
 </footer>
@@ -1323,15 +1350,28 @@ def main():
     (SITE / REGISTER).write_text(json.dumps(nieuw_register(data, weg), ensure_ascii=False,
                                             separators=(',', ':')), encoding='utf-8')
     schrijf_start(data)
-    urls = ([f'{ORIGIN}/', f'{ORIGIN}/lijst', f'{ORIGIN}/kaart', f'{ORIGIN}/afspreken', f'{ORIGIN}/over', f'{ORIGIN}/oppad', f'{ORIGIN}/herfstwandelingen', f'{ORIGIN}/decaporgels-cafes', f'{ORIGIN}/bij-de-kachel', f'{ORIGIN}/grenscafes-belgie-nederland', f'{ORIGIN}/op-cafe-in-alveringem']
-            + ([f'{ORIGIN}/gemeenten'] if gemeenten else [])
-            + [f'{ORIGIN}/{g["u"]}/' for g in gemeenten.values()]
-            + [f'{ORIGIN}/{d["u"]}/' for d in data])
+    # Sitemap-index met drie delen, zodat Search Console per soort pagina toont wat
+    # geindexeerd raakt. Cafepagina's alleen als ze open zijn en een echte Info hebben;
+    # gesloten zaken blijven als archief bereikbaar via de gemeentepagina's.
+    vast = [f'{ORIGIN}/', f'{ORIGIN}/lijst', f'{ORIGIN}/kaart', f'{ORIGIN}/afspreken', f'{ORIGIN}/over', f'{ORIGIN}/oppad', f'{ORIGIN}/herfstwandelingen', f'{ORIGIN}/decaporgels-cafes', f'{ORIGIN}/bij-de-kachel', f'{ORIGIN}/grenscafes-belgie-nederland', f'{ORIGIN}/op-cafe-in-alveringem']
+    paginas = [(u, '') for u in vast] + ([(f'{ORIGIN}/gemeenten', '')] if gemeenten else [])
+    gem = [(f'{ORIGIN}/{g["u"]}/', max((laatst_gewijzigd(d) for d in g['leden']), default=''))
+           for g in gemeenten.values()]
+    cafes = [(f'{ORIGIN}/{d["u"]}/', laatst_gewijzigd(d)) for d in data
+             if d.get('s') != 'Gesloten' and not dun(d)]
+    delen = [('sitemap-paginas.xml', paginas), ('sitemap-gemeenten.xml', gem), ('sitemap-cafes.xml', cafes)]
+    for naam, items in delen:
+        (SITE / naam).write_text(sitemap_bestand(items), encoding='utf-8')
     (SITE / 'sitemap.xml').write_text(
         '<?xml version="1.0" encoding="UTF-8"?>\n'
-        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-        + ''.join(f'<url><loc>{e(u)}</loc></url>\n' for u in urls) + '</urlset>\n',
-        encoding='utf-8')
+        '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        + ''.join(f'<sitemap><loc>{ORIGIN}/{naam}</loc>'
+                  + (f'<lastmod>{max(m for _, m in items)}</lastmod>' if any(m for _, m in items) else '')
+                  + '</sitemap>\n' for naam, items in delen)
+        + '</sitemapindex>\n', encoding='utf-8')
+    n_dun = sum(dun(d) for d in data)
+    print(f'sitemap: {len(paginas)} vaste pagina\'s, {len(gem)} gemeenten, {len(cafes)} cafes; '
+          f'{n_dun} dunne cafepagina\'s met noindex (Info onder {DUN_WOORDEN} woorden)')
     (SITE / 'robots.txt').write_text(f'User-agent: *\nAllow: /\n\nSitemap: {ORIGIN}/sitemap.xml\n',
                                      encoding='utf-8')
     regels = doorverwijzingen(data, weg)
