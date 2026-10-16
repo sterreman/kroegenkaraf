@@ -200,3 +200,35 @@ fetch('data/start.json')
     console.error('De startpagina kreeg haar gegevens niet binnen:', err);
     $('ontdek').hidden = true;
   });
+
+/* ---- delen ---------------------------------------------------------------
+   Zoals op de pagina van een zaak: op de gsm de eigen deelknop van het toestel,
+   op de computer een rij met WhatsApp, Facebook, e-mail en kopiëren. */
+(function () {
+  const knop = $('deel');
+  const paneel = $('deelpaneel');
+  const melding = $('gekopieerd');
+  if (!knop || !paneel) return;
+  const url = 'https://kroegenkaraf.be/';
+  knop.addEventListener('click', async () => {
+    if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+      try {
+        await navigator.share({title: 'Kroeg & Karaf', text: knop.dataset.tekst, url});
+        return;
+      } catch (err) {
+        if (err && err.name === 'AbortError') return;
+      }
+    }
+    paneel.hidden = !paneel.hidden;
+    knop.setAttribute('aria-expanded', paneel.hidden ? 'false' : 'true');
+  });
+  $('kopieer').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      melding.textContent = 'Link gekopieerd';
+    } catch (err) {
+      window.prompt('Kopieer deze link:', url);
+    }
+    setTimeout(() => { melding.textContent = ''; }, 3000);
+  });
+})();

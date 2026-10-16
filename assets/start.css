@@ -25,6 +25,27 @@
 .intro{margin:10px 0 0;max-width:68ch;font-size:18px;line-height:1.42;color:var(--creme)}
 .startkop .zoek{margin:16px 0 0;max-width:640px}
 
+/* de leuze boven de titel, ook op de gsm zichtbaar (de merkzin valt daar weg) */
+.leuze{margin:0 0 6px;font-family:var(--kop);font-stretch:85%;font-weight:700;font-size:17px;letter-spacing:.02em;
+ color:var(--roest-licht)}
+
+/* delen: op de gsm de deelknop van het toestel, op de computer een rij opties */
+.startdeel{margin:12px 0 0}
+.deelknop{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0;background:none;border:0;cursor:pointer;
+ color:var(--creme);font-family:var(--kop);font-stretch:90%;font-weight:600;font-size:15px;
+ text-decoration:underline;text-decoration-color:var(--lijn-m);text-underline-offset:5px;text-decoration-thickness:1.5px}
+.deelknop:hover{color:var(--roest-licht);text-decoration-color:currentColor}
+.deelknop:focus-visible{outline:2px solid var(--creme);outline-offset:3px}
+.deelknop svg{width:17px;height:17px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+.startkop .deelpaneel{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;max-width:640px;
+ padding:10px 0;border-top:1px dashed var(--lijn-m);border-bottom:1px dashed var(--lijn-m)}
+.startkop .deelpaneel[hidden]{display:none}
+.deelpaneel a,.deelpaneel button{font-family:var(--kop);font-stretch:90%;font-size:14px;
+ font-weight:600;padding:6px 11px;border:1px solid var(--lijn-m);background:var(--marine2);
+ color:var(--creme);text-decoration:none;cursor:pointer}
+.deelpaneel a:hover,.deelpaneel button:hover{border-color:var(--roest-licht);color:var(--roest-licht)}
+.gekopieerd{font-family:var(--kop);font-size:14px;color:var(--creme)}
+
 #inhoud{padding-top:30px}
 #inhoud:focus{outline:none}
 .startpagina h2{margin:0 0 4px;font-family:var(--kop);font-weight:800;font-stretch:70%;font-size:30px;line-height:1.05}
