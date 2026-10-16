@@ -465,7 +465,7 @@ ICOON_DEEL = ('<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5
               '<circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/>'
               '<path d="m8.3 13.3 7.4 4.4M15.7 6.3l-7.4 4.4"/></svg>')
 
-VERSIE = 'balk-20261015'
+VERSIE = 'leuze-20261017'
 
 ICOON_WEB = ('<svg class="lijn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/>'
              '<path d="M2.8 12h18.4M12 2.8c2.6 2.6 3.8 5.7 3.8 9.2s-1.2 6.6-3.8 9.2c-2.6-2.6-3.8-5.7-3.8-9.2'
@@ -878,6 +878,7 @@ def pagina(d, buren):
  <article class="{klassen}">
   <div class="kop">
    <div class="wrap">
+    <p class="leuze">Waar gaan we ene drinken?</p>
     <nav class="kruimel" aria-label="Kruimelpad">{' <span aria-hidden="true">/</span> '.join(kruimel)}</nav>
     <div class="kopraster">
      <div class="kopnaam">

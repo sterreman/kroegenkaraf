@@ -47,6 +47,9 @@ a{color:inherit}
 .hoofdnav a[aria-current="page"]{border-bottom-color:var(--roest-licht)}
 /* ---- de kop ---- */
 .kop{background:var(--marine);color:var(--creme);padding:10px 0 0}
+/* de leuze boven het kruimelpad, ook op de gsm zichtbaar (de merkzin valt daar weg) */
+.leuze{margin:0 0 4px;font-family:var(--kop);font-stretch:85%;font-weight:700;font-size:16px;letter-spacing:.02em;
+ color:var(--roest-licht)}
 .kruimel{font-family:var(--kop);font-stretch:90%;font-size:13px;color:var(--creme2)}
 .kruimel a{display:inline-block;padding:12px 0 8px;color:var(--creme2);text-decoration:none;border-bottom:1px solid var(--lijn-m)}
 .kruimel a:hover{color:var(--creme);border-color:var(--creme)}
