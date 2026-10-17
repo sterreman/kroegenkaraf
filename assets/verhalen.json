@@ -190,6 +190,34 @@
         "KK02739": {
           "anker": "zelf",
           "label": "Boltra in Watou: alleen nog voor groepen"
+        },
+        "KK03264": {
+          "anker": "nieuwenappel",
+          "label": "Halte 2: twee boltrabanen, binnen en onder het afdak"
+        },
+        "KK03265": {
+          "anker": "legendoorn",
+          "label": "Halte 3: een café vol spelen"
+        },
+        "KK03266": {
+          "anker": "wijngaard",
+          "label": "Halte 4: de tweede boltrahalte in Poperinge"
+        },
+        "KK03267": {
+          "anker": "pottes",
+          "label": "Halte 5: een baan op het terras"
+        },
+        "KK03268": {
+          "anker": "herinnes",
+          "label": "Halte 6: het café dat de maat aangaf"
+        },
+        "KK03269": {
+          "anker": "verdwenen",
+          "label": "De boltra die verdween: de naam bleef"
+        },
+        "KK03270": {
+          "anker": "verdwenen",
+          "label": "De boltra die verdween: het Boldersparadijs"
         }
       }
     }
