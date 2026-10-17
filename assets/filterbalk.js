@@ -26,7 +26,7 @@ const TAGGROEPEN = [
   ['Drinken', ['Speciaalbier', 'Grote bierkaart', 'Belgische bieren', 'Trappist', 'Brouwerijcafé', 'Cocktails',
     'Wijn', 'Natuurwijn', 'Aperitief', 'Sterke drank', 'Koffie']],
   ['Eten', ['Eten', 'Snacks', 'Kleine kaart', 'Lunch', 'Ontbijt', 'Brunch']],
-  ['Spelen en sport', ['Biljart', 'Darts', 'Kicker', 'Pool', 'Kaarten', 'Sport op tv', 'Supporterscafé', 'Wielercafé']],
+  ['Spelen en sport', ['Biljart', 'Darts', 'Kicker', 'Pool', 'Kaarten', 'Volksspelen', 'Sport op tv', 'Supporterscafé', 'Wielercafé']],
   ['Muziek en uitgaan', ['Live muziek', 'DJ', 'Rock', 'Jazz', 'Dansen', 'Feestcafé', 'Late night']],
   ['Karakter', ['Dorpscafé', 'Buurtcafé', 'Gezellig', 'Historisch', 'Erfgoed', 'Authentiek interieur', 'Stamcafé',
     'Studentencafé', 'Rustig', 'Trendy', 'Alternatief', 'Speakeasy', 'Date night']],
