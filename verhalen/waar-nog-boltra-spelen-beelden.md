@@ -7,8 +7,8 @@ Alle beelden staan in assets/verhalen/boltra/, bijgesneden en verkleind (AVIF en
 | held-* (Trabol.JPG) | Overdekte trabolbaan met rode en blauwe bollen rond de pluim, speler achteraan; locatie onbekend | onbekend | hero, 16:9, ook bij de uitleg over het spel | te bevestigen door Steven |
 | klyteput-* (Klyteput.jpg) | Speler bukt op een baan met rek rode en blauwe bollen; volgens de bestandsnaam De Klyteput | Eric Vanhooren, Torhout (EXIF) | halte 1, 4:3 | **toestemming van de fotograaf nodig**; locatie bevestigen |
 | nieuwenappel-* (DeNieuwenAppel.jpeg) | Overdekte baan met muurschilderingen van soldaten en klaprozen | onbekend | halte 2, 4:5 | te bevestigen door Steven |
-| bolders-* (bolletra.jpg.webp) | Groep met groene petten kijkt naar een speler op een bolletra in een sportclub; locatie onbekend | onbekend | hoofdstuk bolders, 2:1 | te bevestigen door Steven |
-| pottes-* (Pottes.jpg) | Bourlebaan in open lucht met spelers, weiland en hoeve met torentje; volgens Steven Pottes; mogelijk een still uit een tv-reportage (16:9) | onbekend | hoofdstuk grens, 16:9 | te bevestigen door Steven |
+| bolders-* (bolletra.jpg.webp) | Groep met groene petten kijkt naar een speler op een bolletra in een sportclub | Visit Roeselare (pagina bolletra) | hoofdstuk bolders, 2:1 | bron vermeld onder de foto, gebruik akkoord Steven 17/10/2026 |
+| pottes-* (Pottes.jpg) | Bourlebaan in open lucht in Pottes met spelers, weiland en hoeve met torentje | NoTélé (still uit een reportage) | hoofdstuk grens, 16:9 | bron vermeld onder de foto, gebruik akkoord Steven 17/10/2026 |
 | barriere-* (NieuweBarriereJaren70.jpg) | Zwart-wit groepsfoto op de bolletra van De Nieuwe Barrière, opschrift Nieuwe Barrière en naam André Lamsens op de achterwand; jaren zeventig volgens de bestandsnaam | onbekend | hoofdstuk verdwenen | te bevestigen door Steven |
 
 Het bijschrift bij bolders noemt geen club of plaats: niet bevestigd waar de foto genomen is.
