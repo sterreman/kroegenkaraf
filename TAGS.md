@@ -23,3 +23,6 @@ kwamen er op 1 oktober 2026 bewust bij, net als `Kicker` (er staat een kickerkas
 naast `Darts`, `Biljart` en `Pool`). Een nieuwe tag kan bewust aan
 de toegestane lijst worden toegevoegd als geen bestaande tag volstaat en het
 kenmerk nuttig is voor filtering. Maak geen nieuwe categorieën aan.
+`Volksspelen` kwam er op 17 oktober 2026 bij: er staat een baan of tafel voor een
+traditioneel caféspel, zoals boltra (trabol), bourle, gaaibolling, mannetjesspel,
+topspel of schuiftafel. Alleen toekennen als een bron het spel vermeldt.
