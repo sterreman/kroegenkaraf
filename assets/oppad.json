@@ -91,6 +91,24 @@
         "hoog": 450,
         "alt": "Witgekalkt hoekcafé De Vette Os met bruine luiken en een terras op de kasseien van het dorpsplein van Leisele"
       }
+    },
+    {
+      "id": "waar-nog-boltra-spelen",
+      "datum": "2026-10-17",
+      "url": "/waar-nog-boltra-spelen",
+      "rubriek": "Volkssport",
+      "titel": "Een pint en een bolle",
+      "omschrijving": "Waar je nog boltra kunt spelen: van de Koekelareberg tot de terrasbaan van Pottes.",
+      "feiten": ["6 cafés", "Met kaart", "Westhoek en Henegouwen"],
+      "beeld": {
+        "bestanden": [
+          {"w": 800, "avif": "/assets/verhalen/boltra/held-800.avif", "webp": "/assets/verhalen/boltra/held-800.webp"},
+          {"w": 1280, "avif": "/assets/verhalen/boltra/held-1280.avif", "webp": "/assets/verhalen/boltra/held-1280.webp"}
+        ],
+        "breed": 800,
+        "hoog": 450,
+        "alt": "Een overdekte trabolbaan met rode en blauwe houten bollen rond de pluim, achteraan een speler die zijn bol rolt"
+      }
     }
   ]
 }
