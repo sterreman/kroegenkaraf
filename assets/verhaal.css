@@ -94,3 +94,37 @@
 
 /* publicatiedatum onder de ondertitel van een artikel */
 .verhaalpagina .kop .datum{margin:10px 0 0;font-family:var(--kop);font-stretch:90%;font-weight:600;font-size:14px;letter-spacing:.02em;color:var(--creme2)}
+
+/* uitlegkader: een compacte samenvatting in een omkaderd blok (boltra in één minuut) */
+.kader{margin:22px 0 24px;padding:16px 18px 6px;border:2px solid var(--inkt);background:var(--papier)}
+.leeskolom .kader h3{margin:0 0 8px;font-family:var(--kop);font-weight:800;font-stretch:80%;font-size:19px;letter-spacing:.02em}
+.kader ul{margin:0 0 10px;padding-left:1.1em}
+.kader li{margin:0 0 6px;font-size:16px;line-height:1.45}
+
+/* inhoudsopgave met ankerlinks */
+.inhoud{margin:18px 0 8px;padding:12px 16px;border-left:3px solid var(--roest);background:var(--papier2)}
+.inhoud p{margin:0 0 6px;font-family:var(--kop);font-weight:700;font-stretch:85%;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--inkt3)}
+.inhoud ol{margin:0;padding-left:1.3em}
+.inhoud li{margin:2px 0;font-size:16px}
+
+/* een foto die nog ontbreekt: een nette lege plek met wat er moet komen */
+.fotoplaats{margin:22px 0 24px;padding:22px 18px;border:1.5px dashed var(--lijn);background:var(--papier2);text-align:center}
+.fotoplaats p{margin:0;font-size:15px;line-height:1.45;color:var(--inkt3)}
+.fotoplaats strong{display:block;margin-bottom:4px;font-family:var(--kop);font-stretch:85%;letter-spacing:.06em;text-transform:uppercase;font-size:13px}
+
+/* overzichtstabel van speelplekken, op de gsm als kaartjes onder elkaar */
+.speeltabel{width:100%;border-collapse:collapse;margin:14px 0 10px;font-size:15.5px;line-height:1.4}
+.speeltabel th{text-align:left;font-family:var(--kop);font-weight:700;font-stretch:85%;font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--inkt3);border-bottom:2px solid var(--inkt);padding:6px 8px 6px 0}
+.speeltabel td{border-bottom:1px solid var(--lijn);padding:9px 8px 9px 0;vertical-align:top}
+.speeltabel td:first-child{font-weight:700}
+.toegang{display:inline-block;padding:1px 7px;font-family:var(--kop);font-weight:700;font-stretch:88%;font-size:13px;white-space:nowrap}
+.toegang.vrij{background:#dfe9d6;color:#2f4a1f}
+.toegang.bellen{background:#f6e2c4;color:#6b3f08}
+.toegang.groep{background:#ecd7d0;color:#7a2a14}
+.toegang.club{background:#dde3ea;color:#25374a}
+@media(max-width:640px){
+  .speeltabel thead{position:absolute;left:-9999px}
+  .speeltabel tr{display:block;padding:10px 0;border-bottom:1px solid var(--lijn)}
+  .speeltabel td{display:block;border:0;padding:1px 0}
+}
+.speeltabel .tabelkop{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}

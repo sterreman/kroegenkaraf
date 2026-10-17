@@ -178,6 +178,20 @@
           "label": "Halte 5: in de zomer in Stavele"
         }
       }
+    },
+    {
+      "url": "/waar-nog-boltra-spelen",
+      "titel": "Een pint en een bolle",
+      "cafes": {
+        "KK02440": {
+          "anker": "klyteput",
+          "label": "Halte 1: een overdekte boltrabaan op de Koekelareberg"
+        },
+        "KK02739": {
+          "anker": "zelf",
+          "label": "Boltra in Watou: alleen nog voor groepen"
+        }
+      }
     }
   ]
 }
