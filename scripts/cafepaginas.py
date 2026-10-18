@@ -1353,7 +1353,7 @@ def main():
     # Sitemap-index met drie delen, zodat Search Console per soort pagina toont wat
     # geindexeerd raakt. Cafepagina's alleen als ze open zijn en een echte Info hebben;
     # gesloten zaken blijven als archief bereikbaar via de gemeentepagina's.
-    vast = [f'{ORIGIN}/', f'{ORIGIN}/lijst', f'{ORIGIN}/kaart', f'{ORIGIN}/afspreken', f'{ORIGIN}/over', f'{ORIGIN}/oppad', f'{ORIGIN}/herfstwandelingen', f'{ORIGIN}/decaporgels-cafes', f'{ORIGIN}/bij-de-kachel', f'{ORIGIN}/grenscafes-belgie-nederland', f'{ORIGIN}/op-cafe-in-alveringem', f'{ORIGIN}/waar-nog-boltra-spelen']
+    vast = [f'{ORIGIN}/', f'{ORIGIN}/lijst', f'{ORIGIN}/kaart', f'{ORIGIN}/afspreken', f'{ORIGIN}/over', f'{ORIGIN}/oppad', f'{ORIGIN}/herfstwandelingen', f'{ORIGIN}/decaporgels-cafes', f'{ORIGIN}/bij-de-kachel', f'{ORIGIN}/grenscafes-belgie-nederland', f'{ORIGIN}/op-cafe-in-alveringem', f'{ORIGIN}/waar-nog-boltra-spelen', f'{ORIGIN}/wielercafes-uit-2008-deel-1']
     paginas = [(u, '') for u in vast] + ([(f'{ORIGIN}/gemeenten', '')] if gemeenten else [])
     gem = [(f'{ORIGIN}/{g["u"]}/', max((laatst_gewijzigd(d) for d in g['leden']), default=''))
            for g in gemeenten.values()]

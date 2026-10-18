@@ -220,6 +220,52 @@
           "label": "De boltra die verdween: het Boldersparadijs"
         }
       }
+    },
+    {
+      "url": "/wielercafes-uit-2008-deel-1",
+      "titel": "Schatten uit de kringwinkel",
+      "cafes": {
+        "KK03368": {
+          "anker": "sportpaleis",
+          "label": "Café 1: het spookcafé uit de wielergids van 2008"
+        },
+        "KK03373": {
+          "anker": "handelshuis",
+          "label": "Café 2: van rugnummers naar tapas"
+        },
+        "KK03374": {
+          "anker": "sportclub",
+          "label": "Café 3: Jempi verhuisde naar het museum"
+        },
+        "KK03369": {
+          "anker": "koppenberg",
+          "label": "Café 5: nog altijd aan de voet van de muur"
+        },
+        "KK03370": {
+          "anker": "flandrien",
+          "label": "Café 6: van vroege passage naar finishstad"
+        },
+        "KK01374": {
+          "anker": "karper",
+          "label": "Café 7: Keisse doet het nog altijd"
+        },
+        "KK03375": {
+          "anker": "wiel",
+          "label": "Café 8: van covermodel naar voordeur"
+        },
+        "KK01276": {
+          "anker": "aubisque",
+          "label": "Café 9: een eeuw na de titanentocht"
+        },
+        "KK03372": {
+          "anker": "uitkijktoren",
+          "label": "Café 10: afgebroken zodra de inkt droog was"
+        },
+        "KK03371": {
+          "anker": "uitkijktoren",
+          "label": "Café 10: de nieuwe stopplaats op de Bosberg"
+        }
+      }
     }
   ]
 }

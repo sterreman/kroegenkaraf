@@ -5,7 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 WORK = ROOT / '.publication'
-FILES = ('index.html', 'lijst.html', 'kaart.html', 'afspreken.html', 'over.html', 'privacy.html', 'herfstwandelingen.html', 'oppad.html', 'decaporgels-cafes.html', 'bij-de-kachel.html', 'grenscafes-belgie-nederland.html', 'op-cafe-in-alveringem.html', 'waar-nog-boltra-spelen.html', '_headers', 'favicon.ico', 'apple-touch-icon.png')
+FILES = ('index.html', 'lijst.html', 'kaart.html', 'afspreken.html', 'over.html', 'privacy.html', 'herfstwandelingen.html', 'oppad.html', 'decaporgels-cafes.html', 'bij-de-kachel.html', 'grenscafes-belgie-nederland.html', 'op-cafe-in-alveringem.html', 'waar-nog-boltra-spelen.html', 'wielercafes-uit-2008-deel-1.html', '_headers', 'favicon.ico', 'apple-touch-icon.png')
 
 def main():
     for name in (*FILES, 'assets', 'data/zaken.json'):

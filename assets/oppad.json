@@ -109,6 +109,24 @@
         "hoog": 450,
         "alt": "Een overdekte trabolbaan met rode en blauwe houten bollen rond de pluim, achteraan een speler die zijn bol rolt"
       }
+    },
+    {
+      "id": "wielercafes-uit-2008-deel-1",
+      "datum": "2026-10-18",
+      "url": "/wielercafes-uit-2008-deel-1",
+      "rubriek": "Koerscafés",
+      "titel": "Schatten uit de kringwinkel",
+      "omschrijving": "Een wielergids uit 2008 tipte dertig koerscafés. Wat blijft er bijna twintig jaar later van over? Deel 1: tien adressen.",
+      "feiten": ["10 cafés", "Deel 1 van 3", "West- en Oost-Vlaanderen"],
+      "beeld": {
+        "bestanden": [
+          {"w": 800, "avif": "/assets/verhalen/wielercafes1/held-800.avif", "webp": "/assets/verhalen/wielercafes1/held-800.webp"},
+          {"w": 1280, "avif": "/assets/verhalen/wielercafes1/held-1280.avif", "webp": "/assets/verhalen/wielercafes1/held-1280.webp"}
+        ],
+        "breed": 800,
+        "hoog": 450,
+        "alt": "Het boek Wielerroutes en -cafés in België op een houten toog, naast een vers getapte pint"
+      }
     }
   ]
 }
