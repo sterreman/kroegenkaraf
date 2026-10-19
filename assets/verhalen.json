@@ -266,6 +266,52 @@
           "label": "Café 10: de nieuwe stopplaats op de Bosberg"
         }
       }
+    },
+    {
+      "url": "/wielercafes-uit-2008-deel-2",
+      "titel": "Schatten uit de kringwinkel, deel 2",
+      "cafes": {
+        "KK03376": {
+          "anker": "angele",
+          "label": "Café 11: van koers naar darts, en dan de deur dicht"
+        },
+        "KK03377": {
+          "anker": "wheelers",
+          "label": "Café 12: de fietsenwinkel reed verder dan de brasserie"
+        },
+        "KK00618": {
+          "anker": "toekomst",
+          "label": "Café 13: de toekomst duurt nog even"
+        },
+        "KK03378": {
+          "anker": "toren",
+          "label": "Café 14: Tom bleef langer dan zijn fans"
+        },
+        "KK03099": {
+          "anker": "waregem",
+          "label": "Café 15: zestig jaar in de naam van één koers"
+        },
+        "KK03380": {
+          "anker": "plaza",
+          "label": "Café 16: van supportersbus naar sushi"
+        },
+        "KK01993": {
+          "anker": "marietherese",
+          "label": "Café 17: de naam is weg, de tap loopt nog"
+        },
+        "KK03381": {
+          "anker": "sportwereld",
+          "label": "Café 18: Merckx en Sercu, maar niet hand in hand"
+        },
+        "KK03144": {
+          "anker": "roubaix",
+          "label": "Café 19: een kilo rosbief voor Parijs-Roubaix"
+        },
+        "KK02035": {
+          "anker": "boerenhof",
+          "label": "Café 20: vijftig jaar bij Merckx thuis"
+        }
+      }
     }
   ]
 }
