@@ -17,6 +17,11 @@ const PLAATSEN = new Set();
 /* Accenten en apostrofs vallen weg, zodat "'t Boshuisje", "\u2019t boshuisje" en "t boshuisje"
    hetzelfde zoeken (de apostrof staat in de data recht, op een gsm vaak gekruld). */
 const norm = s => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f'\u2019\u2018`\u00b4]/g, '');
+/* Voor het zoeken telt ook leestekens niet mee: streepjes, punten, slashes en & worden
+   een spatie, zodat "hoek city" ook "Hoek-City" vindt en "sint niklaas" "Sint-Niklaas".
+   _ks is dezelfde sleutel zonder spaties, zodat ook "hoekcity" werkt. */
+const zoekNorm = s => norm(s).replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+const zonderSpatie = s => s.replace(/ /g, '');
 const esc = s => (s || '').replace(/[&<>"]/g, c =>
   ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
 
@@ -33,8 +38,9 @@ function match(d) {
     /* Is de zoekterm precies een gemeente of deelgemeente, dan tellen alleen de
        zaken uit die plaats. Anders duikt bij "Haacht" ook een Gents café op
        omdat brouwerij Haacht in de beschrijving staat. */
-    const q = f.q.trim();
-    if (PLAATSEN.has(q) ? !d._g.includes(q) : !d._k.includes(f.q)) return false;
+    const q = zoekNorm(f.q);
+    if (PLAATSEN.has(q) ? !d._g.includes(q)
+      : !(d._k.includes(q) || d._ks.includes(zonderSpatie(q)))) return false;
   }
   return true;
 }
@@ -81,8 +87,9 @@ function laadData(dan, fout) {
         || alfabetisch(a.n, b.n));
       DATA.forEach((d, i) => {
         d.tags = Array.isArray(d.tags) ? [...new Set(d.tags.filter(t => typeof t === 'string' && t))] : [];
-        d._k = norm([d.n, d.g, d.p, d.a, d.i, d.t, ...d.tags].join(' '));
-        d._g = (d.g || '').split(/[()]/).map(x => norm(x).trim()).filter(Boolean);
+        d._k = zoekNorm([d.n, d.g, d.p, d.a, d.i, d.t, ...d.tags].join(' '));
+        d._ks = zonderSpatie(d._k);
+        d._g = (d.g || '').split(/[()]/).map(x => zoekNorm(x)).filter(Boolean);
         d._g.forEach(x => PLAATSEN.add(x));
         d._i = i;
         if (!PROV_ORDER.includes(d.p)) PROV_ORDER.push(d.p);
