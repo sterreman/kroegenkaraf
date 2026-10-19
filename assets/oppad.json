@@ -127,6 +127,24 @@
         "hoog": 450,
         "alt": "Het boek Wielerroutes en -cafés in België op een houten toog, naast een vers getapte pint"
       }
+    },
+    {
+      "id": "wielercafes-uit-2008-deel-2",
+      "datum": "2026-10-20",
+      "url": "/wielercafes-uit-2008-deel-2",
+      "rubriek": "Koerscafés",
+      "titel": "Schatten uit de kringwinkel, deel 2",
+      "omschrijving": "De wielercafés uit de gids van 2008, deel 2: van Rik Van Steenbergen tot Eddy Merckx, tien adressen in de Kempen en het Hageland.",
+      "feiten": ["10 cafés", "Deel 2 van 3", "Antwerpen en Vlaams-Brabant"],
+      "beeld": {
+        "bestanden": [
+          {"w": 800, "avif": "/assets/verhalen/wielercafes2/held-800.avif", "webp": "/assets/verhalen/wielercafes2/held-800.webp"},
+          {"w": 1280, "avif": "/assets/verhalen/wielercafes2/held-1280.avif", "webp": "/assets/verhalen/wielercafes2/held-1280.webp"}
+        ],
+        "breed": 800,
+        "hoog": 450,
+        "alt": "Het boek Wielerroutes en -cafés in België op een terrastafel naast een glas tripel, met een koersfiets op de achtergrond"
+      }
     }
   ]
 }

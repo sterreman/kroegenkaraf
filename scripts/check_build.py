@@ -29,12 +29,12 @@ def main():
         for name in ('index.html', 'deel.jpg'):
             if not Path('site', row['u'], name).is_file():
                 raise SystemExit(f"STOP: {name} ontbreekt voor {row['n']} ({row['u']}).")
-    for name in ('privacy.html', 'over.html', 'herfstwandelingen.html', 'decaporgels-cafes.html', 'bij-de-kachel.html', 'grenscafes-belgie-nederland.html', 'op-cafe-in-alveringem.html', 'waar-nog-boltra-spelen.html', 'wielercafes-uit-2008-deel-1.html', 'oppad.html', 'assets/oppad.json', 'assets/oppad.js', 'assets/oppad.css', 'assets/verhaal.css', 'assets/verhaal.js', 'assets/verhaalkaart.js', 'assets/gemeente.css', 'assets/verhalen.json', 'assets/gemeenten.json', 'afspreken.html', 'assets/afspreken.js', 'lijst.html', 'data/start.json', 'assets/fonts/fonts.css', 'sitemap.xml', 'sitemap-paginas.xml', 'sitemap-gemeenten.xml', 'sitemap-cafes.xml', 'robots.txt', 'data/slugs.json', 'assets/cafe.css', 'assets/cafe.js'):
+    for name in ('privacy.html', 'over.html', 'herfstwandelingen.html', 'decaporgels-cafes.html', 'bij-de-kachel.html', 'grenscafes-belgie-nederland.html', 'op-cafe-in-alveringem.html', 'waar-nog-boltra-spelen.html', 'wielercafes-uit-2008-deel-1.html', 'wielercafes-uit-2008-deel-2.html', 'oppad.html', 'assets/oppad.json', 'assets/oppad.js', 'assets/oppad.css', 'assets/verhaal.css', 'assets/verhaal.js', 'assets/verhaalkaart.js', 'assets/gemeente.css', 'assets/verhalen.json', 'assets/gemeenten.json', 'afspreken.html', 'assets/afspreken.js', 'lijst.html', 'data/start.json', 'assets/fonts/fonts.css', 'sitemap.xml', 'sitemap-paginas.xml', 'sitemap-gemeenten.xml', 'sitemap-cafes.xml', 'robots.txt', 'data/slugs.json', 'assets/cafe.css', 'assets/cafe.js'):
         if not Path('site', name).is_file():
             raise SystemExit(f'STOP: {name} ontbreekt.')
     print(f'{len(urls)} cafepaginas aanwezig.')
     # Verhalen linken naar cafepaginas: die moeten echt bestaan.
-    for verhaal in ('herfstwandelingen.html', 'decaporgels-cafes.html', 'bij-de-kachel.html', 'grenscafes-belgie-nederland.html', 'op-cafe-in-alveringem.html', 'waar-nog-boltra-spelen.html', 'wielercafes-uit-2008-deel-1.html'):
+    for verhaal in ('herfstwandelingen.html', 'decaporgels-cafes.html', 'bij-de-kachel.html', 'grenscafes-belgie-nederland.html', 'op-cafe-in-alveringem.html', 'waar-nog-boltra-spelen.html', 'wielercafes-uit-2008-deel-1.html', 'wielercafes-uit-2008-deel-2.html'):
         for link in sorted(set(re.findall(r'href="/(cafe/[^"#?]+?)/?"', Path('site', verhaal).read_text(encoding='utf-8')))):
             if not Path('site', link, 'index.html').is_file():
                 raise SystemExit(f'STOP: {verhaal} linkt naar een cafepagina die niet bestaat: /{link}/')
