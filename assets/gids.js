@@ -64,7 +64,7 @@ function gemeenteLink(g) {
     /* op de gemeentepagina staan gesloten zaken onder hun eigen kopjes */
     return `/${pagina}/#${OPENPLAATS.has(g) ? '' : 'gesloten-'}${urlDeel(p)}`;
   }
-  if (f.q && f.q.trim() === norm(p)) return '';
+  if (f.q && zoekNorm(f.q) === zoekNorm(p)) return '';
   return '/lijst?q=' + encodeURIComponent(p);
 }
 function plaatsNaam(g) {
