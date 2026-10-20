@@ -316,6 +316,48 @@
           "label": "Café 20: vijftig jaar bij Merckx thuis"
         }
       }
+    },
+    {
+      "url": "/wielercafes-uit-2008-deel-3",
+      "titel": "Schatten uit de kringwinkel, deel 3",
+      "cafes": {
+        "KK03531": {
+          "anker": "extratime",
+          "label": "Café 21: de Tour op acht schermen"
+        },
+        "KK03532": {
+          "anker": "brug",
+          "label": "Café 22: rondjes langs de Westlaan"
+        },
+        "KK03533": {
+          "anker": "kluis",
+          "label": "Café 23: Armstrong was er niet"
+        },
+        "KK00923": {
+          "anker": "rita",
+          "label": "Café 24: Rita heet nu In den Drej"
+        },
+        "KK03534": {
+          "anker": "malpertuus",
+          "label": "Café 25: de prins van de ereplaatsen"
+        },
+        "KK03535": {
+          "anker": "tour",
+          "label": "Café 26: een paar tafeltjes en een wielerencyclopedie"
+        },
+        "KK02875": {
+          "anker": "hostellerie",
+          "label": "Café 27: welke VDB zoek je?"
+        },
+        "KK03536": {
+          "anker": "panorama",
+          "label": "Café 28: klimmen met Ghislain Lambert"
+        },
+        "KK03537": {
+          "anker": "chevalblanc",
+          "label": "Café 29: barbecue op de Redoute"
+        }
+      }
     }
   ]
 }

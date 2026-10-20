@@ -145,6 +145,24 @@
         "hoog": 450,
         "alt": "Het boek Wielerroutes en -cafés in België op een terrastafel naast een glas tripel, met een koersfiets op de achtergrond"
       }
+    },
+    {
+      "id": "wielercafes-uit-2008-deel-3",
+      "datum": "2026-10-21",
+      "url": "/wielercafes-uit-2008-deel-3",
+      "rubriek": "Koerscafés",
+      "titel": "Schatten uit de kringwinkel, deel 3",
+      "omschrijving": "Het slot van de wielercafés uit de gids van 2008: van kamer 11 van Cipollini tot de hostellerie van de familie Vandenbroucke, tien adressen in Limburg en Wallonië.",
+      "feiten": ["10 cafés", "Deel 3 van 3", "Limburg en Wallonië"],
+      "beeld": {
+        "bestanden": [
+          {"w": 800, "avif": "/assets/verhalen/wielercafes3/held-800.avif", "webp": "/assets/verhalen/wielercafes3/held-800.webp"},
+          {"w": 1280, "avif": "/assets/verhalen/wielercafes3/held-1280.avif", "webp": "/assets/verhalen/wielercafes3/held-1280.webp"}
+        ],
+        "breed": 800,
+        "hoog": 450,
+        "alt": "Een gedenksteen met het opschrift La Redoute langs een smalle weg tussen groene velden"
+      }
     }
   ]
 }
