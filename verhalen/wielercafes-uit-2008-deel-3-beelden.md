@@ -4,7 +4,7 @@ Alle beelden staan in assets/verhalen/wielercafes3/, bijgesneden en verkleind (A
 
 | Bestand | Toont | Maker | Gebruik | Rechten |
 |---|---|---|---|---|
-| held-* (cote-de-la-redoute.jpg) | Gedenksteen La Redoute langs de weg | onbekend | hero 16:9 en deelbeeld | te bevestigen door Steven |
+| held-* (afbeelding van Steven, 20 okt 2026) | Het boek op een Jupiler-bak voor een café aan La Redoute, koersfietsen en renners op de helling | gegenereerd beeld | hero 16:9 en deelbeeld | als Illustratie vermeld; merk Jupiler zichtbaar op de bak |
 | boek12-* (boek_limburg_cafe_1-2.jpg, uitsnede) | Boekpagina Limburg café 1-2, Extra Time en De Brug | Steven (foto van het boek) | café 21 | citaatrecht, eigen foto |
 | kluis-* (DeKluisKokima(BronFacebook).jpg) | Gevel Kokima De Kluis | Facebook | café 23 | bron vermeld |
 | boekrita-* (boek_limburg_cafe_4.jpg, uitsnede) | Foto uit het boek: hoekcafé Bij Rita met Jupiler-lichtbakken | Steven (foto van het boek), oorspronkelijke foto uit het boek | café 24 | citaatrecht, eigen foto |
@@ -16,4 +16,4 @@ Alle beelden staan in assets/verhalen/wielercafes3/, bijgesneden en verkleind (A
 | chevalblanc-* (ChevalBlancRemouchamps.jpg) | Gevel Auberge Le Cheval Blanc met Gilbert-affiche | onbekend | café 29 | te bevestigen door Steven |
 | musee-* (MuseedecycleHuccorgne.jpg) | Loopfietsen en hoge bi in Famelette | sterba-bike.cz (watermerk) | café 30 | bron vermeld; toestemming te vragen |
 
-Niet gebruikt: HotelMalpertuusKamer11.webp (watermerk VRT, persbeeld), Invaren_van_de_brug_bij_Viversel.jpg (de brug komt niet meer in de tekst voor), CitadelVanNamen.jpg (reserve voor café 28), boekpagina's Limburg 3 en 5, Namen 1 en Luik 1-2 (reserve).
+Niet gebruikt: cote-de-la-redoute.jpg (eerdere hero, vervangen), HotelMalpertuusKamer11.webp (watermerk VRT, persbeeld), Invaren_van_de_brug_bij_Viversel.jpg (de brug komt niet meer in de tekst voor), CitadelVanNamen.jpg (reserve voor café 28), boekpagina's Limburg 3 en 5, Namen 1 en Luik 1-2 (reserve).
