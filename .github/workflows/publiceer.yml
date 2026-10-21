@@ -27,6 +27,8 @@ jobs:
         with:
           node-version: '22'
       - run: pip install -r requirements.txt
+      - name: Op pad gelijk in Python en JavaScript
+        run: python scripts/test_oppad.py
       - name: Werkmap voorbereiden
         run: python scripts/prepare_build.py
       - name: Drive downloaden
@@ -52,6 +54,7 @@ jobs:
           set -o pipefail
           python ../scripts/publiceer.py 2>&1 | tee build.log
           python ../scripts/cafepaginas.py 2>&1 | tee paginas.log
+          python ../scripts/oppad_statisch.py 2>&1 | tee oppad.log
           python ../scripts/check_build.py 2>&1 | tee checks.log
       - name: Proefsite bewaren
         uses: actions/upload-artifact@v4
@@ -71,7 +74,7 @@ jobs:
         if: always()
         shell: bash
         run: |
-          for report in .publication/download.log .publication/inzendingen.log .publication/build.log .publication/paginas.log .publication/checks.log; do
+          for report in .publication/download.log .publication/inzendingen.log .publication/build.log .publication/paginas.log .publication/oppad.log .publication/checks.log; do
             if [ -f "$report" ]; then
               echo '```text' >> "$GITHUB_STEP_SUMMARY"
               cat "$report" >> "$GITHUB_STEP_SUMMARY"

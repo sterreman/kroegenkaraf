@@ -39,8 +39,7 @@
  </div>
 
  <div class="wrap oppadwrap">
-  <ul class="opoverzicht" id="opoverzicht" aria-busy="true"></ul>
-  <noscript><p class="opleeg">Voor dit overzicht is JavaScript nodig.</p></noscript>
+  <!--oppad:overzicht--><ul class="opoverzicht" id="opoverzicht" aria-busy="true"></ul><!--/oppad:overzicht-->
   <p class="opleeg" id="opleeg" hidden>De uitstappen konden niet geladen worden. Probeer het later opnieuw.</p>
  </div>
 </main>
@@ -54,16 +53,23 @@
 
 <script src="/assets/oppad.js?v=datum-20261014"></script>
 <script>
-OpPad.laad().then(function (artikels) {
-  var rij = OpPad.ordenen(artikels), lijst = document.getElementById('opoverzicht');
-  if (!rij.length) throw new Error('geen artikels');
-  lijst.innerHTML = rij.map(function (a, i) { return '<li>' + OpPad.kaart(a, 'lijst', i === 0) + '</li>'; }).join('');
-  lijst.removeAttribute('aria-busy');
-}).catch(function (err) {
-  console.error('Op pad kreeg zijn artikels niet binnen:', err);
-  document.getElementById('opoverzicht').hidden = true;
-  document.getElementById('opleeg').hidden = false;
-});
+/* De publicatie zet de kaarten al in de html (scripts/oppad_statisch.py). Alleen
+   als die stap ontbreekt, bijvoorbeeld bij een kale kopie van de repo, tekent
+   het script ze hier. */
+(function () {
+  var lijst = document.getElementById('opoverzicht');
+  if (lijst.children.length) return;
+  OpPad.laad().then(function (artikels) {
+    var rij = OpPad.ordenen(artikels);
+    if (!rij.length) throw new Error('geen artikels');
+    lijst.innerHTML = rij.map(function (a, i) { return '<li>' + OpPad.kaart(a, 'lijst', i === 0) + '</li>'; }).join('');
+    lijst.removeAttribute('aria-busy');
+  }).catch(function (err) {
+    console.error('Op pad kreeg zijn artikels niet binnen:', err);
+    lijst.hidden = true;
+    document.getElementById('opleeg').hidden = false;
+  });
+})();
 </script>
 </body>
 </html>
