@@ -3,6 +3,8 @@ import json
 import re
 from pathlib import Path
 
+import artikels as A
+
 def main():
     base = json.loads(Path('baseline.json').read_text())
     data = json.loads(Path('site/data/zaken.json').read_text(encoding='utf-8'))
@@ -29,12 +31,14 @@ def main():
         for name in ('index.html', 'deel.jpg'):
             if not Path('site', row['u'], name).is_file():
                 raise SystemExit(f"STOP: {name} ontbreekt voor {row['n']} ({row['u']}).")
-    for name in ('privacy.html', 'over.html', 'herfstwandelingen.html', 'decaporgels-cafes.html', 'bij-de-kachel.html', 'grenscafes-belgie-nederland.html', 'op-cafe-in-alveringem.html', 'waar-nog-boltra-spelen.html', 'wielercafes-uit-2008-deel-1.html', 'wielercafes-uit-2008-deel-2.html', 'wielercafes-uit-2008-deel-3.html', 'oppad.html', 'assets/oppad.json', 'assets/oppad.js', 'assets/oppad.css', 'assets/verhaal.css', 'assets/verhaal.js', 'assets/verhaalkaart.js', 'assets/gemeente.css', 'assets/verhalen.json', 'assets/gemeenten.json', 'afspreken.html', 'assets/afspreken.js', 'lijst.html', 'data/start.json', 'assets/fonts/fonts.css', 'sitemap.xml', 'sitemap-paginas.xml', 'sitemap-gemeenten.xml', 'sitemap-cafes.xml', 'robots.txt', 'data/slugs.json', 'assets/cafe.css', 'assets/cafe.js'):
+    # De artikels staan in assets/oppad.json; daar komt ook deze lijst vandaan.
+    verhalen = [A.bestand(a) for a in A.laad('site')]
+    for name in (*verhalen, 'privacy.html', 'over.html', 'oppad.html', 'assets/oppad.json', 'assets/oppad.js', 'assets/oppad.css', 'assets/verhaal.css', 'assets/verhaal.js', 'assets/verhaalkaart.js', 'assets/gemeente.css', 'assets/verhalen.json', 'assets/gemeenten.json', 'afspreken.html', 'assets/afspreken.js', 'lijst.html', 'data/start.json', 'assets/fonts/fonts.css', 'sitemap.xml', 'sitemap-paginas.xml', 'sitemap-gemeenten.xml', 'sitemap-cafes.xml', 'robots.txt', 'data/slugs.json', 'assets/cafe.css', 'assets/cafe.js'):
         if not Path('site', name).is_file():
             raise SystemExit(f'STOP: {name} ontbreekt.')
     print(f'{len(urls)} cafepaginas aanwezig.')
     # Verhalen linken naar cafepaginas: die moeten echt bestaan.
-    for verhaal in ('herfstwandelingen.html', 'decaporgels-cafes.html', 'bij-de-kachel.html', 'grenscafes-belgie-nederland.html', 'op-cafe-in-alveringem.html', 'waar-nog-boltra-spelen.html', 'wielercafes-uit-2008-deel-1.html', 'wielercafes-uit-2008-deel-2.html', 'wielercafes-uit-2008-deel-3.html'):
+    for verhaal in verhalen:
         for link in sorted(set(re.findall(r'href="/(cafe/[^"#?]+?)/?"', Path('site', verhaal).read_text(encoding='utf-8')))):
             if not Path('site', link, 'index.html').is_file():
                 raise SystemExit(f'STOP: {verhaal} linkt naar een cafepagina die niet bestaat: /{link}/')
@@ -54,7 +58,19 @@ def main():
             for soort in ('avif', 'webp'):
                 if not Path('site', bestand[soort].lstrip('/')).is_file():
                     raise SystemExit(f"STOP: oppad.json toont een beeld dat ontbreekt: {bestand[soort]}")
-    print(f"Op pad: {len(artikels)} artikel(s) gecontroleerd.")
+    # De kaarten staan in de html zelf (oppad_statisch.py), in de volgorde van de JavaScript.
+    rij = A.ordenen(A.laad('site'))
+    oppad = Path('site/oppad.html').read_text(encoding='utf-8')
+    blok = re.search(r'<!--oppad:overzicht-->(.*?)<!--/oppad:overzicht-->', oppad, re.S)
+    gevonden = re.findall(r'<h3 class="optitel"><a href="([^"]+)"', blok.group(1) if blok else '')
+    if gevonden != [a['url'] for a in rij]:
+        raise SystemExit(f'STOP: /oppad toont in de html niet alle artikels in de juiste volgorde '
+                         f'({len(gevonden)} van {len(rij)}). Draaide oppad_statisch.py wel?')
+    start = Path('site/index.html').read_text(encoding='utf-8')
+    gevonden = re.findall(r'<h3 class="optitel"><a href="([^"]+)"', start)
+    if gevonden != [a['url'] for a in rij[:3]]:
+        raise SystemExit('STOP: de startpagina toont in de html niet de drie recentste artikels van Op pad.')
+    print(f"Op pad: {len(artikels)} artikel(s) gecontroleerd, alle in de html van /oppad.")
     # Gemeentepagina's: eigen titel, canonical, deelkaartje, en elke link naar een cafe klopt.
     namen = json.loads(Path('site/assets/gemeenten.json').read_text(encoding='utf-8')).get('gemeenten', [])
     titels, gemeenten = set(), 0

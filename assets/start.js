@@ -120,8 +120,11 @@ function tekenOntdek(keuze) {
 }
 
 /* Op pad: het eerste artikel groot, de volgende twee compact. Zonder artikels
-   (of zonder bestand) verdwijnt de rubriek; de link naar het overzicht blijft. */
+   (of zonder bestand) verdwijnt de rubriek; de link naar het overzicht blijft.
+   De publicatie zet de kaarten al in de html (scripts/oppad_statisch.py); dan
+   blijft het hierbij. */
 function toonOpPad() {
+  if ($('op-uitgelicht').children.length) return;
   OpPad.laad().then(artikels => {
     const rij = OpPad.ordenen(artikels);
     if (!rij.length) throw new Error('geen artikels');

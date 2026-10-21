@@ -1,4 +1,4 @@
-# Kroeg & Karaf — dagelijkse publicatie
+# Kroeg & Karaf: dagelijkse publicatie
 
 Dit aanvullingspakket gebruikt de websitebestanden aan de root van de bestaande
 repository. Upload alle inhoud, inclusief de map `.github`, naar diezelfde root.
@@ -60,3 +60,18 @@ Lokaal bouwen en bekijken zonder te publiceren: `python scripts/bouw_lokaal.py <
 (standaard met de csv en foto's in `G:\Mijn Drive\Volkscaf�s`), daarna `<werkmap>\site` serveren.
 De site draait op Cloudflare met schone urls (`/lijst`, niet `/lijst.html`); canonical en
 sitemap gebruiken daarom de schone vorm.
+
+## Op pad in de html (21 oktober 2026)
+
+`assets/oppad.json` is de enige lijst met artikels. Daaruit komen de bronbestanden
+die mee naar de bouw gaan, de sitemap, het linkblok in `lijst.html`, de controles en
+de kaarten op `/oppad` en de startpagina. Een artikel toevoegen is dus: het
+html-bestand aan de root en een regel in `oppad.json` (en in `verhalen.json` als
+er cafés in besproken worden). Niets anders.
+
+`scripts/oppad_statisch.py` zet de kaarten na `cafepaginas.py` al in de html, tussen
+de markeringen `<!--oppad:...-->`. Zo staan de links naar de artikels er ook voor
+wie geen JavaScript uitvoert. De JavaScript tekent alleen nog als die stap
+ontbreekt. `scripts/test_oppad.py` controleert dat de markup uit Python
+(`scripts/artikels.py`) byte voor byte gelijk is aan die van `assets/oppad.js`;
+wie de kaart aanpast, past beide aan.

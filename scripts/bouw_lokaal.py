@@ -36,7 +36,7 @@ def main():
     prepare_build.main()
     shutil.copy2(csv, work / 'cafes_100_jaar_v11.csv')
     shutil.copytree(fotos, work / 'fotos', ignore=shutil.ignore_patterns('*.txt'))
-    for script in ('publiceer.py', 'cafepaginas.py', 'check_build.py'):
+    for script in ('publiceer.py', 'cafepaginas.py', 'oppad_statisch.py', 'check_build.py'):
         print(f'--- {script}')
         subprocess.run([sys.executable, str(ROOT / 'scripts' / script)], cwd=work, check=True)
     print(f'\nKlaar: {work / "site"}')

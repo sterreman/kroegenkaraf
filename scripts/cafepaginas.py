@@ -49,6 +49,8 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
+import artikels as A
+
 ORIGIN = os.environ.get('SITE_ORIGIN', 'https://kroegenkaraf.be').rstrip('/')
 SITE = Path('site')
 REPO = Path(__file__).resolve().parents[1]
@@ -1330,8 +1332,10 @@ def main():
     pad_lijst = SITE / 'lijst.html'
     if pad_lijst.exists():
         t = pad_lijst.read_text(encoding='utf-8')
-        blok = ('<p class="laden">Bekijk de <a href="/gemeenten">cafés per gemeente</a>. Of lees <a href="/herfstwandelingen">'
-                'Eerst het bos in. Dan op café</a>, <a href="/decaporgels-cafes">Een pint met een heel orkest</a>, <a href="/bij-de-kachel">Bij de kachel</a>, <a href="/grenscafes-belgie-nederland">Op café langs de grens</a> of <a href="/op-cafe-in-alveringem">Op café in Alveringem</a>.</p>') if gemeenten else ''
+        # alle artikels uit oppad.json, het recentste eerst
+        links = [f'<a href="{e(a["url"])}">{e(a["titel"].rstrip("."))}</a>' for a in A.ordenen(A.laad(SITE))]
+        lees = (' Of lees ' + (', '.join(links[:-1]) + ' of ' if len(links) > 1 else '') + links[-1] + '.') if links else ''
+        blok = (f'<p class="laden">Bekijk de <a href="/gemeenten">cafés per gemeente</a>.{lees}</p>') if gemeenten else ''
         t = t.replace('<!--gemeentelinks-->', blok)
         # welke hoofdgemeenten een eigen pagina hebben, zodat de plaatsnaam boven elke
         # groep in de lijst ernaar kan linken (gids.js); de sleutel is die van sleutel()
@@ -1353,7 +1357,8 @@ def main():
     # Sitemap-index met drie delen, zodat Search Console per soort pagina toont wat
     # geindexeerd raakt. Cafepagina's alleen als ze open zijn en een echte Info hebben;
     # gesloten zaken blijven als archief bereikbaar via de gemeentepagina's.
-    vast = [f'{ORIGIN}/', f'{ORIGIN}/lijst', f'{ORIGIN}/kaart', f'{ORIGIN}/afspreken', f'{ORIGIN}/over', f'{ORIGIN}/oppad', f'{ORIGIN}/herfstwandelingen', f'{ORIGIN}/decaporgels-cafes', f'{ORIGIN}/bij-de-kachel', f'{ORIGIN}/grenscafes-belgie-nederland', f'{ORIGIN}/op-cafe-in-alveringem', f'{ORIGIN}/waar-nog-boltra-spelen', f'{ORIGIN}/wielercafes-uit-2008-deel-1', f'{ORIGIN}/wielercafes-uit-2008-deel-2', f'{ORIGIN}/wielercafes-uit-2008-deel-3']
+    vast = ([f'{ORIGIN}/', f'{ORIGIN}/lijst', f'{ORIGIN}/kaart', f'{ORIGIN}/afspreken', f'{ORIGIN}/over', f'{ORIGIN}/oppad']
+            + [ORIGIN + a['url'] for a in A.laad(SITE)])
     paginas = [(u, '') for u in vast] + ([(f'{ORIGIN}/gemeenten', '')] if gemeenten else [])
     gem = [(f'{ORIGIN}/{g["u"]}/', max((laatst_gewijzigd(d) for d in g['leden']), default=''))
            for g in gemeenten.values()]
