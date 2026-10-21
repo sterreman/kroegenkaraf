@@ -163,6 +163,15 @@
         "hoog": 450,
         "alt": "Het boek Wielerroutes en -cafés in België op een terrastafel naast een glas tripel, met een koersfiets op de achtergrond"
       }
+    },
+    {
+      "id": "laatste-cafe-van-het-dorp",
+      "datum": "2026-10-22",
+      "url": "/laatste-cafe-van-het-dorp",
+      "rubriek": "Caféverhalen",
+      "titel": "De laatste toog van het dorp",
+      "omschrijving": "Een op de drie Vlaamse cafés verdween in tien jaar. Zes dorpscafés die het toch haalden, en drie die het niet haalden.",
+      "feiten": ["6 cafés", "Vlaams-Brabant", "Met fietstip"]
     }
   ]
 }
