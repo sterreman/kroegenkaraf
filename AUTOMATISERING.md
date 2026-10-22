@@ -75,3 +75,11 @@ wie geen JavaScript uitvoert. De JavaScript tekent alleen nog als die stap
 ontbreekt. `scripts/test_oppad.py` controleert dat de markup uit Python
 (`scripts/artikels.py`) byte voor byte gelijk is aan die van `assets/oppad.js`;
 wie de kaart aanpast, past beide aan.
+
+## Pas open (22 oktober 2026)
+
+`assets/nieuwopen.json` stuurt de tegel Pas open op de startpagina: per zaak de ID, de maand
+van (her)opening (`JJJJ-MM`) en `nieuw` of `heropend`. Alleen opnemen als de Info-tekst die
+maand vermeldt. `cafepaginas.py` zet de zaken die nog geverifieerd zijn in `data/start.json`;
+de pagina toont zelf alleen wat de voorbije twaalf maanden opende, de recentste eerst. Oude
+regels mogen blijven staan, ze vallen vanzelf weg.

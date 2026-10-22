@@ -1,4 +1,4 @@
-/* De startpagina. Zes zaken om te ontdekken (met een knop voor zes andere), de artikels van Op pad
+/* De startpagina. Zes zaken om te ontdekken (met een knop voor zes andere), de tegel Pas open, de artikels van Op pad
    uit assets/oppad.json (via oppad.js), en de provincies;
    de zoekbalk is een gewoon formulier naar /lijst.
 
@@ -109,6 +109,52 @@ function tekenRonde(pool) {
   $('verhalen').hidden = false;
 }
 
+/* ---- pas open ----------------------------------------------------------------
+   Recent (her)geopende zaken uit assets/nieuwopen.json, al gesorteerd met de
+   recentste eerst. "sinds" is een maand (JJJJ-MM); de tegel toont alleen wat de
+   voorbije twaalf maanden opende en telt dat hier, zodat ze niet veroudert als er
+   een tijd geen nieuwe bouw is. Eerst zes, met een knop voor de rest. */
+const PAS_OPEN_MAANDEN = 12;
+
+function pasOpenPool(rij) {
+  const nu = new Date(), grens = nu.getFullYear() * 12 + nu.getMonth() - PAS_OPEN_MAANDEN;
+  return (rij || []).filter(d => {
+    const m = /^(\d{4})-(\d{2})$/.exec(d.sinds || '');
+    return d.u && m && (+m[1] * 12 + (+m[2] - 1)) > grens;
+  });
+}
+
+function pasOpenKaart(d) {
+  const [j, m] = d.sinds.split('-');
+  const wat = d.soort === 'heropend' ? 'Heropend' : 'Nieuw';
+  return `<li class="cafekaart${d.foto ? ' metfoto' : ''}"><a href="/${esc(d.u)}/">`
+    + `<span class="pasdatum"><b>${wat}</b> ${MAANDEN[+m - 1]} ${j}</span>`
+    + (d.foto ? `<span class="cafefoto"><img src="fotos/${esc(d.foto)}-klein.avif" alt="" width="92" height="92" loading="lazy" decoding="async"></span>` : '')
+    + `<span class="cafenaam">${esc(d.n)}</span>`
+    + `<span class="cafeplaats">${esc(d.g || d.p)}</span>`
+    + `<span class="caferede">${esc(d.k || eersteZin(d.i))}</span></a></li>`;
+}
+
+function tekenPasOpen(rij) {
+  const pool = pasOpenPool(rij);
+  if (!pool.length) return;
+  const lijst = $('pasopenlijst');
+  lijst.innerHTML = pool.slice(0, ZES).map(pasOpenKaart).join('');
+  $('pasopen').hidden = false;
+  if (pool.length > ZES) {
+    const knop = $('pasopenmeer');
+    $('pasopenaantal').textContent = pool.length;
+    $('pasopenmeerp').hidden = false;
+    knop.addEventListener('click', () => {
+      lijst.insertAdjacentHTML('beforeend', pool.slice(ZES).map(pasOpenKaart).join(''));
+      knop.setAttribute('aria-expanded', 'true');
+      $('pasopenmeerp').hidden = true;
+      const eerste = lijst.children[ZES] && lijst.children[ZES].querySelector('a');
+      if (eerste) eerste.focus({preventScroll: true});
+    });
+  }
+}
+
 function tekenOntdek(keuze) {
   const lijst = $('ontdeklijst');
   lijst.innerHTML = keuze.map(d =>
@@ -144,6 +190,7 @@ function toonOpPad() {
 toonOpPad();
 function toon(start) {
   tekenRonde(start.ronde);
+  tekenPasOpen(start.nieuw);
   const pool = ontdekPool(start.zaken || []);
   const lijst = $('ontdeklijst');
   lijst.removeAttribute('aria-busy');
@@ -182,11 +229,18 @@ function toon(start) {
 function terugval() {
   return Promise.all([
     fetch('data/zaken.json').then(r => r.json()),
-    fetch('assets/ontdek.json').then(r => r.json())
-  ]).then(([data, ontdek]) => {
+    fetch('assets/ontdek.json').then(r => r.json()),
+    fetch('assets/nieuwopen.json').then(r => r.json()).catch(() => ({}))
+  ]).then(([data, ontdek, nieuwopen]) => {
     const tel = {};
     data.forEach(d => { if (d.s !== 'Gesloten') tel[d.p] = (tel[d.p] || 0) + 1; });
+    const perId = {};
+    data.forEach(d => { if (d.id) perId[d.id] = d; });
     return {
+      nieuw: (nieuwopen.zaken || [])
+        .filter(r => perId[r.id] && perId[r.id].s === 'Geverifieerd')
+        .map(r => Object.assign({}, perId[r.id], {sinds: r.sinds, soort: r.soort}))
+        .sort((x, y) => y.sinds.localeCompare(x.sinds)),
       aantal: data.length,
       provincies: Object.entries(tel).sort((a, b) => a[0].localeCompare(b[0], 'nl')),
       zaken: data.filter(d => (ontdek.ids || []).includes(d.id)

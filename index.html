@@ -31,7 +31,7 @@
 <link rel="stylesheet" href="/assets/fonts/fonts.css">
 <link rel="stylesheet" href="assets/lijst.css?v=balk-20261015">
 <link rel="stylesheet" href="assets/oppad.css?v=balk-20261015">
-<link rel="stylesheet" href="assets/start.css?v=deel-20261017">
+<link rel="stylesheet" href="assets/start.css?v=pasopen-20261022">
 </head>
 <body class="startpagina">
 <a class="naarinhoud" href="#inhoud">Naar de inhoud</a>
@@ -42,7 +42,7 @@
    <a class="merk" href="/"><img src="assets/logo.png" alt="Kroeg &amp; Karaf" width="760" height="575"></a>
    <p class="merkzin">Voor schoon volk en dorstige zielen</p>
    <nav class="kopknoppen" aria-label="Hoofdmenu">
-    <a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a>
+    <a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/gemeenten">Gemeenten</a><a href="/afspreken">Afspreken</a>
    </nav>
   </div>
   <div class="startintro">
@@ -102,9 +102,17 @@
  <section class="hulp" aria-labelledby="hulpkop">
   <h2 id="hulpkop" class="sr">Handige hulpmiddelen</h2>
   <ul>
+   <li><a href="/gemeenten"><span class="hulpnaam">Cafés per gemeente</span><span class="hulptekst">Je eigen dorp of stad, met deelgemeenten en verdwenen cafés.</span></a></li>
    <li><a href="/afspreken"><span class="hulpnaam">Afspreken in het midden</span><span class="hulptekst">Vind een café dat voor iedereen handig ligt.</span></a></li>
    <li><a href="/kaart#buurt"><span class="hulpnaam">Cafés in de buurt</span><span class="hulptekst">Ontdek een adres dichtbij.</span></a></li>
   </ul>
+ </section>
+
+ <section class="pasopen" id="pasopen" aria-labelledby="pasopenkop" hidden>
+  <h2 id="pasopenkop">Pas open</h2>
+  <p class="kolintro">Nieuwe cafés en kroegen die na een tijd dicht opnieuw de deur openzetten.</p>
+  <ol class="pasopenlijst" id="pasopenlijst"></ol>
+  <p class="pasopenmeer" id="pasopenmeerp" hidden><button type="button" class="ontdekmeer" id="pasopenmeer" aria-expanded="false" aria-controls="pasopenlijst">Toon alle <span id="pasopenaantal"></span></button></p>
  </section>
 
  <section class="verhalen" id="verhalen" aria-labelledby="verhalenkop" hidden>
@@ -115,6 +123,7 @@
  <section class="provincies" id="provincies" aria-labelledby="provkop" hidden>
   <h2 id="provkop">Per provincie</h2>
   <ul class="provlijst" id="provlijst"></ul>
+  <p class="provvoet"><a href="/gemeenten">Alle gemeenten per provincie</a></p>
  </section>
 </main>
 
@@ -127,6 +136,6 @@
 
 <script>const BIJGEWERKT = "11 september 2026";</script>
 <script src="assets/oppad.js?v=datum-20261014"></script>
-<script src="assets/start.js?v=oppad-20261021"></script>
+<script src="assets/start.js?v=pasopen-20261022"></script>
 </body>
 </html>

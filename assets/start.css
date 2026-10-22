@@ -97,7 +97,7 @@
 
 /* hulpmiddelen: een smalle strook onder de kolommen */
 .hulp{margin:40px 0 36px;border-top:2px solid var(--inkt);border-bottom:1px solid var(--lijn)}
-.hulp ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.hulp ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
 .hulp li+li{border-left:1px solid var(--lijn)}
 .hulp a{display:block;height:100%;padding:16px 20px 16px 0;text-decoration:none;color:inherit}
 .hulp li+li a{padding-left:26px}
@@ -107,6 +107,20 @@
 .hulp a:hover{background:var(--papier2)}
 .hulp a:hover .hulpnaam{color:var(--roest-tekst);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:4px}
 .hulp a:focus-visible{outline:2px solid var(--inkt);outline-offset:-2px;background:var(--papier2)}
+
+/* pas open: recent (her)geopende zaken, in drie kolommen op de computer. Een
+   roestkleurige streep bovenaan, de tegenhanger van de marine Laatste ronde. */
+.pasopen{margin:0 0 40px;border-top:4px solid var(--roest);padding-top:12px}
+.pasopenlijst{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 26px}
+.pasdatum{display:block;margin-bottom:6px;font-family:var(--kop);font-stretch:85%;font-weight:600;font-size:13px;
+ letter-spacing:.08em;text-transform:uppercase;color:var(--inkt3)}
+.pasdatum b{font-weight:800;color:var(--roest-tekst)}
+.pasopenlijst .caferede{-webkit-line-clamp:3;line-clamp:3}
+.pasopenmeer{margin:14px 0 0;padding-top:14px;border-top:2px solid var(--inkt)}
+.provvoet{margin:10px 0 0}
+.provvoet a{display:inline-block;padding:10px 0;font-family:var(--kop);font-stretch:90%;font-weight:700;font-size:16px;
+ color:var(--roest-tekst);text-decoration-thickness:1.5px;text-underline-offset:4px}
+.provvoet a:hover{color:var(--inkt)}
 
 /* verhalen van aan de toog, met de laatste ronde: een verdwenen café, in marine,
    zodat ze niet verward wordt met een café waar je vandaag naartoe kunt */
@@ -173,8 +187,7 @@
   .startkop .merk img{height:48px}
   .startbalk{gap:0 12px}
   .merkzin{font-size:12px;letter-spacing:.08em}
-  .kopknoppen{margin-left:-10px;width:calc(100% + 10px);justify-content:space-between}
-  .kopknoppen a{padding:0 10px;font-size:15.5px}
+  .kopknoppen{margin-left:-6px;width:calc(100% + 12px);justify-content:space-between}
   .startkop h1{font-size:clamp(30px,8.4vw,38px)}
   .intro{font-size:17px}
   .startkop .zoek{margin-top:14px}
@@ -184,6 +197,9 @@
   .kolom h2{font-size:28px}
   .op-uitgelicht[aria-busy="true"]{min-height:380px}
   .hulp ul{grid-template-columns:1fr}
+  .pasopenlijst{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kopknoppen{gap:0}
+  .kopknoppen a{padding:0 5px;font-size:15px}
   .hulp li+li{border-left:0;border-top:1px solid var(--lijn)}
   .hulp li+li a{padding-left:0}
   .ronde{padding:16px 16px 14px}
@@ -192,7 +208,7 @@
   .rreden{font-size:15.5px}
 }
 @media(max-width:599px){
-  .cafelijst{grid-template-columns:1fr}
+  .cafelijst,.pasopenlijst{grid-template-columns:1fr}
   .cafelijst[aria-busy="true"]{min-height:800px}
   .cafekaart a{padding:12px 2px 14px 0}
   .cafenaam{font-size:23px}

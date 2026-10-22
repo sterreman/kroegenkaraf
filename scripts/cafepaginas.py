@@ -872,7 +872,7 @@ def pagina(d, buren):
  <div class="wrap">
   <a class="merk" href="/"><img src="/assets/logo.png" alt="Kroeg &amp; Karaf, naar de startpagina" width="760" height="575"></a>
   <p class="merkzin">Voor schoon volk en dorstige zielen</p>
-  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a></nav>
+  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/gemeenten">Gemeenten</a><a href="/afspreken">Afspreken</a></nav>
  </div>
 </header>
 
@@ -1092,7 +1092,7 @@ def gemeente_pagina(g):
  <div class="wrap">
   <a class="merk" href="/"><img src="/assets/logo.png" alt="Kroeg &amp; Karaf, naar de startpagina" width="760" height="575"></a>
   <p class="merkzin">Voor schoon volk en dorstige zielen</p>
-  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a></nav>
+  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/gemeenten">Gemeenten</a><a href="/afspreken">Afspreken</a></nav>
  </div>
 </header>
 
@@ -1179,7 +1179,7 @@ def gemeenten_overzicht(gemeenten):
  <div class="wrap">
   <a class="merk" href="/"><img src="/assets/logo.png" alt="Kroeg &amp; Karaf, naar de startpagina" width="760" height="575"></a>
   <p class="merkzin">Voor schoon volk en dorstige zielen</p>
-  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a></nav>
+  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/gemeenten" aria-current="page">Gemeenten</a><a href="/afspreken">Afspreken</a></nav>
  </div>
 </header>
 
@@ -1249,8 +1249,37 @@ def schrijf_start(data):
     (SITE / 'data/start.json').write_text(json.dumps({
         'aantal': len(data), 'open': len(open_),
         'provincies': sorted(provincies.items(), key=lambda x: sleutel(x[0])),
-        'zaken': zaken, 'ronde': laatste_ronde(data, per_id, open_)},
+        'zaken': zaken, 'ronde': laatste_ronde(data, per_id, open_),
+        'nieuw': pas_open(per_id)},
         ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+
+
+def pas_open(per_id):
+    """De pool van de tegel Pas open (assets/nieuwopen.json): zaken die recent
+    (her)openden, met de maand en of het om een nieuw of een heropend café gaat.
+    Alleen zaken die nog geverifieerd zijn en een eigen pagina hebben gaan mee;
+    welke binnen de voorbije twaalf maanden vallen, beslist de pagina zelf, zodat
+    de tegel ook zonder nieuwe bouw niet veroudert."""
+    pad = SITE / 'assets/nieuwopen.json'
+    if not pad.exists():
+        return []
+    uit = []
+    for r in json.loads(pad.read_text(encoding='utf-8')).get('zaken', []):
+        d = per_id.get(r.get('id'))
+        if not re.fullmatch(r'\d{4}-\d{2}', r.get('sinds') or '') or r.get('soort') not in ('nieuw', 'heropend'):
+            print(f'  LET OP: nieuwopen.json heeft een onvolledige regel: {r}')
+            continue
+        if not d:
+            print(f'  LET OP: nieuwopen.json noemt {r["id"]}, maar die zaak staat niet (meer) in de lijst.')
+            continue
+        if d.get('s') != 'Geverifieerd' or not d.get('u'):
+            continue
+        z = {k: d[k] for k in ('id', 'n', 'g', 'p', 'u', 'foto', 'k') if d.get(k)}
+        if d.get('i'):
+            z['i'] = d['i'].split('\n')[0][:240]
+        z['sinds'], z['soort'] = r['sinds'], r['soort']
+        uit.append(z)
+    return sorted(uit, key=lambda z: z['sinds'], reverse=True)
 
 
 def laatste_ronde(data, per_id, open_):
