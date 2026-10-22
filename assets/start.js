@@ -112,9 +112,9 @@ function tekenRonde(pool) {
 /* ---- pas open ----------------------------------------------------------------
    Recent (her)geopende zaken uit assets/nieuwopen.json, al gesorteerd met de
    recentste eerst. "sinds" is een maand (JJJJ-MM); de tegel toont alleen wat de
-   voorbije twaalf maanden opende en telt dat hier, zodat ze niet veroudert als er
+   voorbije zes maanden opende en telt dat hier, zodat ze niet veroudert als er
    een tijd geen nieuwe bouw is. Eerst zes, met een knop voor de rest. */
-const PAS_OPEN_MAANDEN = 12;
+const PAS_OPEN_MAANDEN = 6;
 
 function pasOpenPool(rij) {
   const nu = new Date(), grens = nu.getFullYear() * 12 + nu.getMonth() - PAS_OPEN_MAANDEN;

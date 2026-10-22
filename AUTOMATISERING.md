@@ -80,6 +80,6 @@ wie de kaart aanpast, past beide aan.
 
 `assets/nieuwopen.json` stuurt de tegel Pas open op de startpagina: per zaak de ID, de maand
 van (her)opening (`JJJJ-MM`) en `nieuw` of `heropend`. Alleen opnemen als de Info-tekst die
-maand vermeldt. `cafepaginas.py` zet de zaken die nog geverifieerd zijn in `data/start.json`;
-de pagina toont zelf alleen wat de voorbije twaalf maanden opende, de recentste eerst. Oude
+maand vermeldt, en nooit seizoenszaken (zomerbars, winterbars, pop-ups). `cafepaginas.py` zet de zaken die nog geverifieerd zijn in `data/start.json`;
+de pagina toont zelf alleen wat de voorbije zes maanden opende, de recentste eerst. Oude
 regels mogen blijven staan, ze vallen vanzelf weg.
