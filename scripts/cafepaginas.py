@@ -1257,31 +1257,31 @@ def vandaag_be():
         return datetime.date.today()
 
 
-def haal_vorig_rooster():
-    """Het rooster van de vorige bouw, uit de live start.json. Lukt dat niet, dan
+def haal_vorige_start():
+    """De live start.json met de roosters van de vorige bouw. Lukt dat niet, dan
     begint het rooster opnieuw: jammer, maar geen reden om de publicatie te stoppen."""
     if os.environ.get('ROOSTER_BESTAND'):         # enkel om lokaal te testen
         p = Path(os.environ['ROOSTER_BESTAND'])
-        return json.loads(p.read_text(encoding='utf-8')).get('rooster') if p.exists() else None
+        return json.loads(p.read_text(encoding='utf-8')) if p.exists() else {}
     nonce = datetime.datetime.now(datetime.timezone.utc).timestamp()
     req = urllib.request.Request(f'{ORIGIN}/data/start.json?bouw={nonce}',
                                  headers={'Cache-Control': 'no-cache',
                                           'User-Agent': 'KroegEnKaraf-publicatie/1.0'})
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
-            return json.loads(r.read()).get('rooster')
+            return json.loads(r.read())
     except (OSError, ValueError, urllib.error.HTTPError) as exc:
-        print(f'  LET OP: vorig rooster van Ontdek niet op te halen ({exc}); het begint opnieuw.')
-        return None
+        print(f'  LET OP: vorige roosters niet op te halen ({exc}); ze beginnen opnieuw.')
+        return {}
 
 
-def ontdek_rooster(pool, vorig, vandaag):
+def ontdek_rooster(pool, vorig, vandaag, per=ONTDEK_PER_DAG, rust=ONTDEK_RUST,
+                   vooruit=ONTDEK_VOORUIT, naam='ontdek'):
     """pool: de ID's die vandaag in aanmerking komen. Geeft het nieuwe rooster:
     {'start': datum, 'offset': n, 'rondes': [[id, ...], ...]}. Op dag d toont de
     pagina de zes ID's vanaf plek (d - start) * 6 - offset in de aaneengeschakelde
-    rondes."""
-    per = ONTDEK_PER_DAG
-    rnd = random.Random(f'ontdek-{vandaag.isoformat()}')
+    rondes. Met per=1 werkt het ook voor de tegel Laatste ronde."""
+    rnd = random.Random(f'{naam}-{vandaag.isoformat()}')
     in_pool = set(pool)
     rondes, start, offset, p = [], vandaag, 0, 0
     try:
@@ -1326,14 +1326,15 @@ def ontdek_rooster(pool, vorig, vandaag):
     def nieuwe_ronde(laatste):
         rij = sorted(in_pool)
         rnd.shuffle(rij)
-        rust = set(laatste[-min(ONTDEK_RUST * per, len(rij) // 2):]) if laatste else set()
-        return [i for i in rij if i not in rust] + [i for i in rij if i in rust]
+        staart = min(rust * per, len(rij) // 2)
+        weg = set(laatste[-staart:]) if laatste and staart else set()
+        return [i for i in rij if i not in weg] + [i for i in rij if i in weg]
 
     if not rondes and in_pool:
         rondes = [nieuwe_ronde(vorige_staart)]
         if vorige_staart:          # de pagina begint vandaag aan deze ronde
             start, offset, p = vandaag, 0, 0
-    while in_pool and len(rondes[0]) - p + sum(len(r) for r in rondes[1:]) < ONTDEK_VOORUIT * per:
+    while in_pool and len(rondes[0]) - p + sum(len(r) for r in rondes[1:]) < vooruit * per:
         rondes.append(nieuwe_ronde(rondes[-1]))
     return {'start': start.isoformat(), 'offset': offset, 'rondes': rondes}
 
@@ -1356,12 +1357,21 @@ def schrijf_start(data):
     provincies = {}
     for d in open_:
         provincies[d['p']] = provincies.get(d['p'], 0) + 1
+    vorig = haal_vorige_start()
+    ronde = laatste_ronde(data, per_id, open_)
+    vandaag = vandaag_be()
+    # minstens drie maanden dicht, zoals de pagina het telt
+    j, m = divmod(vandaag.year * 12 + vandaag.month - 1 - 3, 12)
+    grens = datetime.date(j, m + 1, min(vandaag.day, 28))
     (SITE / 'data/start.json').write_text(json.dumps({
         'aantal': len(data), 'open': len(open_),
         'provincies': sorted(provincies.items(), key=lambda x: sleutel(x[0])),
-        'zaken': zaken, 'ronde': laatste_ronde(data, per_id, open_),
+        'zaken': zaken, 'ronde': ronde,
         'nieuw': pas_open(per_id),
-        'rooster': ontdek_rooster([z['id'] for z in zaken if z.get('s') == 'Geverifieerd' and z.get('u') and z.get('i')], haal_vorig_rooster(), vandaag_be())},
+        'rooster': ontdek_rooster([z['id'] for z in zaken if z.get('s') == 'Geverifieerd' and z.get('u') and z.get('i')],
+                                  (vorig or {}).get('rooster'), vandaag),
+        'ronderooster': ontdek_rooster([z['id'] for z in ronde if z.get('u') and sluiting_einde(z.get('z')) <= grens],
+                                       (vorig or {}).get('ronderooster'), vandaag, per=1, naam='ronde')},
         ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
 
 
@@ -1391,6 +1401,20 @@ def pas_open(per_id):
         z['sinds'], z['soort'] = r['sinds'], r['soort']
         uit.append(z)
     return sorted(uit, key=lambda z: z['sinds'], reverse=True)
+
+
+def sluiting_einde(z):
+    """Het einde van "Gesloten op": een datum, een maand of alleen een jaar telt
+    vanaf het einde ervan (zoals sluiting() in start.js)."""
+    m = re.match(r'(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?', z or '')
+    if not m:
+        return datetime.date(1970, 1, 1)
+    j, mnd, dag = int(m[1]), m[2] and int(m[2]), m[3] and int(m[3])
+    if dag:
+        return datetime.date(j, mnd, dag)
+    if mnd:
+        return (datetime.date(j + mnd // 12, mnd % 12 + 1, 1) - datetime.timedelta(days=1))
+    return datetime.date(j, 12, 31)
 
 
 def laatste_ronde(data, per_id, open_):

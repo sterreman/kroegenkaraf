@@ -93,3 +93,6 @@ komt een keer per ronde. Een nieuwe ronde zet de zaken van het einde van de vori
 achteraan. Het rooster ligt minstens 45 dagen vooruit. Lukt het ophalen niet, dan begint het
 rooster opnieuw (geen stop). Lokaal testen: `ROOSTER_BESTAND=<pad naar een start.json>`.
 De knop Toon zes andere neemt zaken uit de tweede helft van de huidige ronde, niet die van morgen.
+De tegel Laatste ronde werkt op dezelfde manier met een eigen rooster (`ronderooster`, een zaak
+per dag, alleen zaken die minstens drie maanden dicht zijn). De knop Een ander verdwenen cafe
+loopt verder in de tweede helft van die ronde.

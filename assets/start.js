@@ -67,21 +67,21 @@ function dagVan(iso) {
   return Math.floor(Date.UTC(j, m - 1, d) / 864e5);
 }
 
-function kiesRooster(rooster, perId, verder = 0) {
+function kiesRooster(rooster, perId, verder = 0, per = ZES) {
   const rij = [].concat(...(rooster.rondes || []));
   const n = rij.length;
   if (!n) return [];
-  let p = (dagNummer(new Date()) - dagVan(rooster.start)) * ZES - (rooster.offset || 0);
+  let p = (dagNummer(new Date()) - dagVan(rooster.start)) * per - (rooster.offset || 0);
   p = Math.max(0, p);
   if (verder) {
     // de helft van wat er in de huidige ronde nog komt: ver genoeg weg om er de
     // komende weken niet terug op te botsen, en nog in deze ronde
     let einde = 0;
     for (const r of rooster.rondes) { einde += r.length; if (einde > p) break; }
-    p += Math.max(ZES, Math.floor((Math.min(einde, n) - p) / 2)) + (verder - 1) * ZES;
+    p += Math.max(per, Math.floor((Math.min(einde, n) - p) / 2)) + (verder - 1) * per;
   }
   const keuze = [];
-  for (let k = 0; keuze.length < Math.min(n, ZES) && k < n; k++) {
+  for (let k = 0; keuze.length < Math.min(n, per) && k < n; k++) {
     const d = perId[rij[(p + k) % n]];
     if (d && !keuze.includes(d)) keuze.push(d);
   }
@@ -120,27 +120,55 @@ function sluiting(z) {
   return {einde: new Date(+j, 11, 31), tekst: `gesloten in ${j}`};
 }
 
-function tekenRonde(pool) {
+/* Welk verdwenen café vandaag aan de beurt is: uit het rooster van de bouw
+   (een per dag, elk een keer per ronde), anders de oude berekening. De knop
+   "Een ander verdwenen café" loopt verder in hetzelfde rooster, net als bij
+   Ontdek in de tweede helft van de ronde, zodat je morgen niet terugziet wat
+   je vandaag doorklikte. */
+function tekenRonde(pool, rooster) {
   const grens = new Date();
   grens.setMonth(grens.getMonth() - 3);
   const kand = (pool || []).filter(d => d.u && d.i && sluiting(d.z).einde <= grens);
   if (!kand.length) return;
   kand.sort((x, y) => (x.id || x.u).localeCompare(y.id || y.u));
-  const dag = dagNummer(new Date()), n = kand.length;
-  const d = geschud(kand, Math.floor(dag / n))[dag % n];
-  $('ronde').innerHTML = `<div class="ronde">`
-    + `<span class="rkop">Laatste ronde</span>`
-    + (d.foto ? `<img class="rfoto" src="fotos/${esc(d.foto)}-klein.avif" alt="" width="64" height="64" loading="lazy" decoding="async">` : '')
-    + `<h3 class="rnaam"><a href="/${esc(d.u)}/">${esc(d.n)}</a></h3>`
-    + `<span class="rplaats">${esc(d.g || d.p)} · ${esc(sluiting(d.z).tekst)}</span>`
-    + `<p class="rreden">${esc(d.k || eersteZin(d.i))}</p>`
-    + `<p class="racties"><a href="/${esc(d.u)}/">Lees het verhaal</a>`
-    + (d.oproep ? `<a href="${esc(d.oproep)}" target="_blank" rel="noopener">Ken je dit café? Stuur je eigen oude foto</a>` : '')
-    + '</p>'
-    + (d.buur ? `<p class="rbuur">Een ander café in de buurt: <a href="/${esc(d.buur.u)}/">${esc(d.buur.n)}</a>`
-      + ` <span>(${esc(d.buur.a)}${d.buur.g && d.buur.g !== d.g ? ', ' + esc(d.buur.g) : ''})</span></p>` : '')
-    + '</div>';
-  $('verhalen').hidden = false;
+  const perId = {};
+  kand.forEach(d => { if (d.id) perId[d.id] = d; });
+  const geldig = rooster && Array.isArray(rooster.rondes) && rooster.start ? rooster : null;
+  const kiesRonde = verder => {
+    const k = geldig ? kiesRooster(geldig, perId, verder, 1) : [];
+    if (k.length) return k[0];
+    const n = kand.length, pos = dagNummer(new Date()) + (verder ? Math.floor(n / 2) + verder - 1 : 0);
+    return geschud(kand, Math.floor(pos / n))[pos % n];
+  };
+  let verder = 0;
+  const teken = () => {
+    const d = kiesRonde(verder);
+    $('ronde').innerHTML = `<div class="ronde">`
+      + `<span class="rkop">Laatste ronde</span>`
+      + (d.foto ? `<img class="rfoto" src="fotos/${esc(d.foto)}-klein.avif" alt="" width="64" height="64" loading="lazy" decoding="async">` : '')
+      + `<h3 class="rnaam"><a href="/${esc(d.u)}/">${esc(d.n)}</a></h3>`
+      + `<span class="rplaats">${esc(d.g || d.p)} · ${esc(sluiting(d.z).tekst)}</span>`
+      + `<p class="rreden">${esc(d.k || eersteZin(d.i))}</p>`
+      + `<p class="racties"><a href="/${esc(d.u)}/">Lees het verhaal</a>`
+      + (d.oproep ? `<a href="${esc(d.oproep)}" target="_blank" rel="noopener">Ken je dit café? Stuur je eigen oude foto</a>` : '')
+      + '</p>'
+      + (d.buur ? `<p class="rbuur">Een ander café in de buurt: <a href="/${esc(d.buur.u)}/">${esc(d.buur.n)}</a>`
+        + ` <span>(${esc(d.buur.a)}${d.buur.g && d.buur.g !== d.g ? ', ' + esc(d.buur.g) : ''})</span></p>` : '')
+      + (kand.length > 1 ? `<p class="rander"><button type="button" id="rondeander">`
+        + `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>`
+        + `Een ander verdwenen café</button></p>` : '')
+      + '</div>';
+    $('verhalen').hidden = false;
+    const knop = $('rondeander');
+    if (knop) knop.addEventListener('click', () => {
+      verder++;
+      teken();
+      $('rondestatus').textContent = 'Een ander verdwenen café getoond.';
+      const a = document.querySelector('#ronde .rnaam a');
+      if (a) a.focus({preventScroll: true});
+    });
+  };
+  teken();
 }
 
 /* ---- pas open ----------------------------------------------------------------
@@ -223,7 +251,7 @@ function toonOpPad() {
 }
 toonOpPad();
 function toon(start) {
-  tekenRonde(start.ronde);
+  tekenRonde(start.ronde, start.ronderooster);
   tekenPasOpen(start.nieuw);
   const pool = ontdekPool(start.zaken || []);
   const perId = {};

@@ -146,6 +146,16 @@
  font-stretch:92%;font-size:15px;color:var(--creme2)}
 .rbuur span{color:var(--creme2)}
 .ronde a:focus-visible{outline-color:var(--creme)}
+.ronde>.rander{grid-column:1 / -1;margin:14px 0 0}
+.rander button{display:inline-flex;align-items:center;gap:9px;height:44px;padding:0 16px;cursor:pointer;
+ border:1.5px solid var(--creme2);background:transparent;color:var(--creme);white-space:nowrap;
+ font-family:var(--kop);font-stretch:85%;font-weight:700;font-size:15px}
+.rander svg{width:17px;height:17px;fill:none;stroke:var(--roest-licht);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;
+ transition:transform .35s ease}
+.rander button:hover{background:var(--creme);border-color:var(--creme);color:var(--marine)}
+.rander button:hover svg{stroke:var(--roest);transform:rotate(90deg)}
+.rander button:focus-visible{outline:2px solid var(--creme);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){.rander svg{transition:none}}
 
 /* provincies */
 .provlijst{list-style:none;margin:6px 0 0;padding:0;columns:3 220px;column-gap:32px;border-top:2px solid var(--inkt)}
