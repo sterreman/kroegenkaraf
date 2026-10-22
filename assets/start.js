@@ -1,4 +1,4 @@
-/* De startpagina. Zes zaken om te ontdekken (met een knop voor zes andere), de artikels van Op pad
+/* De startpagina. Zes zaken om te ontdekken (met een knop voor zes andere), de tegel Pas open, de artikels van Op pad
    uit assets/oppad.json (via oppad.js), en de provincies;
    de zoekbalk is een gewoon formulier naar /lijst.
 
@@ -54,12 +54,46 @@ function ontdekPool(zaken) {
     .sort((x, y) => (x.id || x.u).localeCompare(y.id || y.u));
 }
 
-/* `verder` telt de klikken op "Toon zes andere": elke klik loopt verder in
-   dezelfde geschudde volgorde, dus je ziet de hele pool voor er een zaak
-   terugkeert. Zonder klik is het de keuze van de dag. */
+/* Het rooster uit start.json (zie ontdek_rooster in cafepaginas.py): de bouw
+   houdt per nacht bij welke zaken al aan de beurt waren, zodat elke zaak één keer
+   per ronde komt, ook als de pool groeit. Op dag d staan de zes ID's vanaf plek
+   (d - start) * 6 - offset in de aaneengeschakelde rondes.
+
+   `verder` telt de klikken op "Toon zes andere". Die nemen zaken uit de tweede
+   helft van wat nog komt, niet die van morgen: anders zie je morgen gewoon terug
+   wat je vandaag doorklikte. */
+function dagVan(iso) {
+  const [j, m, d] = iso.split('-').map(Number);
+  return Math.floor(Date.UTC(j, m - 1, d) / 864e5);
+}
+
+function kiesRooster(rooster, perId, verder = 0, per = ZES) {
+  const rij = [].concat(...(rooster.rondes || []));
+  const n = rij.length;
+  if (!n) return [];
+  let p = (dagNummer(new Date()) - dagVan(rooster.start)) * per - (rooster.offset || 0);
+  p = Math.max(0, p);
+  if (verder) {
+    // de helft van wat er in de huidige ronde nog komt: ver genoeg weg om er de
+    // komende weken niet terug op te botsen, en nog in deze ronde
+    let einde = 0;
+    for (const r of rooster.rondes) { einde += r.length; if (einde > p) break; }
+    p += Math.max(per, Math.floor((Math.min(einde, n) - p) / 2)) + (verder - 1) * per;
+  }
+  const keuze = [];
+  for (let k = 0; keuze.length < Math.min(n, per) && k < n; k++) {
+    const d = perId[rij[(p + k) % n]];
+    if (d && !keuze.includes(d)) keuze.push(d);
+  }
+  return keuze;
+}
+
+/* Zonder rooster (een lokale kopie zonder bouw): de oude berekening op de pool.
+   Ook hier lopen de klikken niet vooruit op de volgende dagen. */
 function kies(pool, verder = 0) {
   if (!pool.length) return [];
-  const n = pool.length, pos = (dagNummer(new Date()) + verder) * ZES, keuze = [];
+  const n = pool.length, keuze = [];
+  const pos = dagNummer(new Date()) * ZES + (verder ? Math.floor(n / 2) + (verder - 1) * ZES : 0);
   for (let k = 0; keuze.length < Math.min(n, ZES) && k < n * 2; k++) {
     const p = pos + k;
     const d = geschud(pool, Math.floor(p / n))[p % n];
@@ -86,27 +120,101 @@ function sluiting(z) {
   return {einde: new Date(+j, 11, 31), tekst: `gesloten in ${j}`};
 }
 
-function tekenRonde(pool) {
+/* Welk verdwenen café vandaag aan de beurt is: uit het rooster van de bouw
+   (een per dag, elk een keer per ronde), anders de oude berekening. De knop
+   "Een ander verdwenen café" loopt verder in hetzelfde rooster, net als bij
+   Ontdek in de tweede helft van de ronde, zodat je morgen niet terugziet wat
+   je vandaag doorklikte. */
+function tekenRonde(pool, rooster) {
   const grens = new Date();
   grens.setMonth(grens.getMonth() - 3);
   const kand = (pool || []).filter(d => d.u && d.i && sluiting(d.z).einde <= grens);
   if (!kand.length) return;
   kand.sort((x, y) => (x.id || x.u).localeCompare(y.id || y.u));
-  const dag = dagNummer(new Date()), n = kand.length;
-  const d = geschud(kand, Math.floor(dag / n))[dag % n];
-  $('ronde').innerHTML = `<div class="ronde">`
-    + `<span class="rkop">Laatste ronde</span>`
-    + (d.foto ? `<img class="rfoto" src="fotos/${esc(d.foto)}-klein.avif" alt="" width="64" height="64" loading="lazy" decoding="async">` : '')
-    + `<h3 class="rnaam"><a href="/${esc(d.u)}/">${esc(d.n)}</a></h3>`
-    + `<span class="rplaats">${esc(d.g || d.p)} · ${esc(sluiting(d.z).tekst)}</span>`
-    + `<p class="rreden">${esc(d.k || eersteZin(d.i))}</p>`
-    + `<p class="racties"><a href="/${esc(d.u)}/">Lees het verhaal</a>`
-    + (d.oproep ? `<a href="${esc(d.oproep)}" target="_blank" rel="noopener">Ken je dit café? Stuur je eigen oude foto</a>` : '')
-    + '</p>'
-    + (d.buur ? `<p class="rbuur">Een ander café in de buurt: <a href="/${esc(d.buur.u)}/">${esc(d.buur.n)}</a>`
-      + ` <span>(${esc(d.buur.a)}${d.buur.g && d.buur.g !== d.g ? ', ' + esc(d.buur.g) : ''})</span></p>` : '')
-    + '</div>';
-  $('verhalen').hidden = false;
+  const perId = {};
+  kand.forEach(d => { if (d.id) perId[d.id] = d; });
+  const geldig = rooster && Array.isArray(rooster.rondes) && rooster.start ? rooster : null;
+  const kiesRonde = verder => {
+    const k = geldig ? kiesRooster(geldig, perId, verder, 1) : [];
+    if (k.length) return k[0];
+    const n = kand.length, pos = dagNummer(new Date()) + (verder ? Math.floor(n / 2) + verder - 1 : 0);
+    return geschud(kand, Math.floor(pos / n))[pos % n];
+  };
+  let verder = 0;
+  const teken = () => {
+    const d = kiesRonde(verder);
+    $('ronde').innerHTML = `<div class="ronde">`
+      + `<span class="rkop">Laatste ronde</span>`
+      + (d.foto ? `<img class="rfoto" src="fotos/${esc(d.foto)}-klein.avif" alt="" width="64" height="64" loading="lazy" decoding="async">` : '')
+      + `<h3 class="rnaam"><a href="/${esc(d.u)}/">${esc(d.n)}</a></h3>`
+      + `<span class="rplaats">${esc(d.g || d.p)} · ${esc(sluiting(d.z).tekst)}</span>`
+      + `<p class="rreden">${esc(d.k || eersteZin(d.i))}</p>`
+      + `<p class="racties"><a href="/${esc(d.u)}/">Lees het verhaal</a>`
+      + (d.oproep ? `<a href="${esc(d.oproep)}" target="_blank" rel="noopener">Ken je dit café? Stuur je eigen oude foto</a>` : '')
+      + '</p>'
+      + (d.buur ? `<p class="rbuur">Een ander café in de buurt: <a href="/${esc(d.buur.u)}/">${esc(d.buur.n)}</a>`
+        + ` <span>(${esc(d.buur.a)}${d.buur.g && d.buur.g !== d.g ? ', ' + esc(d.buur.g) : ''})</span></p>` : '')
+      + (kand.length > 1 ? `<p class="rander"><button type="button" id="rondeander">`
+        + `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>`
+        + `Een ander verdwenen café</button></p>` : '')
+      + '</div>';
+    $('verhalen').hidden = false;
+    const knop = $('rondeander');
+    if (knop) knop.addEventListener('click', () => {
+      verder++;
+      teken();
+      $('rondestatus').textContent = 'Een ander verdwenen café getoond.';
+      const a = document.querySelector('#ronde .rnaam a');
+      if (a) a.focus({preventScroll: true});
+    });
+  };
+  teken();
+}
+
+/* ---- pas open ----------------------------------------------------------------
+   Recent (her)geopende zaken uit assets/nieuwopen.json, al gesorteerd met de
+   recentste eerst. "sinds" is een maand (JJJJ-MM); de tegel toont alleen wat de
+   voorbije zes maanden opende en telt dat hier, zodat ze niet veroudert als er
+   een tijd geen nieuwe bouw is. Eerst zes, met een knop voor de rest. */
+const PAS_OPEN_MAANDEN = 6;
+
+function pasOpenPool(rij) {
+  const nu = new Date(), grens = nu.getFullYear() * 12 + nu.getMonth() - PAS_OPEN_MAANDEN;
+  return (rij || []).filter(d => {
+    const m = /^(\d{4})-(\d{2})$/.exec(d.sinds || '');
+    return d.u && m && (+m[1] * 12 + (+m[2] - 1)) > grens;
+  });
+}
+
+function pasOpenKaart(d) {
+  const [j, m] = d.sinds.split('-');
+  const wat = d.soort === 'heropend' ? 'Heropend' : 'Nieuw';
+  return `<li class="cafekaart${d.foto ? ' metfoto' : ''}"><a href="/${esc(d.u)}/">`
+    + `<span class="pasdatum"><b>${wat}</b> ${MAANDEN[+m - 1]} ${j}</span>`
+    + (d.foto ? `<span class="cafefoto"><img src="fotos/${esc(d.foto)}-klein.avif" alt="" width="92" height="92" loading="lazy" decoding="async"></span>` : '')
+    + `<span class="cafenaam">${esc(d.n)}</span>`
+    + `<span class="cafeplaats">${esc(d.g || d.p)}</span>`
+    + `<span class="caferede">${esc(d.k || eersteZin(d.i))}</span></a></li>`;
+}
+
+function tekenPasOpen(rij) {
+  const pool = pasOpenPool(rij);
+  if (!pool.length) return;
+  const lijst = $('pasopenlijst');
+  lijst.innerHTML = pool.slice(0, ZES).map(pasOpenKaart).join('');
+  $('pasopen').hidden = false;
+  if (pool.length > ZES) {
+    const knop = $('pasopenmeer');
+    $('pasopenaantal').textContent = pool.length;
+    $('pasopenmeerp').hidden = false;
+    knop.addEventListener('click', () => {
+      lijst.insertAdjacentHTML('beforeend', pool.slice(ZES).map(pasOpenKaart).join(''));
+      knop.setAttribute('aria-expanded', 'true');
+      $('pasopenmeerp').hidden = true;
+      const eerste = lijst.children[ZES] && lijst.children[ZES].querySelector('a');
+      if (eerste) eerste.focus({preventScroll: true});
+    });
+  }
 }
 
 function tekenOntdek(keuze) {
@@ -143,19 +251,27 @@ function toonOpPad() {
 }
 toonOpPad();
 function toon(start) {
-  tekenRonde(start.ronde);
+  tekenRonde(start.ronde, start.ronderooster);
+  tekenPasOpen(start.nieuw);
   const pool = ontdekPool(start.zaken || []);
+  const perId = {};
+  pool.forEach(d => { if (d.id) perId[d.id] = d; });
+  const rooster = start.rooster && Array.isArray(start.rooster.rondes) && start.rooster.start ? start.rooster : null;
+  const kiesNu = verder => {
+    const k = rooster ? kiesRooster(rooster, perId, verder) : [];
+    return k.length ? k : kies(pool, verder);
+  };
   const lijst = $('ontdeklijst');
   lijst.removeAttribute('aria-busy');
   if (!pool.length) { $('ontdek').hidden = true; } else {
-    tekenOntdek(kies(pool));
+    tekenOntdek(kiesNu(0));
     const knop = $('ontdekmeer');
     if (pool.length > ZES) {
       let verder = 0;
       knop.hidden = false;
       knop.addEventListener('click', () => {
         verder++;
-        tekenOntdek(kies(pool, verder));
+        tekenOntdek(kiesNu(verder));
         $('ontdekstatus').textContent = 'Zes andere cafés getoond.';
         lijst.classList.remove('vers');
         void lijst.offsetWidth;
@@ -182,11 +298,18 @@ function toon(start) {
 function terugval() {
   return Promise.all([
     fetch('data/zaken.json').then(r => r.json()),
-    fetch('assets/ontdek.json').then(r => r.json())
-  ]).then(([data, ontdek]) => {
+    fetch('assets/ontdek.json').then(r => r.json()),
+    fetch('assets/nieuwopen.json').then(r => r.json()).catch(() => ({}))
+  ]).then(([data, ontdek, nieuwopen]) => {
     const tel = {};
     data.forEach(d => { if (d.s !== 'Gesloten') tel[d.p] = (tel[d.p] || 0) + 1; });
+    const perId = {};
+    data.forEach(d => { if (d.id) perId[d.id] = d; });
     return {
+      nieuw: (nieuwopen.zaken || [])
+        .filter(r => perId[r.id] && perId[r.id].s === 'Geverifieerd')
+        .map(r => Object.assign({}, perId[r.id], {sinds: r.sinds, soort: r.soort}))
+        .sort((x, y) => y.sinds.localeCompare(x.sinds)),
       aantal: data.length,
       provincies: Object.entries(tel).sort((a, b) => a[0].localeCompare(b[0], 'nl')),
       zaken: data.filter(d => (ontdek.ids || []).includes(d.id)

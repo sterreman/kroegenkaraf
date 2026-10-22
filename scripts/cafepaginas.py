@@ -38,6 +38,7 @@ import html
 import json
 import math
 import os
+import random
 import re
 import shutil
 import sys
@@ -872,7 +873,7 @@ def pagina(d, buren):
  <div class="wrap">
   <a class="merk" href="/"><img src="/assets/logo.png" alt="Kroeg &amp; Karaf, naar de startpagina" width="760" height="575"></a>
   <p class="merkzin">Voor schoon volk en dorstige zielen</p>
-  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a></nav>
+  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/gemeenten">Gemeenten</a><a href="/afspreken">Afspreken</a></nav>
  </div>
 </header>
 
@@ -1092,7 +1093,7 @@ def gemeente_pagina(g):
  <div class="wrap">
   <a class="merk" href="/"><img src="/assets/logo.png" alt="Kroeg &amp; Karaf, naar de startpagina" width="760" height="575"></a>
   <p class="merkzin">Voor schoon volk en dorstige zielen</p>
-  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a></nav>
+  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/gemeenten">Gemeenten</a><a href="/afspreken">Afspreken</a></nav>
  </div>
 </header>
 
@@ -1179,7 +1180,7 @@ def gemeenten_overzicht(gemeenten):
  <div class="wrap">
   <a class="merk" href="/"><img src="/assets/logo.png" alt="Kroeg &amp; Karaf, naar de startpagina" width="760" height="575"></a>
   <p class="merkzin">Voor schoon volk en dorstige zielen</p>
-  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a></nav>
+  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/gemeenten" aria-current="page">Gemeenten</a><a href="/afspreken">Afspreken</a></nav>
  </div>
 </header>
 
@@ -1228,6 +1229,116 @@ def ontdek_pool(data):
     return sorted(ids)
 
 
+# ---- het rooster van Ontdek deze cafés --------------------------------------
+# Elke dag zes zaken, en elke zaak één keer per ronde. Vroeger rekende de pagina
+# de volgorde zelf uit de pool; omdat die pool bijna elke nacht groeit, schoof dan
+# alles op en kwamen sommige zaken na een paar dagen al terug terwijl andere lang
+# wegbleven. Nu houdt de bouw een rooster bij en geeft het door aan de volgende
+# nacht via de gepubliceerde start.json, zoals het register met vaste urls.
+#   - wat al getoond is, blijft op zijn plaats;
+#   - een nieuwe zaak komt op een willekeurige plek in het nog niet getoonde deel;
+#   - een zaak die uit de pool valt, verdwijnt uit het nog niet getoonde deel;
+#   - is een ronde bijna op, dan komt er een nieuwe achter, met de zaken die op
+#     het einde van de vorige ronde stonden achteraan, zodat niets kort na elkaar
+#     terugkomt.
+# Het rooster ligt minstens ONTDEK_VOORUIT dagen vooruit, zodat de pagina ook
+# zonder nieuwe bouw elke dag iets anders toont.
+
+ONTDEK_PER_DAG = 6
+ONTDEK_RUST = 30        # dagen tussen het einde van een ronde en een herhaling
+ONTDEK_VOORUIT = 45     # dagen die het rooster minstens vooruit ligt
+
+
+def vandaag_be():
+    try:
+        from zoneinfo import ZoneInfo
+        return datetime.datetime.now(ZoneInfo('Europe/Brussels')).date()
+    except Exception:
+        return datetime.date.today()
+
+
+def haal_vorige_start():
+    """De live start.json met de roosters van de vorige bouw. Lukt dat niet, dan
+    begint het rooster opnieuw: jammer, maar geen reden om de publicatie te stoppen."""
+    if os.environ.get('ROOSTER_BESTAND'):         # enkel om lokaal te testen
+        p = Path(os.environ['ROOSTER_BESTAND'])
+        return json.loads(p.read_text(encoding='utf-8')) if p.exists() else {}
+    nonce = datetime.datetime.now(datetime.timezone.utc).timestamp()
+    req = urllib.request.Request(f'{ORIGIN}/data/start.json?bouw={nonce}',
+                                 headers={'Cache-Control': 'no-cache',
+                                          'User-Agent': 'KroegEnKaraf-publicatie/1.0'})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return json.loads(r.read())
+    except (OSError, ValueError, urllib.error.HTTPError) as exc:
+        print(f'  LET OP: vorige roosters niet op te halen ({exc}); ze beginnen opnieuw.')
+        return {}
+
+
+def ontdek_rooster(pool, vorig, vandaag, per=ONTDEK_PER_DAG, rust=ONTDEK_RUST,
+                   vooruit=ONTDEK_VOORUIT, naam='ontdek'):
+    """pool: de ID's die vandaag in aanmerking komen. Geeft het nieuwe rooster:
+    {'start': datum, 'offset': n, 'rondes': [[id, ...], ...]}. Op dag d toont de
+    pagina de zes ID's vanaf plek (d - start) * 6 - offset in de aaneengeschakelde
+    rondes. Met per=1 werkt het ook voor de tegel Laatste ronde."""
+    rnd = random.Random(f'{naam}-{vandaag.isoformat()}')
+    in_pool = set(pool)
+    rondes, start, offset, p = [], vandaag, 0, 0
+    try:
+        if vorig:
+            start = datetime.date.fromisoformat(vorig['start'])
+            offset = int(vorig.get('offset', 0))
+            rondes = [[str(i) for i in r] for r in vorig['rondes'] if isinstance(r, list)]
+            p = (vandaag - start).days * per - offset
+    except (KeyError, TypeError, ValueError):
+        rondes = []
+    if not rondes or p < 0:
+        rondes, start, offset, p = [], vandaag, 0, 0
+
+    # afgewerkte rondes weg (de laatste houden we als geheugen voor de rust)
+    vorige_staart = []
+    while rondes and p >= len(rondes[0]):
+        vorige_staart = rondes[0]
+        p -= len(rondes[0])
+        offset += len(rondes[0])
+        rondes.pop(0)
+
+    # niet getoonde plekken opkuisen; het getoonde deel van de huidige ronde blijft staan
+    if rondes:
+        rondes[0] = rondes[0][:p] + [i for i in rondes[0][p:] if i in in_pool]
+        rondes[1:] = [[i for i in r if i in in_pool] for r in rondes[1:]]
+        rondes = [rondes[0]] + [r for r in rondes[1:] if r]
+
+    # nieuwe zaken op een willekeurige plek in het nog niet getoonde deel; niet in
+    # de zes van vandaag, die heeft een bezoeker misschien al gezien. Ook in de
+    # rondes die al klaarliggen, daar in de tweede helft, zodat een zaak die laat in
+    # deze ronde valt niet meteen vooraan in de volgende terugkomt.
+    bekend = {i for r in rondes for i in r}
+    for i in sorted(in_pool - bekend):
+        if not rondes:
+            break
+        r0 = rondes[0]
+        laagste = min(len(r0), p + per)
+        r0.insert(rnd.randint(laagste, len(r0)), i)
+        for r in rondes[1:]:
+            r.insert(rnd.randint(len(r) // 2, len(r)), i)
+
+    def nieuwe_ronde(laatste):
+        rij = sorted(in_pool)
+        rnd.shuffle(rij)
+        staart = min(rust * per, len(rij) // 2)
+        weg = set(laatste[-staart:]) if laatste and staart else set()
+        return [i for i in rij if i not in weg] + [i for i in rij if i in weg]
+
+    if not rondes and in_pool:
+        rondes = [nieuwe_ronde(vorige_staart)]
+        if vorige_staart:          # de pagina begint vandaag aan deze ronde
+            start, offset, p = vandaag, 0, 0
+    while in_pool and len(rondes[0]) - p + sum(len(r) for r in rondes[1:]) < vooruit * per:
+        rondes.append(nieuwe_ronde(rondes[-1]))
+    return {'start': start.isoformat(), 'offset': offset, 'rondes': rondes}
+
+
 def schrijf_start(data):
     """data/start.json: wat de startpagina nodig heeft, zonder de hele zaken.json
     van een megabyte. De pool van Ontdek deze cafés (zie ontdek_pool) met naam, plaats, foto en beschrijving, en de aantallen
@@ -1246,11 +1357,64 @@ def schrijf_start(data):
     provincies = {}
     for d in open_:
         provincies[d['p']] = provincies.get(d['p'], 0) + 1
+    vorig = haal_vorige_start()
+    ronde = laatste_ronde(data, per_id, open_)
+    vandaag = vandaag_be()
+    # minstens drie maanden dicht, zoals de pagina het telt
+    j, m = divmod(vandaag.year * 12 + vandaag.month - 1 - 3, 12)
+    grens = datetime.date(j, m + 1, min(vandaag.day, 28))
     (SITE / 'data/start.json').write_text(json.dumps({
         'aantal': len(data), 'open': len(open_),
         'provincies': sorted(provincies.items(), key=lambda x: sleutel(x[0])),
-        'zaken': zaken, 'ronde': laatste_ronde(data, per_id, open_)},
+        'zaken': zaken, 'ronde': ronde,
+        'nieuw': pas_open(per_id),
+        'rooster': ontdek_rooster([z['id'] for z in zaken if z.get('s') == 'Geverifieerd' and z.get('u') and z.get('i')],
+                                  (vorig or {}).get('rooster'), vandaag),
+        'ronderooster': ontdek_rooster([z['id'] for z in ronde if z.get('u') and sluiting_einde(z.get('z')) <= grens],
+                                       (vorig or {}).get('ronderooster'), vandaag, per=1, naam='ronde')},
         ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+
+
+def pas_open(per_id):
+    """De pool van de tegel Pas open (assets/nieuwopen.json): zaken die recent
+    (her)openden, met de maand en of het om een nieuw of een heropend café gaat.
+    Alleen zaken die nog geverifieerd zijn en een eigen pagina hebben gaan mee;
+    welke binnen de voorbije twaalf maanden vallen, beslist de pagina zelf, zodat
+    de tegel ook zonder nieuwe bouw niet veroudert."""
+    pad = SITE / 'assets/nieuwopen.json'
+    if not pad.exists():
+        return []
+    uit = []
+    for r in json.loads(pad.read_text(encoding='utf-8')).get('zaken', []):
+        d = per_id.get(r.get('id'))
+        if not re.fullmatch(r'\d{4}-\d{2}', r.get('sinds') or '') or r.get('soort') not in ('nieuw', 'heropend'):
+            print(f'  LET OP: nieuwopen.json heeft een onvolledige regel: {r}')
+            continue
+        if not d:
+            print(f'  LET OP: nieuwopen.json noemt {r["id"]}, maar die zaak staat niet (meer) in de lijst.')
+            continue
+        if d.get('s') != 'Geverifieerd' or not d.get('u'):
+            continue
+        z = {k: d[k] for k in ('id', 'n', 'g', 'p', 'u', 'foto', 'k') if d.get(k)}
+        if d.get('i'):
+            z['i'] = d['i'].split('\n')[0][:240]
+        z['sinds'], z['soort'] = r['sinds'], r['soort']
+        uit.append(z)
+    return sorted(uit, key=lambda z: z['sinds'], reverse=True)
+
+
+def sluiting_einde(z):
+    """Het einde van "Gesloten op": een datum, een maand of alleen een jaar telt
+    vanaf het einde ervan (zoals sluiting() in start.js)."""
+    m = re.match(r'(\d{4})(?:-(\d{2}))?(?:-(\d{2}))?', z or '')
+    if not m:
+        return datetime.date(1970, 1, 1)
+    j, mnd, dag = int(m[1]), m[2] and int(m[2]), m[3] and int(m[3])
+    if dag:
+        return datetime.date(j, mnd, dag)
+    if mnd:
+        return (datetime.date(j + mnd // 12, mnd % 12 + 1, 1) - datetime.timedelta(days=1))
+    return datetime.date(j, 12, 31)
 
 
 def laatste_ronde(data, per_id, open_):

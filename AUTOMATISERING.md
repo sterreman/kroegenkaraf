@@ -75,3 +75,24 @@ wie geen JavaScript uitvoert. De JavaScript tekent alleen nog als die stap
 ontbreekt. `scripts/test_oppad.py` controleert dat de markup uit Python
 (`scripts/artikels.py`) byte voor byte gelijk is aan die van `assets/oppad.js`;
 wie de kaart aanpast, past beide aan.
+
+## Pas open (22 oktober 2026)
+
+`assets/nieuwopen.json` stuurt de tegel Pas open op de startpagina: per zaak de ID, de maand
+van (her)opening (`JJJJ-MM`) en `nieuw` of `heropend`. Alleen opnemen als de Info-tekst die
+maand vermeldt, en nooit seizoenszaken (zomerbars, winterbars, pop-ups). `cafepaginas.py` zet de zaken die nog geverifieerd zijn in `data/start.json`;
+de pagina toont zelf alleen wat de voorbije zes maanden opende, de recentste eerst. Oude
+regels mogen blijven staan, ze vallen vanzelf weg.
+
+## Rooster van Ontdek Belgische cafes (22 oktober 2026)
+
+De zes cafes van de dag komen uit een rooster in `data/start.json` (`rooster`). `cafepaginas.py`
+haalt elke nacht het rooster van de live site op en zet het verder: wat al getoond is blijft
+staan, nieuwe zaken komen op een willekeurige plek in het nog niet getoonde deel, en elke zaak
+komt een keer per ronde. Een nieuwe ronde zet de zaken van het einde van de vorige ronde
+achteraan. Het rooster ligt minstens 45 dagen vooruit. Lukt het ophalen niet, dan begint het
+rooster opnieuw (geen stop). Lokaal testen: `ROOSTER_BESTAND=<pad naar een start.json>`.
+De knop Toon zes andere neemt zaken uit de tweede helft van de huidige ronde, niet die van morgen.
+De tegel Laatste ronde werkt op dezelfde manier met een eigen rooster (`ronderooster`, een zaak
+per dag, alleen zaken die minstens drie maanden dicht zijn). De knop Een ander verdwenen cafe
+loopt verder in de tweede helft van die ronde.
