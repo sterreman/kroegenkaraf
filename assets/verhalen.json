@@ -367,13 +367,17 @@
           "anker": "landelies",
           "label": "Tien jaar achter de toog in Landelies"
         },
-        "KK00808": {
+        "KK03670": {
           "anker": "op-pad",
-          "label": "Op pad in de streek: de taverne aan de abdij van Aulne"
+          "label": "Op pad in de streek: zestig jaar Chez Walter"
         },
         "KK00795": {
           "anker": "op-pad",
           "label": "Op pad in de streek: een Bistrot de Terroir in Charleroi"
+        },
+        "KK00808": {
+          "anker": "op-pad",
+          "label": "Op pad in de streek: de taverne aan de abdij van Aulne"
         }
       }
     }
