@@ -358,6 +358,24 @@
           "label": "Café 29: barbecue op de Redoute"
         }
       }
+    },
+    {
+      "url": "/het-laatste-dorpscafe",
+      "titel": "Het laatste dorpscafé",
+      "cafes": {
+        "KK03623": {
+          "anker": "landelies",
+          "label": "Tien jaar achter de toog in Landelies"
+        },
+        "KK00808": {
+          "anker": "op-pad",
+          "label": "Op pad in de streek: de abdij van Aulne"
+        },
+        "KK00795": {
+          "anker": "op-pad",
+          "label": "Op pad in de streek: Charleroi"
+        }
+      }
     }
   ]
 }
