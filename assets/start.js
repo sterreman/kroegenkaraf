@@ -54,12 +54,46 @@ function ontdekPool(zaken) {
     .sort((x, y) => (x.id || x.u).localeCompare(y.id || y.u));
 }
 
-/* `verder` telt de klikken op "Toon zes andere": elke klik loopt verder in
-   dezelfde geschudde volgorde, dus je ziet de hele pool voor er een zaak
-   terugkeert. Zonder klik is het de keuze van de dag. */
+/* Het rooster uit start.json (zie ontdek_rooster in cafepaginas.py): de bouw
+   houdt per nacht bij welke zaken al aan de beurt waren, zodat elke zaak één keer
+   per ronde komt, ook als de pool groeit. Op dag d staan de zes ID's vanaf plek
+   (d - start) * 6 - offset in de aaneengeschakelde rondes.
+
+   `verder` telt de klikken op "Toon zes andere". Die nemen zaken uit de tweede
+   helft van wat nog komt, niet die van morgen: anders zie je morgen gewoon terug
+   wat je vandaag doorklikte. */
+function dagVan(iso) {
+  const [j, m, d] = iso.split('-').map(Number);
+  return Math.floor(Date.UTC(j, m - 1, d) / 864e5);
+}
+
+function kiesRooster(rooster, perId, verder = 0) {
+  const rij = [].concat(...(rooster.rondes || []));
+  const n = rij.length;
+  if (!n) return [];
+  let p = (dagNummer(new Date()) - dagVan(rooster.start)) * ZES - (rooster.offset || 0);
+  p = Math.max(0, p);
+  if (verder) {
+    // de helft van wat er in de huidige ronde nog komt: ver genoeg weg om er de
+    // komende weken niet terug op te botsen, en nog in deze ronde
+    let einde = 0;
+    for (const r of rooster.rondes) { einde += r.length; if (einde > p) break; }
+    p += Math.max(ZES, Math.floor((Math.min(einde, n) - p) / 2)) + (verder - 1) * ZES;
+  }
+  const keuze = [];
+  for (let k = 0; keuze.length < Math.min(n, ZES) && k < n; k++) {
+    const d = perId[rij[(p + k) % n]];
+    if (d && !keuze.includes(d)) keuze.push(d);
+  }
+  return keuze;
+}
+
+/* Zonder rooster (een lokale kopie zonder bouw): de oude berekening op de pool.
+   Ook hier lopen de klikken niet vooruit op de volgende dagen. */
 function kies(pool, verder = 0) {
   if (!pool.length) return [];
-  const n = pool.length, pos = (dagNummer(new Date()) + verder) * ZES, keuze = [];
+  const n = pool.length, keuze = [];
+  const pos = dagNummer(new Date()) * ZES + (verder ? Math.floor(n / 2) + (verder - 1) * ZES : 0);
   for (let k = 0; keuze.length < Math.min(n, ZES) && k < n * 2; k++) {
     const p = pos + k;
     const d = geschud(pool, Math.floor(p / n))[p % n];
@@ -192,17 +226,24 @@ function toon(start) {
   tekenRonde(start.ronde);
   tekenPasOpen(start.nieuw);
   const pool = ontdekPool(start.zaken || []);
+  const perId = {};
+  pool.forEach(d => { if (d.id) perId[d.id] = d; });
+  const rooster = start.rooster && Array.isArray(start.rooster.rondes) && start.rooster.start ? start.rooster : null;
+  const kiesNu = verder => {
+    const k = rooster ? kiesRooster(rooster, perId, verder) : [];
+    return k.length ? k : kies(pool, verder);
+  };
   const lijst = $('ontdeklijst');
   lijst.removeAttribute('aria-busy');
   if (!pool.length) { $('ontdek').hidden = true; } else {
-    tekenOntdek(kies(pool));
+    tekenOntdek(kiesNu(0));
     const knop = $('ontdekmeer');
     if (pool.length > ZES) {
       let verder = 0;
       knop.hidden = false;
       knop.addEventListener('click', () => {
         verder++;
-        tekenOntdek(kies(pool, verder));
+        tekenOntdek(kiesNu(verder));
         $('ontdekstatus').textContent = 'Zes andere cafés getoond.';
         lijst.classList.remove('vers');
         void lijst.offsetWidth;

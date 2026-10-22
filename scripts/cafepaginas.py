@@ -38,6 +38,7 @@ import html
 import json
 import math
 import os
+import random
 import re
 import shutil
 import sys
@@ -1228,6 +1229,115 @@ def ontdek_pool(data):
     return sorted(ids)
 
 
+# ---- het rooster van Ontdek deze cafés --------------------------------------
+# Elke dag zes zaken, en elke zaak één keer per ronde. Vroeger rekende de pagina
+# de volgorde zelf uit de pool; omdat die pool bijna elke nacht groeit, schoof dan
+# alles op en kwamen sommige zaken na een paar dagen al terug terwijl andere lang
+# wegbleven. Nu houdt de bouw een rooster bij en geeft het door aan de volgende
+# nacht via de gepubliceerde start.json, zoals het register met vaste urls.
+#   - wat al getoond is, blijft op zijn plaats;
+#   - een nieuwe zaak komt op een willekeurige plek in het nog niet getoonde deel;
+#   - een zaak die uit de pool valt, verdwijnt uit het nog niet getoonde deel;
+#   - is een ronde bijna op, dan komt er een nieuwe achter, met de zaken die op
+#     het einde van de vorige ronde stonden achteraan, zodat niets kort na elkaar
+#     terugkomt.
+# Het rooster ligt minstens ONTDEK_VOORUIT dagen vooruit, zodat de pagina ook
+# zonder nieuwe bouw elke dag iets anders toont.
+
+ONTDEK_PER_DAG = 6
+ONTDEK_RUST = 30        # dagen tussen het einde van een ronde en een herhaling
+ONTDEK_VOORUIT = 45     # dagen die het rooster minstens vooruit ligt
+
+
+def vandaag_be():
+    try:
+        from zoneinfo import ZoneInfo
+        return datetime.datetime.now(ZoneInfo('Europe/Brussels')).date()
+    except Exception:
+        return datetime.date.today()
+
+
+def haal_vorig_rooster():
+    """Het rooster van de vorige bouw, uit de live start.json. Lukt dat niet, dan
+    begint het rooster opnieuw: jammer, maar geen reden om de publicatie te stoppen."""
+    if os.environ.get('ROOSTER_BESTAND'):         # enkel om lokaal te testen
+        p = Path(os.environ['ROOSTER_BESTAND'])
+        return json.loads(p.read_text(encoding='utf-8')).get('rooster') if p.exists() else None
+    nonce = datetime.datetime.now(datetime.timezone.utc).timestamp()
+    req = urllib.request.Request(f'{ORIGIN}/data/start.json?bouw={nonce}',
+                                 headers={'Cache-Control': 'no-cache',
+                                          'User-Agent': 'KroegEnKaraf-publicatie/1.0'})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as r:
+            return json.loads(r.read()).get('rooster')
+    except (OSError, ValueError, urllib.error.HTTPError) as exc:
+        print(f'  LET OP: vorig rooster van Ontdek niet op te halen ({exc}); het begint opnieuw.')
+        return None
+
+
+def ontdek_rooster(pool, vorig, vandaag):
+    """pool: de ID's die vandaag in aanmerking komen. Geeft het nieuwe rooster:
+    {'start': datum, 'offset': n, 'rondes': [[id, ...], ...]}. Op dag d toont de
+    pagina de zes ID's vanaf plek (d - start) * 6 - offset in de aaneengeschakelde
+    rondes."""
+    per = ONTDEK_PER_DAG
+    rnd = random.Random(f'ontdek-{vandaag.isoformat()}')
+    in_pool = set(pool)
+    rondes, start, offset, p = [], vandaag, 0, 0
+    try:
+        if vorig:
+            start = datetime.date.fromisoformat(vorig['start'])
+            offset = int(vorig.get('offset', 0))
+            rondes = [[str(i) for i in r] for r in vorig['rondes'] if isinstance(r, list)]
+            p = (vandaag - start).days * per - offset
+    except (KeyError, TypeError, ValueError):
+        rondes = []
+    if not rondes or p < 0:
+        rondes, start, offset, p = [], vandaag, 0, 0
+
+    # afgewerkte rondes weg (de laatste houden we als geheugen voor de rust)
+    vorige_staart = []
+    while rondes and p >= len(rondes[0]):
+        vorige_staart = rondes[0]
+        p -= len(rondes[0])
+        offset += len(rondes[0])
+        rondes.pop(0)
+
+    # niet getoonde plekken opkuisen; het getoonde deel van de huidige ronde blijft staan
+    if rondes:
+        rondes[0] = rondes[0][:p] + [i for i in rondes[0][p:] if i in in_pool]
+        rondes[1:] = [[i for i in r if i in in_pool] for r in rondes[1:]]
+        rondes = [rondes[0]] + [r for r in rondes[1:] if r]
+
+    # nieuwe zaken op een willekeurige plek in het nog niet getoonde deel; niet in
+    # de zes van vandaag, die heeft een bezoeker misschien al gezien. Ook in de
+    # rondes die al klaarliggen, daar in de tweede helft, zodat een zaak die laat in
+    # deze ronde valt niet meteen vooraan in de volgende terugkomt.
+    bekend = {i for r in rondes for i in r}
+    for i in sorted(in_pool - bekend):
+        if not rondes:
+            break
+        r0 = rondes[0]
+        laagste = min(len(r0), p + per)
+        r0.insert(rnd.randint(laagste, len(r0)), i)
+        for r in rondes[1:]:
+            r.insert(rnd.randint(len(r) // 2, len(r)), i)
+
+    def nieuwe_ronde(laatste):
+        rij = sorted(in_pool)
+        rnd.shuffle(rij)
+        rust = set(laatste[-min(ONTDEK_RUST * per, len(rij) // 2):]) if laatste else set()
+        return [i for i in rij if i not in rust] + [i for i in rij if i in rust]
+
+    if not rondes and in_pool:
+        rondes = [nieuwe_ronde(vorige_staart)]
+        if vorige_staart:          # de pagina begint vandaag aan deze ronde
+            start, offset, p = vandaag, 0, 0
+    while in_pool and len(rondes[0]) - p + sum(len(r) for r in rondes[1:]) < ONTDEK_VOORUIT * per:
+        rondes.append(nieuwe_ronde(rondes[-1]))
+    return {'start': start.isoformat(), 'offset': offset, 'rondes': rondes}
+
+
 def schrijf_start(data):
     """data/start.json: wat de startpagina nodig heeft, zonder de hele zaken.json
     van een megabyte. De pool van Ontdek deze cafés (zie ontdek_pool) met naam, plaats, foto en beschrijving, en de aantallen
@@ -1250,7 +1360,8 @@ def schrijf_start(data):
         'aantal': len(data), 'open': len(open_),
         'provincies': sorted(provincies.items(), key=lambda x: sleutel(x[0])),
         'zaken': zaken, 'ronde': laatste_ronde(data, per_id, open_),
-        'nieuw': pas_open(per_id)},
+        'nieuw': pas_open(per_id),
+        'rooster': ontdek_rooster([z['id'] for z in zaken if z.get('s') == 'Geverifieerd' and z.get('u') and z.get('i')], haal_vorig_rooster(), vandaag_be())},
         ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
 
 
