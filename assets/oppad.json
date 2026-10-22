@@ -2,6 +2,25 @@
   "_uitleg": "De artikels van Op pad: de bron voor de startpagina en voor het overzicht op /oppad. Een artikel erbij zetten volstaat; er staat niets anders in de pagina's. 'url' is het pad van het artikel, 'titel' en 'omschrijving' staan als tekst op de kaart, 'rubriek' is het label boven de titel en 'feiten' zijn korte, controleerbare gegevens uit het artikel zelf (streek, thema, afstand): verzin er geen. 'datum' (jjjj-mm-dd) is de publicatiedatum; het recentste artikel komt vooraan. De startpagina toont het eerste artikel groot en de volgende twee compact. 'beeld' verwijst naar echte bestanden onder assets/ met 'bestanden' per breedte (avif en webp), de afmetingen van de standaardversie ('breed' is de breedte van de standaardversie), een beschrijving voor 'alt' en eventueel 'bron' met de naam en licentie van de maker.",
   "artikels": [
     {
+      "id": "het-laatste-dorpscafe",
+      "datum": "2026-10-25",
+      "url": "/het-laatste-dorpscafe",
+      "rubriek": "Achtergrond",
+      "titel": "Het laatste dorpscafé",
+      "omschrijving": "Eén op de vijf Waalse cafés ging in negen jaar dicht. Wat Landelies vertelt over wat een dorp verliest.",
+      "feiten": ["911 cafés dicht", "2013 tot 2022", "Wallonië"],
+      "beeld": {
+        "bestanden": [
+          {"w": 800, "avif": "/assets/verhalen/dorpscafe/held-800.avif", "webp": "/assets/verhalen/dorpscafe/held-800.webp"},
+          {"w": 1600, "avif": "/assets/verhalen/dorpscafe/held-1600.avif", "webp": "/assets/verhalen/dorpscafe/held-1600.webp"}
+        ],
+        "breed": 800,
+        "hoog": 450,
+        "alt": "Het witte stationsgebouw van Landelies aan het spoor, met achteraan rechts een zijgevel waarop de naam Aux Landelins geschilderd staat",
+        "bron": {"maker": "Japplemedia", "licentie": "CC BY-SA 4.0", "licentieurl": "https://creativecommons.org/licenses/by-sa/4.0/deed.nl"}
+      }
+    },
+    {
       "id": "herfstwandelingen",
       "datum": "2026-10-07",
       "url": "/herfstwandelingen",
