@@ -358,6 +358,48 @@
           "label": "Café 29: barbecue op de Redoute"
         }
       }
+    },
+    {
+      "url": "/laatste-cafe-van-het-dorp",
+      "titel": "De laatste toog van het dorp",
+      "cafes": {
+        "KK02905": {
+          "anker": "hever",
+          "label": "Halte 1: twee keer dicht, twee keer weer open"
+        },
+        "KK02132": {
+          "anker": "tildonk",
+          "label": "Halte 2: van bruine kroeg naar bistrobar"
+        },
+        "KK02151": {
+          "anker": "wakkerzeel",
+          "label": "Halte 3: acht vrienden en een schuur"
+        },
+        "KK01806": {
+          "anker": "brussegem",
+          "label": "Halte 4: honderdzeven jaar en één winter"
+        },
+        "KK02097": {
+          "anker": "mekingen",
+          "label": "Halte 5: Anny en de kelder"
+        },
+        "KK01830": {
+          "anker": "eizeringen",
+          "label": "Halte 6: de redding van 1999"
+        },
+        "KK03567": {
+          "anker": "diegem",
+          "label": "Den Arbiter en het station dat verhuisde"
+        },
+        "KK02961": {
+          "anker": "mechelen",
+          "label": "Oep 't Werk en de vraag wie overneemt"
+        },
+        "KK03593": {
+          "anker": "aarschot",
+          "label": "Het laatste Germinal"
+        }
+      }
     }
   ]
 }
