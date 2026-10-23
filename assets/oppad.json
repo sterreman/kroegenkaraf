@@ -171,7 +171,16 @@
       "rubriek": "Caféverhalen",
       "titel": "De laatste toog van het dorp",
       "omschrijving": "Een op de drie Vlaamse cafés verdween in tien jaar. Zes dorpscafés die het toch haalden, en drie die het niet haalden.",
-      "feiten": ["6 cafés", "Vlaams-Brabant", "Met fietstip"]
+      "feiten": ["6 cafés", "Vlaams-Brabant", "Met fietstip"],
+      "beeld": {
+        "bestanden": [
+          {"w": 800, "avif": "/assets/verhalen/laatstetoog/held-800.avif", "webp": "/assets/verhalen/laatstetoog/held-800.webp"},
+          {"w": 1280, "avif": "/assets/verhalen/laatstetoog/held-1280.avif", "webp": "/assets/verhalen/laatstetoog/held-1280.webp"}
+        ],
+        "breed": 800,
+        "hoog": 450,
+        "alt": "De bakstenen gevel van Op den donk bij valavond, met licht achter de ramen en houten banken langs de gevel"
+      }
     }
   ]
 }
