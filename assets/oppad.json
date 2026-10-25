@@ -3,12 +3,12 @@
   "artikels": [
     {
       "id": "het-laatste-dorpscafe",
-      "datum": "2026-10-25",
+      "datum": "2026-11-01",
       "url": "/het-laatste-dorpscafe",
       "rubriek": "Achtergrond",
       "titel": "Het laatste dorpscafé",
-      "omschrijving": "Eén op de vijf Waalse cafés ging in negen jaar dicht. Wat Landelies vertelt over wat een dorp verliest.",
-      "feiten": ["911 cafés dicht", "2013 tot 2022", "Wallonië"],
+      "omschrijving": "Van een gesloten dorpscafé in Landelies naar zestig jaar Chez Walter in Charleroi. Een wandeling langs de Samber, en wat erfgoed en labels niet oplossen.",
+      "feiten": ["Wandeling en treinrit", "Landelies tot Charleroi", "Henegouwen"],
       "beeld": {
         "bestanden": [
           {"w": 800, "avif": "/assets/verhalen/dorpscafe/held-800.avif", "webp": "/assets/verhalen/dorpscafe/held-800.webp"},
