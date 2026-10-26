@@ -236,10 +236,12 @@ function toonOpPad() {
   OpPad.laad().then(artikels => {
     const rij = OpPad.ordenen(artikels);
     if (!rij.length) throw new Error('geen artikels');
+    /* drie invalshoeken: het recentste, een seizoensartikel en een verrassend thema */
+    const kies = OpPad.startselectie(artikels);
     const uit = $('op-uitgelicht');
-    uit.innerHTML = OpPad.kaart(rij[0], 'groot', true);
+    uit.innerHTML = OpPad.kaart(kies[0], 'groot', true);
     uit.removeAttribute('aria-busy');
-    const meer = rij.slice(1, 3);
+    const meer = kies.slice(1);
     if (meer.length) {
       $('op-meer').innerHTML = meer.map(a => `<li>${OpPad.kaart(a, 'klein')}</li>`).join('');
       $('op-meer').hidden = false;

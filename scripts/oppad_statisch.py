@@ -5,8 +5,8 @@ site/assets/oppad.json en vult in site/oppad.html en site/index.html de stukken
 tussen de markeringen in:
 
   oppad.html   <!--oppad:overzicht--> ... <!--/oppad:overzicht-->  alle artikels
-  index.html   <!--oppad:uitgelicht--> ... <!--/oppad:uitgelicht-->  het recentste, groot
-               <!--oppad:meer--> ... <!--/oppad:meer-->  de volgende twee, compact
+  index.html   <!--oppad:uitgelicht--> ... <!--/oppad:uitgelicht-->  het recentste, groot (zie A.startselectie)
+               <!--oppad:meer--> ... <!--/oppad:meer-->  een seizoensartikel en een verrassend thema, compact
 
 Zo staan de links naar de artikels in de html zelf, ook voor wie geen
 JavaScript uitvoert (zoekmachines die niet wachten, linkvoorbeelden). De markup
@@ -44,9 +44,11 @@ def main():
     pad = SITE / 'index.html'
     t = pad.read_text(encoding='utf-8')
     t = vul(t, 'uitgelicht',
-            f'<div class="op-uitgelicht" id="op-uitgelicht">{A.kaart(rij[0], "groot", True)}</div>',
+            f'<div class="op-uitgelicht" id="op-uitgelicht">{A.kaart(kies[0], "groot", True)}</div>',
             'index.html')
-    meer = rij[1:3]
+    # drie invalshoeken: recentste, seizoen, verrassing (A.startselectie); de rest staat op /oppad
+    kies = A.startselectie(rij)
+    meer = kies[1:]
     t = vul(t, 'meer',
             '<ul class="op-meer" id="op-meer" aria-label="Meer uitstappen en verhalen"'
             + ('' if meer else ' hidden') + '>'
@@ -55,7 +57,7 @@ def main():
     pad.write_text(t, encoding='utf-8')
 
     print(f'Op pad in de html: {len(rij)} artikels op /oppad, {1 + len(meer)} op de startpagina '
-          f'(uitgelicht: {rij[0]["url"]}).')
+          f'(uitgelicht: {kies[0]["url"]}; daarnaast {", ".join(a["url"] for a in meer)}).')
 
 
 if __name__ == '__main__':

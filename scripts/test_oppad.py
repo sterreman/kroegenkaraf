@@ -5,6 +5,7 @@ uitzicht. Draait met node, vanuit de root van de repo:
     python scripts/test_oppad.py
 """
 import json
+from datetime import date
 import subprocess
 import sys
 from pathlib import Path
@@ -23,7 +24,9 @@ global.window = {};
 eval(fs.readFileSync(process.argv[1], 'utf8'));
 const OpPad = window.OpPad;
 const artikels = JSON.parse(fs.readFileSync(0, 'utf8'));
-const uit = {volgorde: OpPad.ordenen(artikels).map(a => a.url), kaarten: []};
+const uit = {volgorde: OpPad.ordenen(artikels).map(a => a.url), kaarten: [], start: []};
+for (const [j, m, d] of [[2026, 10, 26], [2026, 10, 27], [2026, 12, 15], [2027, 1, 2], [2027, 7, 1]])
+  uit.start.push(OpPad.startselectie(artikels, new Date(j, m - 1, d)).map(a => a.url));
 for (const a of artikels)
   for (const v of ['groot', 'klein', 'lijst'])
     for (const eerste of [true, false]) uit.kaarten.push(OpPad.kaart(a, v, eerste));
@@ -50,9 +53,14 @@ def main():
     if js['volgorde'] != [a['url'] for a in A.ordenen(artikels)]:
         fout += 1
         print('VERSCHIL in de volgorde:', js['volgorde'], [a['url'] for a in A.ordenen(artikels)])
+    for (j, m, d), x in zip([(2026, 10, 26), (2026, 10, 27), (2026, 12, 15), (2027, 1, 2), (2027, 7, 1)], js['start']):
+        y = [a['url'] for a in A.startselectie(artikels, date(j, m, d))]
+        if x != y:
+            fout += 1
+            print(f'VERSCHIL in de startselectie van {j}-{m}-{d}:', x, y)
     if fout:
         sys.exit(f'FOUT: {fout} verschil(len) tussen artikels.py en oppad.js.')
-    print(f'Op pad: {len(py)} kaarten en de volgorde zijn gelijk in Python en JavaScript.')
+    print(f'Op pad: {len(py)} kaarten en de volgorde en de startselectie zijn gelijk in Python en JavaScript.')
 
 
 if __name__ == '__main__':

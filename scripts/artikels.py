@@ -10,6 +10,7 @@ beide byte voor byte.
 """
 import json
 import re
+from datetime import datetime, timezone
 from pathlib import Path
 
 MAANDEN = ('januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus',
@@ -33,6 +34,39 @@ def ordenen(artikels):
     rij = sorted(enumerate(artikels), key=lambda x: (x[1].get('datum') or '', -x[0]), reverse=True)
     return [a for _, a in rij]
 
+
+def startselectie(artikels, nu=None):
+    """De drie van de startpagina, bewust met drie verschillende invalshoeken: het
+    recentste artikel, een seizoensartikel ('maanden' bevat de huidige maand) en een
+    verrassend thema ('verrassing': true, dagelijks wisselend). Twee artikels met
+    hetzelfde 'reeks' of 'thema' staan nooit samen, en 'startpagina': false houdt een
+    artikel van de startpagina. Is een plaats niet in te vullen, dan komt het recentste
+    artikel dat nog past. Zoals OpPad.startselectie(). `nu` is een datum (standaard
+    vandaag, volgens UTC zoals de bouw)."""
+    nu = nu or datetime.now(timezone.utc).date()
+    dag = nu.toordinal() - 719163  # dagen sinds 1970-01-01, zoals Date.UTC(...) / 864e5
+    rij = [a for a in ordenen(artikels) if a.get('startpagina') is not False]
+
+    def sleutel(a):
+        return a.get('reeks') or a.get('thema') or a.get('id') or a.get('url')
+
+    keuze = []
+
+    def vrij(a):
+        return all(a is not k and sleutel(a) != sleutel(k) for k in keuze)
+
+    if rij:
+        keuze.append(rij[0])
+    seizoen = next((a for a in rij if vrij(a) and nu.month in (a.get('maanden') or [])), None)
+    if seizoen:
+        keuze.append(seizoen)
+    verrassend = [a for a in rij if a.get('verrassing') and vrij(a)]
+    if verrassend:
+        keuze.append(verrassend[dag % len(verrassend)])
+    for a in rij:
+        if len(keuze) < 3 and vrij(a):
+            keuze.append(a)
+    return keuze
 
 def bestand(a):
     """'/bij-de-kachel' wordt 'bij-de-kachel.html'."""

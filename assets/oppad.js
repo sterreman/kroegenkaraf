@@ -19,6 +19,28 @@ window.OpPad = (() => {
       .sort((x, y) => (y[0].datum || '').localeCompare(x[0].datum || '') || x[1] - y[1]).map(x => x[0]);
   }
 
+  /* De drie van de startpagina, bewust met drie verschillende invalshoeken:
+     1. het recentste artikel, 2. een seizoensartikel ('maanden' bevat de huidige maand),
+     3. een verrassend thema ('verrassing': true, dagelijks wisselend). Twee artikels met
+     hetzelfde 'reeks' of 'thema' staan nooit samen, en 'startpagina': false houdt een artikel
+     (bijvoorbeeld deel 2 van een reeks) van de startpagina. Is een plaats niet in te vullen,
+     dan komt het recentste artikel dat nog past. Zoals startselectie() in scripts/artikels.py. */
+  function startselectie(artikels, nu) {
+    nu = nu || new Date();
+    const maand = nu.getMonth() + 1;
+    const dag = Math.floor(Date.UTC(nu.getFullYear(), nu.getMonth(), nu.getDate()) / 864e5);
+    const rij = ordenen(artikels).filter(a => a.startpagina !== false);
+    const sleutel = a => a.reeks || a.thema || a.id || a.url;
+    const keuze = [];
+    const vrij = a => !keuze.includes(a) && !keuze.some(k => sleutel(k) === sleutel(a));
+    if (rij.length) keuze.push(rij[0]);
+    const seizoen = rij.find(a => vrij(a) && (a.maanden || []).includes(maand));
+    if (seizoen) keuze.push(seizoen);
+    const verrassend = rij.filter(a => a.verrassing && vrij(a));
+    if (verrassend.length) keuze.push(verrassend[dag % verrassend.length]);
+    for (const a of rij) if (keuze.length < 3 && vrij(a)) keuze.push(a);
+    return keuze;
+  }
   const MAANDEN = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus',
     'september', 'oktober', 'november', 'december'];
   function datum(a) {
@@ -60,5 +82,5 @@ window.OpPad = (() => {
       + `</div></article>`;
   }
 
-  return {laad, ordenen, kaart, esc};
+  return {laad, ordenen, startselectie, kaart, esc};
 })();

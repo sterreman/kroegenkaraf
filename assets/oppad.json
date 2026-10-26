@@ -1,8 +1,10 @@
 {
-  "_uitleg": "De artikels van Op pad: de bron voor de startpagina en voor het overzicht op /oppad. Een artikel erbij zetten volstaat; er staat niets anders in de pagina's. 'url' is het pad van het artikel, 'titel' en 'omschrijving' staan als tekst op de kaart, 'rubriek' is het label boven de titel en 'feiten' zijn korte, controleerbare gegevens uit het artikel zelf (streek, thema, afstand): verzin er geen. 'datum' (jjjj-mm-dd) is de publicatiedatum; het recentste artikel komt vooraan. De startpagina toont het eerste artikel groot en de volgende twee compact. 'beeld' verwijst naar echte bestanden onder assets/ met 'bestanden' per breedte (avif en webp), de afmetingen van de standaardversie ('breed' is de breedte van de standaardversie), een beschrijving voor 'alt' en eventueel 'bron' met de naam en licentie van de maker.",
+  "_uitleg": "De artikels van Op pad: de bron voor de startpagina en voor het overzicht op /oppad. Een artikel erbij zetten volstaat; er staat niets anders in de pagina's. 'url' is het pad van het artikel, 'titel' en 'omschrijving' staan als tekst op de kaart, 'rubriek' is het label boven de titel en 'feiten' zijn korte, controleerbare gegevens uit het artikel zelf (streek, thema, afstand): verzin er geen. 'datum' (jjjj-mm-dd) is de publicatiedatum; het recentste artikel komt vooraan. De startpagina toont drie bewust verschillende invalshoeken (zie startselectie in assets/oppad.js en scripts/artikels.py): het recentste artikel groot, daarnaast een seizoensartikel en een verrassend thema, compact. Optionele velden: 'maanden' (1 tot 12) voor een seizoensartikel, 'verrassing' (true) voor een artikel dat in aanmerking komt voor de verrassende plaats (dagelijks wisselend), 'thema' en 'reeks' (twee artikels met hetzelfde thema of dezelfde reeks staan nooit samen op de startpagina) en 'startpagina' (false) om een artikel, bijvoorbeeld deel 2 van een reeks, niet op de startpagina te tonen; op /oppad staat altijd alles op datum. 'beeld' verwijst naar echte bestanden onder assets/ met 'bestanden' per breedte (avif en webp), de afmetingen van de standaardversie ('breed' is de breedte van de standaardversie), een beschrijving voor 'alt' en eventueel 'bron' met de naam en licentie van de maker.",
   "artikels": [
     {
       "id": "herfstwandelingen",
+      "thema": "wandelen",
+      "maanden": [9, 10, 11],
       "datum": "2026-10-07",
       "url": "/herfstwandelingen",
       "rubriek": "Wandelingen",
@@ -22,6 +24,8 @@
     },
     {
       "id": "bij-de-kachel",
+      "thema": "kachel",
+      "maanden": [11, 12, 1, 2, 3],
       "datum": "2026-10-12",
       "url": "/bij-de-kachel",
       "rubriek": "Caféverhalen",
@@ -41,6 +45,8 @@
     },
     {
       "id": "decaporgels-cafes",
+      "thema": "orgels",
+      "verrassing": true,
       "datum": "2026-10-11",
       "url": "/decaporgels-cafes",
       "rubriek": "Caféverhalen",
@@ -94,6 +100,8 @@
     },
     {
       "id": "waar-nog-boltra-spelen",
+      "thema": "boltra",
+      "verrassing": true,
       "datum": "2026-10-17",
       "url": "/waar-nog-boltra-spelen",
       "rubriek": "Volkssport",
@@ -112,6 +120,7 @@
     },
     {
       "id": "wielercafes-uit-2008-deel-1",
+      "reeks": "kringwinkel",
       "datum": "2026-10-18",
       "url": "/wielercafes-uit-2008-deel-1",
       "rubriek": "Koerscafés",
@@ -130,6 +139,8 @@
     },
     {
       "id": "wielercafes-uit-2008-deel-3",
+      "reeks": "kringwinkel",
+      "startpagina": false,
       "datum": "2026-10-20",
       "url": "/wielercafes-uit-2008-deel-3",
       "rubriek": "Koerscafés",
@@ -148,6 +159,8 @@
     },
     {
       "id": "wielercafes-uit-2008-deel-2",
+      "reeks": "kringwinkel",
+      "startpagina": false,
       "datum": "2026-10-20",
       "url": "/wielercafes-uit-2008-deel-2",
       "rubriek": "Koerscafés",
