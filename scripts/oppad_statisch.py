@@ -41,14 +41,14 @@ def main():
     t = vul(t, 'overzicht', f'<ul class="opoverzicht" id="opoverzicht">{lijst}</ul>', 'oppad.html')
     pad.write_text(t, encoding='utf-8')
 
+    # drie invalshoeken: recentste, seizoen, verrassing (A.startselectie); de rest staat op /oppad
+    kies = A.startselectie(rij)
+    meer = kies[1:]
     pad = SITE / 'index.html'
     t = pad.read_text(encoding='utf-8')
     t = vul(t, 'uitgelicht',
             f'<div class="op-uitgelicht" id="op-uitgelicht">{A.kaart(kies[0], "groot", True)}</div>',
             'index.html')
-    # drie invalshoeken: recentste, seizoen, verrassing (A.startselectie); de rest staat op /oppad
-    kies = A.startselectie(rij)
-    meer = kies[1:]
     t = vul(t, 'meer',
             '<ul class="op-meer" id="op-meer" aria-label="Meer uitstappen en verhalen"'
             + ('' if meer else ' hidden') + '>'
