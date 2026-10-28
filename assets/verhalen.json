@@ -400,6 +400,48 @@
           "label": "Het laatste Germinal"
         }
       }
+    },
+    {
+      "url": "/een-pint-van-het-huis",
+      "titel": "Een pint van het huis",
+      "cafes": {
+        "KK02584": {
+          "anker": "zeegeuzen",
+          "label": "Halte 1: de geuze met een geheim"
+        },
+        "KK02567": {
+          "anker": "botteltje",
+          "label": "Halte 2: een Strever van het vat"
+        },
+        "KK02746": {
+          "anker": "moriaen",
+          "label": "Halte 3: tabak, smokkel en een Bleeken Moriaen"
+        },
+        "KK01406": {
+          "anker": "dullegriet",
+          "label": "Halte 4: een liter Max, een schoen in de mand"
+        },
+        "KK01566": {
+          "anker": "tuup",
+          "label": "Halte 5: een tripel voor het dorp"
+        },
+        "KK00720": {
+          "anker": "becasse",
+          "label": "Halte 6: lambiek uit de stenen kan"
+        },
+        "KK02047": {
+          "anker": "neerijse",
+          "label": "Halte 7: de brouwerij van de bierprofessor"
+        },
+        "KK01028": {
+          "anker": "kerkom",
+          "label": "Halte 8: de ketels draaien weer"
+        },
+        "KK00927": {
+          "anker": "terdolen",
+          "label": "Halte 9: een abdijbier achter kasteelmuren"
+        }
+      }
     }
   ]
 }
