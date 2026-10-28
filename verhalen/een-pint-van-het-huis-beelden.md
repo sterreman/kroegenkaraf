@@ -12,7 +12,9 @@ Aangeleverd door Steven op 28 oktober 2026 in `Volkscafés/fotos/Artikelhuisbier
 | becasse-* | A-la-becasseLambiek.jpg | Stenen kan La Bécasse met twee glazen | geen | klein bronbestand (550 px), alleen in die breedte |
 | neerijse-* | DeKroonNeerijse.jpg | Gevel Brouwerij De Kroon, kerk op de achtergrond | geen | maker onbekend, te bevestigen |
 | kerkom-* | BrouwerijKerkom.webp | Gevel met uithangborden Brouwerij Kerkom en Bink | geen | 4:5 uit staand beeld; auto onderaan deels zichtbaar |
+| botteltje-* | Botteltje.webp | Gevel en terras van Cafe Botteltje met hotelbord | geen | aangeleverd 28-10-2026 21u; maker onbekend |
+| tuup-* | Tuup.webp | Gevel bij avond, opschrift Cafe Tuup # Oud Wit Huis | geen | breed formaat; maker onbekend |
+| terdolen-* | TerDolen.webp | Poort De Dool met koperen brouwketel | geen | maker onbekend |
 
 Niet gebruikt: Zeegeuzentoog.jpg. EXIF: "© 2022 Antonela Delia, all rights reserved". Alleen gebruiken met toestemming van de fotografe.
 
-Geen foto voor 't Botteltje, Café Tuup en Ter Dolen.
