@@ -68,8 +68,11 @@ def main():
                          f'({len(gevonden)} van {len(rij)}). Draaide oppad_statisch.py wel?')
     start = Path('site/index.html').read_text(encoding='utf-8')
     gevonden = re.findall(r'<h3 class="optitel"><a href="([^"]+)"', start)
-    if gevonden != [a['url'] for a in rij[:3]]:
-        raise SystemExit('STOP: de startpagina toont in de html niet de drie recentste artikels van Op pad.')
+    # drie invalshoeken (recentste, seizoen, verrassend thema), zoals oppad_statisch.py ze kiest
+    verwacht = [a['url'] for a in A.startselectie(rij)]
+    if gevonden != verwacht:
+        raise SystemExit(f'STOP: de startpagina toont in de html niet de selectie van Op pad '
+                         f'(gevonden {gevonden}, verwacht {verwacht}).')
     print(f"Op pad: {len(artikels)} artikel(s) gecontroleerd, alle in de html van /oppad.")
     # Gemeentepagina's: eigen titel, canonical, deelkaartje, en elke link naar een cafe klopt.
     namen = json.loads(Path('site/assets/gemeenten.json').read_text(encoding='utf-8')).get('gemeenten', [])
