@@ -11,7 +11,7 @@ Aangeleverd door Steven op 28 oktober 2026 in `Volkscafés/fotos/Artikelhuisbier
 | dullegriet-schoenen-* | DulleGrietSchoenen.avif | Plafond met wagenwiel, mand en poppen | geen | 4:5; maker onbekend |
 | becasse-* | A-la-becasseLambiek.jpg | Stenen kan La Bécasse met twee glazen | geen | klein bronbestand (550 px), alleen in die breedte |
 | neerijse-* | DeKroonNeerijse.jpg | Gevel Brouwerij De Kroon, kerk op de achtergrond | geen | maker onbekend, te bevestigen |
-| kerkom-* | BrouwerijKerkom.webp | Gevel met uithangborden Brouwerij Kerkom en Bink | geen | 4:5 uit staand beeld; auto onderaan deels zichtbaar |
+| kerkom-* | BrouwerijKerkom.webp | Gevel met borden Brouwerij Kerkom en Bink en de poort naar de binnenkoer | geen | vervangen 28-10-2026 door nieuwe versie, 4:3; maker onbekend |
 | botteltje-* | Botteltje.webp | Gevel en terras van Cafe Botteltje met hotelbord | geen | aangeleverd 28-10-2026 21u; maker onbekend |
 | tuup-* | Tuup.webp | Gevel bij avond, opschrift Cafe Tuup # Oud Wit Huis | geen | breed formaat; maker onbekend |
 | terdolen-* | TerDolen.webp | Poort De Dool met koperen brouwketel | geen | maker onbekend |
