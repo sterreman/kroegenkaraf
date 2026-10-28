@@ -194,6 +194,26 @@
         "hoog": 450,
         "alt": "De bakstenen gevel van Op den donk bij valavond, met licht achter de ramen en houten banken langs de gevel"
       }
+    },
+    {
+      "id": "een-pint-van-het-huis",
+      "thema": "huisbier",
+      "verrassing": true,
+      "datum": "2026-10-28",
+      "url": "/een-pint-van-het-huis",
+      "rubriek": "Caféverhalen",
+      "titel": "Een pint van het huis",
+      "omschrijving": "Een geuze met een geheim, een liter Max tegen een schoen, lambiek uit de stenen kan. Negen cafés met een eigen huisbier.",
+      "feiten": ["9 cafés", "Van Oostende tot Helchteren", "Met wandel- en fietstips"],
+      "beeld": {
+        "bestanden": [
+          {"w": 800, "avif": "/assets/verhalen/huisbier/held-800.avif", "webp": "/assets/verhalen/huisbier/held-800.webp"},
+          {"w": 1280, "avif": "/assets/verhalen/huisbier/held-1280.avif", "webp": "/assets/verhalen/huisbier/held-1280.webp"}
+        ],
+        "breed": 800,
+        "hoog": 450,
+        "alt": "In den Grooten Moriaen in Wervik, een witgekalkt café met lichtblauwe luiken en een terras, met de Briekenmolen erachter"
+      }
     }
   ]
 }
