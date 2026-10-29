@@ -263,4 +263,12 @@ h2::before{content:"";width:34px;height:5px;background:var(--roest)}
 .verhaalblok p{margin:0;font-size:17px;line-height:1.4}
 .verhaalblok a{color:var(--roest-tekst);font-weight:600;text-underline-offset:3px}
 .verhaalblok .vlabel{display:block;margin-top:2px;font-size:15px;color:var(--inkt2)}
+.verhaalblok p + p{margin-top:12px}
+.verhaalblok .metbeeld{display:flex;gap:14px;align-items:flex-start}
+.verhaalblok .vbeeld{flex:0 0 96px;display:block;line-height:0}
+.verhaalblok .vbeeld img{width:96px;height:96px;object-fit:cover;border:1px solid var(--inkt);background:var(--papier)}
+.verhaalblok .vtekst{min-width:0}
+.verhaalblok .vbron{display:block;margin-top:4px;font-family:var(--kop);font-stretch:92%;font-size:12.5px;color:var(--inkt3)}
+.verhaalblok .vbron a{color:inherit;font-weight:400}
+@media(max-width:560px){.verhaalblok .vbeeld{flex-basis:72px}.verhaalblok .vbeeld img{width:72px;height:72px}}
 .fotohint{display:block;margin:0 0 4px;font-family:var(--kop);font-stretch:92%;font-size:13px;color:var(--creme2)}

@@ -1,5 +1,5 @@
 {
-  "_uitleg": "Welke artikels welke zaken bespreken (ID's uit de csv). Bij de bouw krijgt elke genoemde cafepagina een blokje Lees ook en elke gemeentepagina een zin met een link naar het artikel. Anker is het id van de passage in het artikel.",
+  "_uitleg": "Welke artikels welke zaken bespreken (ID's uit de csv). Bij de bouw krijgt elke genoemde cafepagina een blokje Lees ook en elke gemeentepagina een zin met een link naar het artikel. Anker is het id van de passage in het artikel. Optioneel per zaak: 'beeld' met 'bestand' (een webp-beeld uit het artikel onder /assets/verhalen/, de avif met dezelfde naam moet ernaast staan) en eventueel 'bron' (de tekst zoals onder de foto in het artikel) met 'links' (stukken van die tekst die een link krijgen, zoals maker en licentie). Dat beeld staat klein in het blok Lees ook op de cafepagina, nooit als foto van de zaak. Alleen beelden met een open licentie of met akkoord van Steven; geen boekpagina's en geen beelden waarvan de rechten nog te bevestigen zijn.",
   "verhalen": [
     {
       "url": "/grenscafes-belgie-nederland",
@@ -49,7 +49,21 @@
       "cafes": {
         "KK02298": {
           "anker": "brugge",
-          "label": "Halte 1: de Leuvense stoof van Vlissinghe"
+          "label": "Halte 1: de Leuvense stoof van Vlissinghe",
+          "beeld": {
+            "bestand": "/assets/verhalen/kachel/held-800.webp",
+            "bron": "Foto: Donarreiskoffer, CC BY-SA 4.0, bijgesneden.",
+            "links": [
+              {
+                "tekst": "Donarreiskoffer",
+                "url": "https://commons.wikimedia.org/wiki/File:Leuvense_stoof,_Caf%C3%A9_Vlissinghe_(Brugge).jpg"
+              },
+              {
+                "tekst": "CC BY-SA 4.0",
+                "url": "https://creativecommons.org/licenses/by-sa/4.0/deed.nl"
+              }
+            ]
+          }
         },
         "KK03127": {
           "anker": "kortrijk",
@@ -75,7 +89,10 @@
       "cafes": {
         "KK00034": {
           "anker": "beveren",
-          "label": "Halte 1: het Decap-orgel uit 1937"
+          "label": "Halte 1: het Decap-orgel uit 1937",
+          "beeld": {
+            "bestand": "/assets/verhalen/decap/held-800.webp"
+          }
         },
         "KK00484": {
           "anker": "mol",
@@ -83,11 +100,18 @@
         },
         "KK03068": {
           "anker": "mol",
-          "label": "Halte 2: twee Decap-orgels aan de Eerselseweg"
+          "label": "Halte 2: twee Decap-orgels aan de Eerselseweg",
+          "beeld": {
+            "bestand": "/assets/verhalen/decap/kaasboerin-720.webp",
+            "bron": "Foto: Bert De Deken."
+          }
         },
         "KK03071": {
           "anker": "leffinge",
-          "label": "Halte 4: het orgel uit De Zeemeeuw"
+          "label": "Halte 4: het orgel uit De Zeemeeuw",
+          "beeld": {
+            "bestand": "/assets/verhalen/decap/leffinge-720.webp"
+          }
         },
         "KK03113": {
           "anker": "verdwenen",
@@ -227,11 +251,19 @@
       "cafes": {
         "KK03368": {
           "anker": "sportpaleis",
-          "label": "Café 1: het spookcafé uit de wielergids van 2008"
+          "label": "Café 1: het spookcafé uit de wielergids van 2008",
+          "beeld": {
+            "bestand": "/assets/verhalen/wielercafes1/sportpaleis-720.webp",
+            "bron": "Foto: Facebook"
+          }
         },
         "KK03373": {
           "anker": "handelshuis",
-          "label": "Café 2: van rugnummers naar tapas"
+          "label": "Café 2: van rugnummers naar tapas",
+          "beeld": {
+            "bestand": "/assets/verhalen/wielercafes1/handelshuis-628.webp",
+            "bron": "Foto: Facebook"
+          }
         },
         "KK03374": {
           "anker": "sportclub",
@@ -243,15 +275,27 @@
         },
         "KK03369": {
           "anker": "koppenberg",
-          "label": "Café 5: nog altijd aan de voet van de muur"
+          "label": "Café 5: nog altijd aan de voet van de muur",
+          "beeld": {
+            "bestand": "/assets/verhalen/wielercafes1/koppenberg-720.webp",
+            "bron": "Foto: Facebook"
+          }
         },
         "KK03370": {
           "anker": "flandrien",
-          "label": "Café 6: van vroege passage naar finishstad"
+          "label": "Café 6: van vroege passage naar finishstad",
+          "beeld": {
+            "bestand": "/assets/verhalen/wielercafes1/peloton-516.webp",
+            "bron": "Foto: Facebook"
+          }
         },
         "KK01374": {
           "anker": "karper",
-          "label": "Café 7: Keisse doet het nog altijd"
+          "label": "Café 7: Keisse doet het nog altijd",
+          "beeld": {
+            "bestand": "/assets/verhalen/wielercafes1/karper-720.webp",
+            "bron": "Foto: Facebook"
+          }
         },
         "KK03375": {
           "anker": "wiel",
@@ -259,7 +303,11 @@
         },
         "KK01276": {
           "anker": "aubisque",
-          "label": "Café 9: een eeuw na de titanentocht"
+          "label": "Café 9: een eeuw na de titanentocht",
+          "beeld": {
+            "bestand": "/assets/verhalen/wielercafes1/aubisque-720.webp",
+            "bron": "Foto: Facebook"
+          }
         },
         "KK03372": {
           "anker": "uitkijktoren",
@@ -277,7 +325,11 @@
       "cafes": {
         "KK03376": {
           "anker": "angele",
-          "label": "Café 11: van koers naar darts, en dan de deur dicht"
+          "label": "Café 11: van koers naar darts, en dan de deur dicht",
+          "beeld": {
+            "bestand": "/assets/verhalen/wielercafes2/angele-540.webp",
+            "bron": "Foto: Eddy Meulemans"
+          }
         },
         "KK03377": {
           "anker": "wheelers",
@@ -285,11 +337,19 @@
         },
         "KK00618": {
           "anker": "toekomst",
-          "label": "Café 13: de toekomst duurt nog even"
+          "label": "Café 13: de toekomst duurt nog even",
+          "beeld": {
+            "bestand": "/assets/verhalen/wielercafes2/toekomst-720.webp",
+            "bron": "Foto: Facebook"
+          }
         },
         "KK03378": {
           "anker": "toren",
-          "label": "Café 14: Tom bleef langer dan zijn fans"
+          "label": "Café 14: Tom bleef langer dan zijn fans",
+          "beeld": {
+            "bestand": "/assets/verhalen/wielercafes2/toren-720.webp",
+            "bron": "Foto: Facebook"
+          }
         },
         "KK03099": {
           "anker": "waregem",
@@ -301,7 +361,11 @@
         },
         "KK01993": {
           "anker": "marietherese",
-          "label": "Café 17: de naam is weg, de tap loopt nog"
+          "label": "Café 17: de naam is weg, de tap loopt nog",
+          "beeld": {
+            "bestand": "/assets/verhalen/wielercafes2/depart-720.webp",
+            "bron": "Foto: Facebook, SC Marie-Thérèse"
+          }
         },
         "KK03381": {
           "anker": "sportwereld",
@@ -313,7 +377,11 @@
         },
         "KK02035": {
           "anker": "boerenhof",
-          "label": "Café 20: vijftig jaar bij Merckx thuis"
+          "label": "Café 20: vijftig jaar bij Merckx thuis",
+          "beeld": {
+            "bestand": "/assets/verhalen/wielercafes2/boerenhof-720.webp",
+            "bron": "Foto: Facebook"
+          }
         }
       }
     },
@@ -331,7 +399,11 @@
         },
         "KK03533": {
           "anker": "kluis",
-          "label": "Café 23: Armstrong was er niet"
+          "label": "Café 23: Armstrong was er niet",
+          "beeld": {
+            "bestand": "/assets/verhalen/wielercafes3/kluis-720.webp",
+            "bron": "Foto: Facebook"
+          }
         },
         "KK00923": {
           "anker": "rita",
@@ -339,7 +411,11 @@
         },
         "KK03534": {
           "anker": "malpertuus",
-          "label": "Café 25: de prins van de ereplaatsen"
+          "label": "Café 25: de prins van de ereplaatsen",
+          "beeld": {
+            "bestand": "/assets/verhalen/wielercafes3/malpertuus-720.webp",
+            "bron": "Foto: Hotel Malpertuus"
+          }
         },
         "KK03535": {
           "anker": "tour",
@@ -347,7 +423,11 @@
         },
         "KK02875": {
           "anker": "hostellerie",
-          "label": "Café 27: welke VDB zoek je?"
+          "label": "Café 27: welke VDB zoek je?",
+          "beeld": {
+            "bestand": "/assets/verhalen/wielercafes3/grandplace-610.webp",
+            "bron": "Foto: Café de la Grand'Place"
+          }
         },
         "KK03536": {
           "anker": "panorama",

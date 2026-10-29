@@ -46,6 +46,21 @@ def main():
         for beeld in sorted(set(re.findall(r'(/assets/verhalen/[^\s"]+)', tekst))):
             if not Path('site', beeld.lstrip('/')).is_file():
                 raise SystemExit(f'STOP: {verhaal} toont een beeld dat ontbreekt: {beeld}')
+    # Lees ook: een beeld uit het artikel naast de link op de cafepagina moet echt bestaan,
+    # in webp en avif, en uit dat artikel komen.
+    for v in json.loads(Path('site/assets/verhalen.json').read_text(encoding='utf-8')).get('verhalen', []):
+        artikel = Path('site', v['url'].strip('/') + '.html').read_text(encoding='utf-8')
+        for i, c in v.get('cafes', {}).items():
+            b = c.get('beeld')
+            if not b:
+                continue
+            if not b['bestand'].endswith('.webp'):
+                raise SystemExit(f"STOP: verhalen.json: het beeld bij {i} is geen webp: {b['bestand']}")
+            for pad in (b['bestand'], b['bestand'][:-5] + '.avif'):
+                if not Path('site', pad.lstrip('/')).is_file():
+                    raise SystemExit(f'STOP: verhalen.json toont bij {i} een beeld dat ontbreekt: {pad}')
+            if b['bestand'] not in artikel:
+                raise SystemExit(f"STOP: verhalen.json: het beeld bij {i} staat niet in {v['url']}.")
     # Op pad: de artikels in assets/oppad.json voeden de startpagina en /oppad; elk artikel
     # en elk beeld moet echt bestaan.
     artikels = json.loads(Path('site/assets/oppad.json').read_text(encoding='utf-8')).get('artikels', [])
