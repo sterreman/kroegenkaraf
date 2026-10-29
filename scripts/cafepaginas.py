@@ -928,17 +928,51 @@ def laad_verhalen():
     for v in json.loads(pad.read_text(encoding='utf-8')).get('verhalen', []):
         for i, c in v.get('cafes', {}).items():
             uit.setdefault(i, []).append({'url': v['url'], 'titel': v['titel'],
-                                          'anker': c.get('anker', ''), 'label': c.get('label', '')})
+                                          'anker': c.get('anker', ''), 'label': c.get('label', ''),
+                                          'beeld': c.get('beeld')})
     return uit
+
+
+def bron_html(b):
+    """De bronvermelding van een artikelbeeld, met de links (maker, licentie) zoals in het artikel."""
+    tekst = e(b.get('bron', ''))
+    for l in b.get('links', []):
+        stuk = e(l['tekst'])
+        if stuk and stuk in tekst:
+            tekst = tekst.replace(stuk, f'<a href="{e(l["url"])}" rel="noopener">{stuk}</a>', 1)
+    return tekst
+
+
+def verhaalbeeld(v, href):
+    """Klein beeld uit het artikel naast de link in Lees ook. Het hoort bij het artikel en
+    wordt nooit de foto van de zaak: niet in de lijst, de kaart, deel.jpg of json-ld."""
+    b = v.get('beeld')
+    if not b:
+        return ''
+    webp = b['bestand']
+    avif = webp[:-len('.webp')] + '.avif'
+    return (f'<a class="vbeeld" href="{e(href)}" tabindex="-1" aria-hidden="true"><picture>'
+            f'<source type="image/avif" srcset="{e(avif)}">'
+            f'<img src="{e(webp)}" alt="" width="96" height="96" loading="lazy" decoding="async">'
+            '</picture></a>')
 
 
 def verhaalblok(d):
     items = VERHALEN.get(d.get('id'), [])
     if not items:
         return ''
-    regels = ''.join(
-        f'<p><a href="{e(v["url"] + ("#" + v["anker"] if v["anker"] else ""))}">{e(v["titel"])}</a>'
-        + (f'<span class="vlabel">{e(v["label"])}</span>' if v['label'] else '') + '</p>' for v in items)
+    regels = ''
+    for v in items:
+        href = v['url'] + ('#' + v['anker'] if v['anker'] else '')
+        beeld = verhaalbeeld(v, href)
+        tekst = (f'<a href="{e(href)}">{e(v["titel"])}</a>'
+                 + (f'<span class="vlabel">{e(v["label"])}</span>' if v['label'] else ''))
+        if beeld:
+            bron = v['beeld'].get('bron')
+            tekst += f'<span class="vbron">{bron_html(v["beeld"])}</span>' if bron else ''
+            regels += f'<p class="metbeeld">{beeld}<span class="vtekst">{tekst}</span></p>'
+        else:
+            regels += f'<p>{tekst}</p>'
     return ('<aside class="verhaalblok" aria-labelledby="verhaalkop"><h2 id="verhaalkop">Lees ook</h2>'
             f'{regels}</aside>')
 
