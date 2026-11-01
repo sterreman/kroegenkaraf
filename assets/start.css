@@ -37,6 +37,14 @@
 .deelknop:hover{color:var(--roest-licht);text-decoration-color:currentColor}
 .deelknop:focus-visible{outline:2px solid var(--creme);outline-offset:3px}
 .deelknop svg{width:17px;height:17px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+/* volgen: Facebook en Instagram naast de deelknop, zelfde crème en roest bij hover */
+.deelrij{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px}
+.volg{display:inline-flex;align-items:center;gap:4px;padding-left:16px;border-left:1px solid var(--lijn-m)}
+.volg a{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;color:var(--creme)}
+.volg a:hover{color:var(--roest-licht)}
+.volg a:focus-visible{outline:2px solid var(--creme);outline-offset:-4px}
+.volg svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.7}
+.volg svg .vol{fill:currentColor;stroke:none}
 .startkop .deelpaneel{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px;max-width:640px;
  padding:10px 0;border-top:1px dashed var(--lijn-m);border-bottom:1px dashed var(--lijn-m)}
 .startkop .deelpaneel[hidden]{display:none}
