@@ -214,6 +214,16 @@
         "hoog": 450,
         "alt": "In den Grooten Moriaen in Wervik, een witgekalkt café met lichtblauwe luiken en een terras, met de Briekenmolen erachter"
       }
+    },
+    {
+      "id": "cafes-mooiste-dorpen-wallonie",
+      "thema": "wallonie",
+      "datum": "2026-11-04",
+      "url": "/cafes-mooiste-dorpen-wallonie",
+      "rubriek": "Caféverhalen",
+      "titel": "Is er nog een café in het mooiste dorp?",
+      "omschrijving": "Kasseien en kastelen genoeg in de mooiste dorpen van Wallonië. Wij zochten de toog: acht cafés, en twee die op de wip staan.",
+      "feiten": ["8 cafés", "Van Mélin tot Chassepierre"]
     }
   ]
 }
