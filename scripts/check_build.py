@@ -33,7 +33,7 @@ def main():
                 raise SystemExit(f"STOP: {name} ontbreekt voor {row['n']} ({row['u']}).")
     # De artikels staan in assets/oppad.json; daar komt ook deze lijst vandaan.
     verhalen = [A.bestand(a) for a in A.laad('site')]
-    for name in (*verhalen, 'privacy.html', 'over.html', 'oppad.html', 'assets/oppad.json', 'assets/oppad.js', 'assets/oppad.css', 'assets/verhaal.css', 'assets/verhaal.js', 'assets/verhaalkaart.js', 'assets/gemeente.css', 'assets/verhalen.json', 'assets/gemeenten.json', 'afspreken.html', 'assets/afspreken.js', 'lijst.html', 'data/start.json', 'assets/fonts/fonts.css', 'sitemap.xml', 'sitemap-paginas.xml', 'sitemap-gemeenten.xml', 'sitemap-cafes.xml', 'robots.txt', 'data/slugs.json', 'assets/cafe.css', 'assets/cafe.js'):
+    for name in (*verhalen, 'privacy.html', '404.html', 'over.html', 'oppad.html', 'assets/oppad.json', 'assets/oppad.js', 'assets/oppad.css', 'assets/verhaal.css', 'assets/verhaal.js', 'assets/verhaalkaart.js', 'assets/gemeente.css', 'assets/verhalen.json', 'assets/gemeenten.json', 'afspreken.html', 'assets/afspreken.js', 'lijst.html', 'data/start.json', 'assets/fonts/fonts.css', 'sitemap.xml', 'sitemap-paginas.xml', 'sitemap-gemeenten.xml', 'sitemap-cafes.xml', 'robots.txt', 'data/slugs.json', 'assets/cafe.css', 'assets/cafe.js'):
         if not Path('site', name).is_file():
             raise SystemExit(f'STOP: {name} ontbreekt.')
     print(f'{len(urls)} cafepaginas aanwezig.')

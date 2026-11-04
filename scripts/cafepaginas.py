@@ -468,7 +468,7 @@ ICOON_DEEL = ('<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5
               '<circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/>'
               '<path d="m8.3 13.3 7.4 4.4M15.7 6.3l-7.4 4.4"/></svg>')
 
-VERSIE = 'balk-20261015'
+VERSIE = 'bijdrage-20261104'
 
 ICOON_WEB = ('<svg class="lijn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/>'
              '<path d="M2.8 12h18.4M12 2.8c2.6 2.6 3.8 5.7 3.8 9.2s-1.2 6.6-3.8 9.2c-2.6-2.6-3.8-5.7-3.8-9.2'
@@ -784,8 +784,12 @@ def pagina(d, buren):
     # staat onderaan de pagina
     oproep_url = (FOTO_FORMULIER + '?' + urllib.parse.urlencode(
         {'cafe': f'{d["n"]}, {gem}' if gem else d['n'], 'slug': d['u']}))
+    # Bij een gesloten zaak vragen we een oude foto, zoals de tegel Laatste ronde
+    # op de startpagina; een nieuwe foto van een dicht café heeft weinig zin.
+    oproep_tekst = (f'Ken je {e(d["n"])}? Stuur je eigen oude foto' if dicht
+                    else f'Upload jouw eigen foto van {e(d["n"])}')
     oproep = (f'<p class="fotooproep"><a class="link" href="{e(oproep_url)}" target="_blank" '
-              f'rel="noopener">{ICOON_FOTO}Upload jouw eigen foto van {e(d["n"])}</a>'
+              f'rel="noopener">{ICOON_FOTO}{oproep_tekst}</a>'
               f'<span class="fotohint">Het formulier koppelt je foto automatisch aan {e(d["n"])}'
               f'{", " + e(plaats(gem)) if gem else ""}.</span></p>')
     # Een fout melden gaat gewoon per mail, met de zaak en de pagina al ingevuld.
@@ -794,8 +798,12 @@ def pagina(d, buren):
                      + '&body=' + urllib.parse.quote(f'Pagina: {ORIGIN}/{d["u"]}/\n\nWat klopt er niet?\n'))
     oproep += (f'<p class="correctie"><a class="link" href="{e(correctie_url)}">{ICOON_PEN}'
                f'Klopt er iets niet bij {e(d["n"])}? Laat het weten</a></p>')
+    # De fotooproep en de correctie staan niet meer in het praktische blok maar onder
+    # het verhaal: zo blijft het blok naast de opening kort en schuift het verhaal
+    # (op de gsm staat het praktische blok erboven) niet ver naar onderen.
     praktisch = (f'<div class="praktisch">{adresblok}{status_blok(d)}{archief}{"".join(acties)}'
-                 f'<ul class="links">{"".join(links)}</ul>{deelpaneel}{oproep}</div>')
+                 f'<ul class="links">{"".join(links)}</ul>{deelpaneel}</div>')
+    bijdrage = f'<aside class="bijdrage" aria-label="Help de gids">{oproep}</aside>'
     sinds = (f'<p class="sinds">In de gids sinds {e(datum(d["d"]))}.</p>' if d.get('d') else '')
 
     # ---- de romp: links de rest van een lange tekst en de ligging, rechts de buurt
@@ -834,7 +842,7 @@ def pagina(d, buren):
 
     tekstblok = f'<div class="tekst">{tekst}</div>' if tekst else ''
     romp = (f'<div class="romp wrap{" zonderbuurt" if not buurt else ""}">'
-            f'<div class="hoofdkolom">{tekstblok}{verhaalblok(d)}{kaart}{sinds}</div>'
+            f'<div class="hoofdkolom">{tekstblok}{verhaalblok(d)}{kaart}{bijdrage}{sinds}</div>'
             f'{buurt}</div>')
 
     klassen = ' '.join(k for k in ('zaak', 'dicht' if dicht else '', 'metfoto' if foto else '',
@@ -1083,7 +1091,12 @@ def gemeente_pagina(g):
                   f'{groep(dicht, "gesloten-")}</section>' if dicht else '')
     kaartlinks = (f'<p class="gknoppen"><a class="gknop" href="/kaart?q={q(naam)}">Bekijk {e(naam)} op de kaart</a>'
                   f'<a class="gknop stil" href="/lijst?q={q(naam)}">Zoek in de lijst</a></p>') if actueel else ''
-    namen = [d['n'] for d in actueel[:3]]
+    # Niet de eerste drie in alfabetische volgorde (dan opent elke gemeente met haar
+    # brasserieën), maar de zaken met het meeste verhaal, cafés voor eetcafés.
+    def voorbeeld(d):
+        return (d.get('t') == 'Eetcafé', d.get('s') != 'Geverifieerd',
+                -len((d.get('i') or '').split()), sleutel(d['n']))
+    namen = [d['n'] for d in sorted(actueel, key=voorbeeld)[:3]]
     omschrijving = kort(f'{len(actueel)} {"café" if len(actueel) == 1 else "cafés"} in {naam}'
                         + (f', onder meer {", ".join(namen[:-1])}{" en " if len(namen) > 1 else ""}{namen[-1]}.' if namen else '.')
                         + ' Met adres, soort en ligging op de kaart.', 158)

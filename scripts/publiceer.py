@@ -324,6 +324,7 @@ with open(f'{SITE}/data/zaken.json', 'w', encoding='utf-8') as fp:
     json.dump(data, fp, ensure_ascii=False, separators=(',', ':'))
 
 # ---- datum en aantal in de pagina's ------------------------------------------
+open_zaken = sum(1 for d in data if d.get('s') != 'Gesloten')
 for pagina in ('index.html', 'lijst.html', 'kaart.html'):
     p = f'{SITE}/{pagina}'
     t = open(p, encoding='utf-8').read()
@@ -332,8 +333,10 @@ for pagina in ('index.html', 'lijst.html', 'kaart.html'):
     if n != 1:
         print(f'  LET OP: de datum in {pagina} niet gevonden ({n} treffers), '
               'de voettekst blijft op de oude datum staan')
+    # de gesloten zaken staan als archief in de gids, maar je kunt er niet meer
+    # binnen: de beschrijving telt alleen wat open is, zoals de lijst
     t = re.sub(r'(<meta name="description" content="[^"]*?)\b\d+ zaken',
-               rf'\g<1>{len(data)} zaken', t)
+               rf'\g<1>{open_zaken} zaken', t)
     open(p, 'w', encoding='utf-8').write(t)
 
 # ---- verslag -----------------------------------------------------------------
