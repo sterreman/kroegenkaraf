@@ -522,6 +522,48 @@
           "label": "Halte 9: een abdijbier achter kasteelmuren"
         }
       }
+    },
+    {
+      "url": "/cafes-mooiste-dorpen-wallonie",
+      "titel": "Is er nog een café in het mooiste Waalse dorp?",
+      "cafes": {
+        "KK03812": {
+          "anker": "melin",
+          "label": "Halte 1: aperitief op het plein"
+        },
+        "KK03808": {
+          "anker": "limbourg",
+          "label": "Halte 2: streekbier in de bovenstad"
+        },
+        "KK03809": {
+          "anker": "soiron",
+          "label": "Halte 3: de taverne die afscheid neemt, of niet"
+        },
+        "KK03807": {
+          "anker": "crupet",
+          "label": "Halte 4: een bierbar in een oude molen"
+        },
+        "KK03810": {
+          "anker": "vierves",
+          "label": "Halte 5: het plein onder het kasteel"
+        },
+        "KK03806": {
+          "anker": "grosfays",
+          "label": "Halte 6: de tijd en het café"
+        },
+        "KK01173": {
+          "anker": "laforet",
+          "label": "Halte 7: café en kruidenier"
+        },
+        "KK03811": {
+          "anker": "chassepierre",
+          "label": "Halte 8: van ontbijt tot Zoup"
+        },
+        "KK00776": {
+          "anker": "zonder",
+          "label": "Als het dorp geen café meer heeft"
+        }
+      }
     }
   ]
 }

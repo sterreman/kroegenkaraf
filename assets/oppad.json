@@ -214,6 +214,25 @@
         "hoog": 450,
         "alt": "In den Grooten Moriaen in Wervik, een witgekalkt café met lichtblauwe luiken en een terras, met de Briekenmolen erachter"
       }
+    },
+    {
+      "id": "cafes-mooiste-dorpen-wallonie",
+      "thema": "wallonie",
+      "datum": "2026-11-04",
+      "url": "/cafes-mooiste-dorpen-wallonie",
+      "rubriek": "Caféverhalen",
+      "titel": "Is er nog een café in het mooiste Waalse dorp?",
+      "omschrijving": "Kasseien en kastelen genoeg in de mooiste dorpen van Wallonië. We zochten de toog: acht cafés, en twee die op de wip staan.",
+      "feiten": ["8 cafés", "Van Mélin tot Chassepierre"],
+      "beeld": {
+        "bestanden": [
+          {"w": 800, "avif": "/assets/verhalen/mooistedorpen/held-800.avif", "webp": "/assets/verhalen/mooistedorpen/held-800.webp"},
+          {"w": 1024, "avif": "/assets/verhalen/mooistedorpen/held-1024.avif", "webp": "/assets/verhalen/mooistedorpen/held-1024.webp"}
+        ],
+        "breed": 800,
+        "hoog": 450,
+        "alt": "Een straatje met huizen van donkere leisteen in Gros-Fays, met een kerktoren achter de bomen"
+      }
     }
   ]
 }
