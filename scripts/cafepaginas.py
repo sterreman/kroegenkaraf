@@ -965,6 +965,34 @@ def verhaalbeeld(v, href):
             '</picture></a>')
 
 
+# robots.txt: zoekmachines en AI-assistenten die een vraag van een gebruiker
+# beantwoorden (en dan naar de gids verwijzen) zijn welkom. Crawlers die alleen
+# trainingsdata verzamelen niet. Content-Signal zegt hetzelfde in de vorm die
+# Cloudflare voorstelt. De beheerde robots.txt van Cloudflare staat uit, anders
+# zet Cloudflare zijn eigen blokkades bovenaan dit bestand.
+ROBOTS = """User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+Allow: /
+
+# Alleen trainingsdata, geen verwijzing naar de bron
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: anthropic-ai
+User-agent: CCBot
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: Bytespider
+User-agent: meta-externalagent
+User-agent: cohere-training-data-crawler
+User-agent: MistralAI-Training
+User-agent: Diffbot
+User-agent: omgili
+Disallow: /
+
+Sitemap: {sitemap}
+"""
+
+
 def verhaalblok(d):
     items = VERHALEN.get(d.get('id'), [])
     if not items:
@@ -1588,8 +1616,7 @@ def main():
     n_dun = sum(dun(d) for d in data)
     print(f'sitemap: {len(paginas)} vaste pagina\'s, {len(gem)} gemeenten, {len(cafes)} cafes; '
           f'{n_dun} dunne cafepagina\'s met noindex (Info onder {DUN_WOORDEN} woorden)')
-    (SITE / 'robots.txt').write_text(f'User-agent: *\nAllow: /\n\nSitemap: {ORIGIN}/sitemap.xml\n',
-                                     encoding='utf-8')
+    (SITE / 'robots.txt').write_text(ROBOTS.format(sitemap=f'{ORIGIN}/sitemap.xml'), encoding='utf-8')
     regels = doorverwijzingen(data, weg)
     if len(regels) > 1900:
         print(f'  LET OP: {len(regels)} doorverwijzingen, Cloudflare aanvaardt er 2000.')
