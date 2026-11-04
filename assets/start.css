@@ -17,7 +17,7 @@
 .kopknoppen{margin-left:auto;display:flex;flex-wrap:wrap;gap:0 6px}
 .kopknoppen a{display:inline-flex;align-items:center;min-height:44px;padding:0 10px;color:var(--creme);text-decoration:none;
  font-family:var(--kop);font-stretch:85%;font-weight:700;font-size:16px;border-bottom:3px solid transparent}
-.kopknoppen a:first-child{border-bottom-color:var(--roest-licht)}
+.kopknoppen a[aria-current="page"]{border-bottom-color:var(--roest-licht)}
 .kopknoppen a:hover{color:#fff;border-bottom-color:var(--creme)}
 .startintro{padding-top:8px;max-width:780px}
 .startkop h1{margin:0;font-family:var(--kop);font-weight:800;font-stretch:66%;

@@ -102,7 +102,12 @@ a{color:inherit}
 .dianav .teller{padding:0 2px;min-width:44px;text-align:center}
 .carrousel .dia figcaption{bottom:0}
 
-.fotooproep{margin:10px 0 0;padding-top:10px;border-top:1px dashed var(--lijn-m)}
+/* de oproep onder het verhaal, op papier: foto insturen en een fout melden */
+.bijdrage{margin:clamp(28px,4vw,40px) 0 0;padding-top:4px;border-top:1px dashed var(--lijn)}
+.bijdrage .link{color:var(--inkt);text-decoration-color:var(--lijn)}
+.bijdrage .link:hover{color:var(--roest-tekst);text-decoration-color:currentColor}
+.bijdrage .fotohint{color:var(--inkt2)}
+.fotooproep{margin:10px 0 0}
 .fotooproep .link svg{fill:none;stroke:currentColor}
 .correctie{margin:4px 0 0}
 .correctie .link svg{fill:none;stroke:currentColor}
@@ -272,3 +277,13 @@ h2::before{content:"";width:34px;height:5px;background:var(--roest)}
 .verhaalblok .vbron a{color:inherit;font-weight:400}
 @media(max-width:560px){.verhaalblok .vbeeld{flex-basis:72px}.verhaalblok .vbeeld img{width:72px;height:72px}}
 .fotohint{display:block;margin:0 0 4px;font-family:var(--kop);font-stretch:92%;font-size:13px;color:var(--creme2)}
+
+/* ---- 404: zoeken naar een café */
+.zoek404{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 24px;max-width:520px}
+.zoek404 label{flex:0 0 100%;font-family:var(--kop);font-weight:700;font-stretch:85%;font-size:13px;
+ letter-spacing:.08em;text-transform:uppercase;color:var(--inkt2)}
+.zoek404 input{flex:1 1 220px;min-height:46px;padding:0 12px;border:1.5px solid var(--inkt);
+ background:#fff;color:var(--inkt);font:inherit;border-radius:0}
+.zoek404 button{min-height:46px;padding:0 20px;border:0;background:var(--roest);color:#fff;
+ font-family:var(--kop);font-weight:800;font-stretch:85%;font-size:17px;cursor:pointer}
+.zoek404 button:hover{background:var(--roest-tekst)}

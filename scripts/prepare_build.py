@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 WORK = ROOT / '.publication'
 # De vaste pagina's. De artikels komen uit assets/oppad.json, zodat een nieuw
 # artikel alleen daar bij moet.
-VAST = ('index.html', 'lijst.html', 'kaart.html', 'afspreken.html', 'over.html', 'privacy.html', 'oppad.html', '_headers', 'favicon.ico', 'apple-touch-icon.png')
+VAST = ('index.html', 'lijst.html', 'kaart.html', 'afspreken.html', 'over.html', 'privacy.html', 'oppad.html', '404.html', '_headers', 'favicon.ico', 'apple-touch-icon.png')
 FILES = VAST + tuple(artikels.bestand(a) for a in artikels.laad(ROOT))
 
 def main():
