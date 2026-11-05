@@ -9,6 +9,10 @@ from google.oauth2 import service_account
 from google.auth.transport.requests import AuthorizedSession
 
 
+TOEGELATEN = ('.jpg', '.jpeg', '.png', '.webp', '.avif')
+MIME_EXT = {'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp', 'image/avif': '.avif'}
+
+
 def main():
     credentials = service_account.Credentials.from_service_account_info(
         json.loads(os.environ['GOOGLE_SERVICE_ACCOUNT_JSON']),
@@ -77,7 +81,7 @@ def main():
         raise RuntimeError('Foto-ID verwijst niet naar een map')
     photos = Path('fotos')
     photos.mkdir(exist_ok=False)
-    page, seen = None, set()
+    page, seen, overgeslagen = None, set(), []
     while True:
         params = {'q':f"'{folder}' in parents and trashed = false", 'pageSize':1000,
                   'fields':f'nextPageToken,files({fields})'}
@@ -90,11 +94,22 @@ def main():
                 continue
             if meta.get('mimeType') == 'application/vnd.google-apps.folder':
                 continue  # submappen (bv. foto's voor een artikel) horen niet bij de caféfoto's
-            if Path(name).name != name or name in ('.','..') or name in seen:
-                raise RuntimeError('Ongeldige of dubbele fotobestandsnaam')
+            if Path(name).name != name or name in ('.','..'):
+                raise RuntimeError('Ongeldige fotobestandsnaam')
+            if Path(name).suffix.lower() not in TOEGELATEN:
+                ext = MIME_EXT.get(meta.get('mimeType', ''))
+                if ext and not Path(name).suffix:
+                    # Foto zonder extensie (bv. 'ChezBertrandFrancorchamps'): neem
+                    # de extensie over van het bestandstype dat Drive opgeeft.
+                    print(f"::warning::Foto zonder extensie, behandeld als {ext}: {name}")
+                    name = name + ext
+                else:
+                    print(f"::warning::Overgeslagen, geen ondersteunde foto: {name}")
+                    overgeslagen.append(name)
+                    continue
+            if name in seen:
+                raise RuntimeError(f'Dubbele fotobestandsnaam: {name}')
             seen.add(name)
-            if Path(name).suffix.lower() not in ('.jpg','.jpeg','.png','.webp','.avif'):
-                raise RuntimeError(f'Niet ondersteund fotobestand: {name}')
             download(meta, photos/name)
         page = result.get('nextPageToken')
         if not page:
@@ -102,6 +117,8 @@ def main():
     if not seen:
         raise RuntimeError('Fotomap is leeg; geen publicatie')
     print(f'Drive: CSV en {len(seen)} foto’s volledig gedownload en gecontroleerd.')
+    if overgeslagen:
+        print(f"Overgeslagen in de fotomap: {', '.join(overgeslagen)}")
 
 if __name__ == '__main__':
     main()
