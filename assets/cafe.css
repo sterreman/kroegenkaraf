@@ -111,6 +111,45 @@ a{color:inherit}
 .fotooproep .link svg{fill:none;stroke:currentColor}
 .correctie{margin:4px 0 0}
 .correctie .link svg{fill:none;stroke:currentColor}
+/* Weet je iets over ...: het eigen meldformulier (worker/melding.js) */
+.sr{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);border:0}
+.melden{margin:18px 0 0}
+.meldkop{display:flex;align-items:center;gap:8px;margin:0;font-family:var(--kop);font-stretch:90%;
+ font-weight:700;font-size:17px;line-height:1.25;color:var(--inkt)}
+.meldkop svg{width:18px;height:18px;flex:0 0 auto}
+.melden .meldkop{flex-direction:row;gap:8px;margin:0;font-weight:700;font-stretch:90%;font-size:17px}
+.melden .meldkop::before{content:none}
+.meldform{margin:10px 0 0;max-width:560px}
+.keuzes{border:0;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.keuze{position:relative;cursor:pointer}
+.keuze input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.keuze span{display:inline-block;padding:8px 13px;border:1.5px solid var(--lijn);color:var(--inkt);
+ font-family:var(--kop);font-stretch:90%;font-weight:600;font-size:14.5px;background:var(--papier)}
+.keuze:hover span{border-color:var(--roest-tekst);color:var(--roest-tekst)}
+.keuze input:checked+span{background:var(--inkt);border-color:var(--inkt);color:var(--creme)}
+.keuze input:focus-visible+span{outline:2px solid var(--roest-tekst);outline-offset:2px}
+.meldform.js:not(.gekozen) .meldrest{display:none}
+.meldrest{margin-top:14px}
+.veldlabel{display:block;margin:12px 0 5px;font-family:var(--kop);font-stretch:90%;font-weight:600;font-size:14.5px;color:var(--inkt)}
+.veldlabel span{font-weight:400;color:var(--inkt2)}
+.veldlabel span::before{content:"· "}
+.kkform textarea,.kkform input[type=email],.kkform input[type=text]{display:block;width:100%;box-sizing:border-box;padding:10px 12px;
+ border:1.5px solid var(--lijn);background:#fff;color:var(--inkt);font:inherit;font-size:16px;line-height:1.4;border-radius:0}
+.meldform textarea{min-height:5.5em;resize:vertical}
+.kkform textarea:focus,.kkform input[type=email]:focus,.kkform input[type=text]:focus{outline:2px solid var(--roest-tekst);outline-offset:0;border-color:var(--roest-tekst)}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.meldknop{margin-top:14px;padding:10px 22px;border:2px solid var(--roest);background:var(--roest);color:#fff;cursor:pointer;
+ font-family:var(--kop);font-weight:800;font-stretch:80%;font-size:18px}
+.meldknop:hover{background:#b93b1b;border-color:#b93b1b}
+.meldknop:disabled{opacity:.6;cursor:default}
+.meldstatus{margin:10px 0 0;font-size:15.5px;color:var(--inkt)}
+.meldstatus:empty{display:none}
+.meldstatus.fout{color:var(--roest-tekst)}
+.meldform.verstuurd .keuzes,.meldform.verstuurd .meldrest>*:not(.meldstatus){display:none}
+.fotoform form.verstuurd>*:not(.meldstatus){display:none}
+.meldform.verstuurd .meldrest{display:block}
+.meldnoot{margin:10px 0 0;font-size:13.5px;line-height:1.45;color:var(--inkt2)}
+.meldnoot a{color:inherit;text-underline-offset:3px}
 .link svg.lijn{fill:none;stroke:currentColor;stroke-width:1.7}
 
 /* de voet van de kop: het verhaal links, het praktische rechts. Een lijn ertussen,
@@ -135,6 +174,13 @@ a{color:inherit}
  font-family:var(--kop);font-weight:800;font-stretch:80%;font-size:20px;letter-spacing:.01em;
  border:2px solid var(--roest)}
 .route:hover{background:#b93b1b;border-color:#b93b1b}
+/* meteen onder de route: waar je de openingsuren vindt */
+.uren{display:flex;align-items:center;justify-content:center;gap:9px;margin-top:8px;
+ padding:9px 18px;border:2px solid var(--creme2);color:var(--creme);text-decoration:none;
+ font-family:var(--kop);font-weight:700;font-stretch:85%;font-size:16.5px}
+.uren:hover{border-color:var(--roest-licht);color:var(--roest-licht)}
+.uren svg{width:18px;height:18px;flex:0 0 auto;fill:currentColor}
+.uren .pin{fill:currentColor}.uren .dot{fill:var(--marine)}
 .route svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.9;
  stroke-linejoin:round;stroke-linecap:round}
 .links{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:4px 20px}
@@ -287,3 +333,18 @@ h2::before{content:"";width:34px;height:5px;background:var(--roest)}
 .zoek404 button{min-height:46px;padding:0 20px;border:0;background:var(--roest);color:#fff;
  font-family:var(--kop);font-weight:800;font-stretch:85%;font-size:17px;cursor:pointer}
 .zoek404 button:hover{background:var(--roest-tekst)}
+
+/* het fotoformulier: een knop die openklapt */
+.fotoform{margin:10px 0 0}
+.fotoform summary{list-style:none;cursor:pointer;color:var(--inkt);text-decoration-color:var(--lijn)}
+.fotoform summary::-webkit-details-marker{display:none}
+.fotoform summary:hover{color:var(--roest-tekst)}
+.fotoform summary svg{fill:none;stroke:currentColor}
+.fotoform form{margin:4px 0 6px;max-width:560px}
+.fotoform .fotohint{display:block;margin:0 0 4px;font-size:15px;line-height:1.45;color:var(--inkt2)}
+.fotoform input[type=file]{display:block;width:100%;box-sizing:border-box;padding:10px;border:1.5px dashed var(--lijn);
+ background:#fff;font-family:var(--kop);font-size:15px;color:var(--inkt)}
+.fotoform input[type=file]::file-selector-button{margin-right:12px;padding:7px 12px;border:1.5px solid var(--inkt);
+ background:var(--inkt);color:var(--creme);font-family:var(--kop);font-weight:600;cursor:pointer}
+.akkoord{display:flex;gap:10px;align-items:flex-start;margin:14px 0 0;font-size:15px;line-height:1.45;color:var(--inkt)}
+.akkoord input{margin:4px 0 0;width:18px;height:18px;flex:0 0 auto;accent-color:var(--roest)}

@@ -1,4 +1,11 @@
-"""Haalt de goedgekeurde foto's op die bezoekers via Tally instuurden.
+"""Haalt de goedgekeurde foto's op die bezoekers instuurden.
+
+Twee bronnen:
+- het eigen fotoformulier op de site (worker/melding.js): goedgekeurde foto's
+  staan in de Drive-map Goedgekeurd (DRIVE_FOTO_GOEDGEKEURD_ID). Elk bestand
+  draagt de zaak (slug), de naamsvermelding en de datum in zijn appProperties.
+  Goedkeuren is dus een foto van Te beoordelen naar Goedgekeurd slepen.
+- de oudere inzendingen via Tally, zoals hieronder.
 
 Draait in .publication, na download_drive.py. Leest de Google Sheet waar Tally
 de inzendingen in zet (alleen lezen, met dezelfde service-account als de csv)
@@ -63,9 +70,71 @@ def download(url, doel):
         return im.format
 
 
+def haal_drive_map(map_id, uit):
+    """De goedgekeurde foto's uit het eigen formulier (zie bovenaan)."""
+    from google.oauth2 import service_account
+    from google.auth.transport.requests import AuthorizedSession
+    cred = service_account.Credentials.from_service_account_info(
+        json.loads(os.environ['GOOGLE_SERVICE_ACCOUNT_JSON']),
+        scopes=['https://www.googleapis.com/auth/drive.readonly'])
+    s = AuthorizedSession(cred)
+    base = 'https://www.googleapis.com/drive/v3/files'
+    bestanden, page = [], None
+    while True:
+        params = {'q': f"'{map_id}' in parents and trashed = false", 'pageSize': 1000,
+                  'fields': 'nextPageToken,files(id,name,mimeType,size,createdTime,appProperties)',
+                  'orderBy': 'createdTime'}
+        if page:
+            params['pageToken'] = page
+        r = s.get(base, params=params, timeout=120)
+        r.raise_for_status()
+        j = r.json()
+        bestanden += j.get('files', [])
+        page = j.get('nextPageToken')
+        if not page:
+            break
+    n = 0
+    for nr, meta in enumerate(bestanden, start=1):
+        if not meta.get('mimeType', '').startswith('image/'):
+            continue
+        prop = meta.get('appProperties') or {}
+        slug = (prop.get('slug') or '').strip().strip('/')
+        if not slug:
+            print(f'  LET OP: {meta["name"]} in Goedgekeurd komt niet uit het fotoformulier '
+                  '(geen zaak gekoppeld), overgeslagen')
+            continue
+        if int(meta.get('size', 0)) > MAX_BYTES:
+            print(f'  LET OP: {meta["name"]} is groter dan 15 MB, overgeslagen')
+            continue
+        doel = MAP / f'd{nr:05d}'
+        try:
+            r = s.get(f'{base}/{meta["id"]}', params={'alt': 'media'}, timeout=120)
+            r.raise_for_status()
+            doel.write_bytes(r.content)
+            with Image.open(doel) as im:
+                im.load()
+        except Exception as exc:
+            print(f'  LET OP: {meta["name"]} niet binnengehaald: {exc}')
+            doel.unlink(missing_ok=True)
+            continue
+        uit.append({'slug': slug, 'bestand': str(doel), 'naam': prop.get('naam', ''),
+                    'datum': prop.get('datum') or meta.get('createdTime', '')[:10]})
+        n += 1
+    print(f'Inzendingen: {n} goedgekeurde foto\'s uit het eigen formulier binnengehaald.')
+
+
 def main():
     MAP.mkdir(exist_ok=True)
     uit = []
+    map_id = os.environ.get('DRIVE_FOTO_GOEDGEKEURD_ID', '').strip()
+    if map_id:
+        try:
+            haal_drive_map(map_id, uit)
+        except Exception as exc:
+            print(f'  LET OP: de map Goedgekeurd is niet te lezen ({exc}). '
+                  'Staat Foto-inzendingen in de map Volkscafés?')
+    else:
+        print('Inzendingen: DRIVE_FOTO_GOEDGEKEURD_ID niet ingesteld, geen foto\'s uit het eigen formulier.')
     sheet_id = os.environ.get('FOTO_INZENDINGEN_SHEET_ID', '').strip()
     if not sheet_id:
         print('Inzendingen: FOTO_INZENDINGEN_SHEET_ID niet ingesteld, geen bezoekersfoto\'s.')

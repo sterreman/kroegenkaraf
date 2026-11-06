@@ -150,7 +150,7 @@ function tekenRonde(pool, rooster) {
       + `<span class="rplaats">${esc(d.g || d.p)} · ${esc(sluiting(d.z).tekst)}</span>`
       + `<p class="rreden">${esc(d.k || eersteZin(d.i))}</p>`
       + `<p class="racties"><a href="/${esc(d.u)}/">Lees het verhaal</a>`
-      + (d.oproep ? `<a href="${esc(d.oproep)}" target="_blank" rel="noopener">Ken je dit café? Stuur je eigen oude foto</a>` : '')
+      + (d.oproep ? `<a href="${esc(d.oproep)}">Ken je dit café? Stuur je eigen oude foto</a>` : '')
       + '</p>'
       + (d.buur ? `<p class="rbuur">Een ander café in de buurt: <a href="/${esc(d.buur.u)}/">${esc(d.buur.n)}</a>`
         + ` <span>(${esc(d.buur.a)}${d.buur.g && d.buur.g !== d.g ? ', ' + esc(d.buur.g) : ''})</span></p>` : '')
@@ -291,8 +291,19 @@ function toon(start) {
     $('provincies').hidden = false;
   }
   if (start.aantal) {
-    $('foot').textContent = 'De gids telt ' + start.aantal.toLocaleString('nl-BE')
-      + ' zaken · bijgewerkt ' + BIJGEWERKT;
+    /* Wat er nu open is, wat als archief bewaard blijft en wat nog niet op de
+       kaart staat, elk apart: één totaal laat raden wat er meetelt. */
+    const nl = n => n.toLocaleString('nl-BE');
+    const open = start.open != null ? start.open : start.aantal;
+    const dicht = start.gesloten != null ? start.gesloten : start.aantal - open;
+    let t = 'De gids telt ' + nl(open) + (open === 1 ? ' actueel café' : ' actuele cafés');
+    if (dicht) t += ' en bewaart ' + nl(dicht) + ' gesloten ' + (dicht === 1 ? 'zaak' : 'zaken') + ' als archief';
+    t += '.';
+    if (start.zonder_ligging) {
+      t += ' ' + nl(start.zonder_ligging) + (start.zonder_ligging === 1
+        ? ' actuele zaak staat nog niet op de kaart.' : ' actuele zaken staan nog niet op de kaart.');
+    }
+    $('foot').textContent = t + ' Bijgewerkt ' + BIJGEWERKT + '.';
   }
 }
 
@@ -313,6 +324,9 @@ function terugval() {
         .map(r => Object.assign({}, perId[r.id], {sinds: r.sinds, soort: r.soort}))
         .sort((x, y) => y.sinds.localeCompare(x.sinds)),
       aantal: data.length,
+      open: data.filter(d => d.s !== 'Gesloten').length,
+      gesloten: data.filter(d => d.s === 'Gesloten').length,
+      zonder_ligging: data.filter(d => d.s !== 'Gesloten' && !d.lat).length,
       provincies: Object.entries(tel).sort((a, b) => a[0].localeCompare(b[0], 'nl')),
       zaken: data.filter(d => (ontdek.ids || []).includes(d.id)
         || (d.s === 'Geverifieerd' && (d.i || '').split(/\s+/).filter(Boolean).length >= 100))

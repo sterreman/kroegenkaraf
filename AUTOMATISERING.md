@@ -96,3 +96,34 @@ De knop Toon zes andere neemt zaken uit de tweede helft van de huidige ronde, ni
 De tegel Laatste ronde werkt op dezelfde manier met een eigen rooster (`ronderooster`, een zaak
 per dag, alleen zaken die minstens drie maanden dicht zijn). De knop Een ander verdwenen cafe
 loopt verder in de tweede helft van die ronde.
+
+## Eigen formulieren: melden en foto's (6 november 2026)
+
+De site is statisch, maar `/api/*` loopt eerst langs `worker/melding.js`
+(`main` en `run_worker_first` in `wrangler.jsonc`). Geen Tally of andere dienst.
+
+- `/api/melding`: het formulier Weet je iets over ... onder elke zaak. Elke melding
+  gaat als mail naar de redactie (send_email-binding `MELDER` van Cloudflare Email
+  Routing). Niets bewaard.
+- `/api/foto`: het fotoformulier. De foto's komen in de Drive-map
+  `Foto-inzendingen/Te beoordelen`, met de zaak en de naamsvermelding in de
+  eigenschappen van het bestand, en de redactie krijgt een mail met de link.
+  **Goedkeuren = de foto naar `Foto-inzendingen/Goedgekeurd` slepen.** Afkeuren =
+  verwijderen. `scripts/inzendingen.py` haalt Goedgekeurd elke nacht op; haal je
+  er later een foto weg, dan verdwijnt hij ook van de site.
+
+Eenmalig instellen:
+
+1. Cloudflare Email Routing: het ontvangstadres staat als geverifieerd bestemmingsadres.
+2. Google Cloud (zelfde project als de service-account): OAuth-client van het type
+   Desktop aanmaken en als json downloaden; het toestemmingsscherm op In production.
+3. Lokaal: `pip install google-auth-oauthlib` en
+   `python scripts/foto_drive_instellen.py client_secret.json`. Dat maakt de mappen
+   (recht drive.file: de site ziet alleen wat ze zelf maakte) en drukt de waarden af.
+4. De map `Foto-inzendingen` in Drive naar `Volkscafés` slepen (leesrecht voor de bouw).
+5. Cloudflare, Worker kroegenkaraf, secrets: `MELDING_AAN`, `GOOGLE_CLIENT_ID`,
+   `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`, `FOTO_TE_BEOORDELEN`.
+6. GitHub, Actions-variabele: `DRIVE_FOTO_GOEDGEKEURD_ID`.
+
+Zolang iets ontbreekt, weigeren de formulieren netjes en verwijzen ze naar
+info@kroegenkaraf.be. De oude Tally-inzendingen (sheet) blijven werken.

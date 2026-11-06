@@ -468,7 +468,7 @@ ICOON_DEEL = ('<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5
               '<circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/>'
               '<path d="m8.3 13.3 7.4 4.4M15.7 6.3l-7.4 4.4"/></svg>')
 
-VERSIE = 'bijdrage-20261104'
+VERSIE = 'fotoform-20261106'
 
 ICOON_WEB = ('<svg class="lijn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/>'
              '<path d="M2.8 12h18.4M12 2.8c2.6 2.6 3.8 5.7 3.8 9.2s-1.2 6.6-3.8 9.2c-2.6-2.6-3.8-5.7-3.8-9.2'
@@ -485,11 +485,80 @@ ICOON_FOTO = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5h4l1.8
               ' fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>'
               '<circle cx="12" cy="13.3" r="3.3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>')
 
-# Bezoekers sturen hun foto in via dit Tally-formulier. De knop vult de zaak en
-# de vaste url in (verborgen velden cafe en slug); inzendingen.py leest de
-# goedgekeurde rijen terug uit de gekoppelde sheet.
-FOTO_FORMULIER = 'https://tally.so/r/zxPWka'
+# Bezoekers sturen hun foto in via het eigen formulier op de pagina (worker/melding.js,
+# /api/foto). De foto's komen in de Drive-map Te beoordelen; inzendingen.py haalt
+# wat naar Goedgekeurd versleept is op. (Vroeger liep dit via Tally; die
+# goedgekeurde inzendingen haalt inzendingen.py nog steeds uit de sheet.)
 CONTACT = 'info@kroegenkaraf.be'   # voor correcties, zoals op de privacypagina
+# Het meldformulier onder elke zaak post naar het eigen meldpunt (worker/melding.js),
+# dat de melding als mail naar de redactie stuurt. Per keuze: (waarde, label, vraag).
+MELD_OPEN = (
+    ('open', 'Nog open', 'Wanneer was je er? Meer hoeft niet.'),
+    ('gesloten', 'Gesloten of verhuisd', 'Sinds wanneer, of waar zit de zaak nu?'),
+    ('anders', 'Iets anders klopt niet', 'Wat klopt er niet?'),
+)
+MELD_DICHT = (
+    ('heropend', 'Weer open', 'Sinds wanneer, en onder welke naam?'),
+    ('anders', 'Iets anders klopt niet', 'Wat klopt er niet?'),
+)
+MELD_LIGGING = ('ligging', 'Juiste plek', 'Plak een link van Google Maps of OpenStreetMap, of het juiste adres.')
+
+
+def fotoformulier(d, naam_gem, oproep_tekst, dicht):
+    """Opengeklapt via de knop of via #foto (de tegel Laatste ronde linkt zo)."""
+    return (
+        '<details class="fotoform" id="foto">'
+        f'<summary class="link">{ICOON_FOTO}<span>{oproep_tekst}</span></summary>'
+        '<form class="kkform" action="/api/foto" method="post" enctype="multipart/form-data">'
+        f'<p class="fotohint">{"Een oude foto van de zaak toen ze nog open was" if dicht else "Je eigen foto van de zaak, binnen of buiten"}: '
+        'jpg, png of webp, hoogstens drie per keer en 15 MB per foto. We bekijken elke foto voor hij online komt.</p>'
+        '<label class="veldlabel" for="ffoto">Foto</label>'
+        '<input id="ffoto" name="foto" type="file" accept="image/jpeg,image/png,image/webp" multiple required>'
+        '<label class="veldlabel" for="fnaam">Naam bij de foto <span>leeg is een bezoeker</span></label>'
+        '<input id="fnaam" name="naam" type="text" maxlength="80" autocomplete="name">'
+        '<label class="veldlabel" for="fmail">Je e-mailadres <span>alleen als je een antwoord wil</span></label>'
+        '<input id="fmail" name="mail" type="email" maxlength="200" autocomplete="email">'
+        '<label class="akkoord"><input type="checkbox" name="akkoord" value="ja" required>'
+        '<span>Ik maakte deze foto zelf, herkenbare mensen erop gaan akkoord, en Kroeg &amp; Karaf '
+        'mag hem kosteloos tonen op de site en in een latere app, met mijn naam als ik die invulde.</span></label>'
+        '<div class="hp" aria-hidden="true"><label>Laat dit leeg <input name="website" tabindex="-1" autocomplete="off"></label></div>'
+        f'<input type="hidden" name="slug" value="{e(d["u"])}">'
+        f'<input type="hidden" name="zaak" value="{e(naam_gem)}">'
+        '<input type="hidden" name="t" value="">'
+        '<button type="submit" class="meldknop">Verstuur</button>'
+        '<p class="meldstatus" role="status" aria-live="polite"></p>'
+        '<p class="meldnoot">Je blijft eigenaar van je foto. <a href="/privacy#fotos">Privacy</a></p>'
+        '</form></details>')
+
+
+def meldformulier(d, naam_gem, dicht):
+    keuzes = list(MELD_DICHT if dicht else MELD_OPEN)
+    if 'lat' not in d and not dicht:
+        keuzes.insert(2, MELD_LIGGING)
+    radios = ''.join(
+        f'<label class="keuze"><input type="radio" name="soort" value="{w}" data-vraag="{e(v)}" required>'
+        f'<span>{e(l)}</span></label>' for w, l, v in keuzes)
+    return (
+        f'<section class="melden" id="melden" aria-labelledby="meldkop">'
+        f'<h2 class="meldkop" id="meldkop">{ICOON_PEN}<span>Weet je iets over {e(d["n"])}?</span></h2>'
+        '<form class="meldform kkform" action="/api/melding" method="post">'
+        '<fieldset class="keuzes"><legend class="sr">Wat wil je melden?</legend>' + radios + '</fieldset>'
+        '<div class="meldrest">'
+        '<label class="veldlabel" for="mbericht">Toelichting</label>'
+        '<textarea id="mbericht" name="bericht" rows="3" maxlength="3000"></textarea>'
+        '<label class="veldlabel" for="mmail">Je e-mailadres <span>alleen als je een antwoord wil</span></label>'
+        '<input id="mmail" name="mail" type="email" maxlength="200" autocomplete="email">'
+        '<div class="hp" aria-hidden="true"><label>Laat dit leeg <input name="website" tabindex="-1" autocomplete="off"></label></div>'
+        f'<input type="hidden" name="slug" value="{e(d["u"])}">'
+        f'<input type="hidden" name="zaak" value="{e(naam_gem)}">'
+        '<input type="hidden" name="t" value="">'
+        '<button type="submit" class="meldknop">Verstuur</button>'
+        '<p class="meldstatus" role="status" aria-live="polite"></p>'
+        '<p class="meldnoot">We krijgen alleen wat je hier invult en gebruiken het om de gids bij te werken. '
+        f'<a href="/privacy#melden">Privacy</a> · liever mailen? <a href="mailto:{CONTACT}">{CONTACT}</a></p>'
+        '</div></form></section>')
+
+
 ICOON_PEN = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z M13.5 6.5l4 4"'
              ' fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>')
 MAX_FOTOS = 5        # zoveel foto's toont een pagina hoogstens
@@ -754,12 +823,17 @@ def pagina(d, buren):
     # ---- praktisch: adres, route, delen, links, controle
     acties = []
     if not dicht:
+        # Openingsuren tonen we zelf niet (ze veranderen te vaak), maar de weg ernaartoe
+        # staat meteen onder de route, zodat niemand ze hoeft te zoeken.
         acties.append(f'<a class="route" href="{e(maps_route(d))}" target="_blank" rel="noopener">'
                       f'{ICOON_ROUTE}<span>Route</span></a>')
+        acties.append(f'<a class="uren" href="{e(maps_zoek(d))}" target="_blank" rel="noopener">'
+                      f'{SPELD}<span>Openingsuren op Google Maps</span></a>')
     links = [f'<li><button class="link" id="deel" type="button" aria-expanded="false" '
-             f'aria-controls="deelpaneel" data-tekst="{e(deeltekst)}">{ICOON_DEEL}Delen</button></li>',
-             f'<li><a class="link" href="{e(maps_zoek(d))}" target="_blank" rel="noopener">'
-             f'{SPELD}Google Maps</a></li>']
+             f'aria-controls="deelpaneel" data-tekst="{e(deeltekst)}">{ICOON_DEEL}Delen</button></li>']
+    if dicht:
+        links.append(f'<li><a class="link" href="{e(maps_zoek(d))}" target="_blank" rel="noopener">'
+                     f'{SPELD}Google Maps</a></li>')
     if d.get('w') and not dicht:
         links.append(f'<li><a class="link" href="{e(d["w"])}" target="_blank" rel="noopener">'
                      f'{ICOON_WEB}{e(domein(d["w"]))}</a></li>')
@@ -778,30 +852,24 @@ def pagina(d, buren):
     adresblok = (f'<p class="adres"><span class="etiket">Adres</span>{e(adres)}</p>' if d.get('a')
                  else '<p class="adres"><span class="etiket">Adres</span>'
                       '<span class="onbekend">Nog aan te vullen</span></p>')
+    eetcafe = ('<p class="controle">Een eetcafé: je bent er ook welkom om alleen iets te drinken. '
+               '<a href="/over#selectie">Wat komt er in de gids?</a></p>'
+               if d.get('t') == 'Eetcafé' and not dicht else '')
     archief = ('<p class="controle">Deze zaak is dicht en blijft als archief in de gids staan.</p>'
                if dicht else '')
     # de controle staat meteen bij het adres; wanneer de zaak in de gids kwam,
     # staat onderaan de pagina
-    oproep_url = (FOTO_FORMULIER + '?' + urllib.parse.urlencode(
-        {'cafe': f'{d["n"]}, {gem}' if gem else d['n'], 'slug': d['u']}))
     # Bij een gesloten zaak vragen we een oude foto, zoals de tegel Laatste ronde
     # op de startpagina; een nieuwe foto van een dicht café heeft weinig zin.
     oproep_tekst = (f'Ken je {e(d["n"])}? Stuur je eigen oude foto' if dicht
                     else f'Upload jouw eigen foto van {e(d["n"])}')
-    oproep = (f'<p class="fotooproep"><a class="link" href="{e(oproep_url)}" target="_blank" '
-              f'rel="noopener">{ICOON_FOTO}{oproep_tekst}</a>'
-              f'<span class="fotohint">Het formulier koppelt je foto automatisch aan {e(d["n"])}'
-              f'{", " + e(plaats(gem)) if gem else ""}.</span></p>')
-    # Een fout melden gaat gewoon per mail, met de zaak en de pagina al ingevuld.
+    # Melden en foto's insturen gaan via eigen formulieren (worker/melding.js).
     naam_gem = f'{d["n"]}, {gem}' if gem else d['n']
-    correctie_url = (f'mailto:{CONTACT}?subject=' + urllib.parse.quote(f'Correctie: {naam_gem}')
-                     + '&body=' + urllib.parse.quote(f'Pagina: {ORIGIN}/{d["u"]}/\n\nWat klopt er niet?\n'))
-    oproep += (f'<p class="correctie"><a class="link" href="{e(correctie_url)}">{ICOON_PEN}'
-               f'Klopt er iets niet bij {e(d["n"])}? Laat het weten</a></p>')
+    oproep = fotoformulier(d, naam_gem, oproep_tekst, dicht) + meldformulier(d, naam_gem, dicht)
     # De fotooproep en de correctie staan niet meer in het praktische blok maar onder
     # het verhaal: zo blijft het blok naast de opening kort en schuift het verhaal
     # (op de gsm staat het praktische blok erboven) niet ver naar onderen.
-    praktisch = (f'<div class="praktisch">{adresblok}{status_blok(d)}{archief}{"".join(acties)}'
+    praktisch = (f'<div class="praktisch">{adresblok}{status_blok(d)}{eetcafe}{archief}{"".join(acties)}'
                  f'<ul class="links">{"".join(links)}</ul>{deelpaneel}</div>')
     bijdrage = f'<aside class="bijdrage" aria-label="Help de gids">{oproep}</aside>'
     sinds = (f'<p class="sinds">In de gids sinds {e(datum(d["d"]))}.</p>' if d.get('d') else '')
@@ -837,7 +905,8 @@ def pagina(d, buren):
     else:
         kaart = ('<section class="ligging" aria-labelledby="liggingkop"><h2 id="liggingkop">Ligging</h2>'
                  '<p class="geenkaart">De exacte ligging is nog niet vastgelegd. '
-                 f'<a href="{e(maps_zoek(d))}" target="_blank" rel="noopener">Zoek op Google Maps</a></p></section>')
+                 f'<a href="{e(maps_zoek(d))}" target="_blank" rel="noopener">Zoek op Google Maps</a> of '
+                 '<a href="#melden" data-meld="ligging">stuur ons de juiste plek</a>.</p></section>')
         leaflet = leaflet_js = ''
 
     tekstblok = f'<div class="tekst">{tekst}</div>' if tekst else ''
@@ -1412,6 +1481,8 @@ def schrijf_start(data):
     grens = datetime.date(j, m + 1, min(vandaag.day, 28))
     (SITE / 'data/start.json').write_text(json.dumps({
         'aantal': len(data), 'open': len(open_),
+        'gesloten': len(data) - len(open_),
+        'zonder_ligging': sum(1 for d in open_ if 'lat' not in d),
         'provincies': sorted(provincies.items(), key=lambda x: sleutel(x[0])),
         'zaken': zaken, 'ronde': ronde,
         'nieuw': pas_open(per_id),
@@ -1481,8 +1552,7 @@ def laatste_ronde(data, per_id, open_):
         z = {k: d[k] for k in ('id', 'n', 'g', 'p', 't', 'u', 'z', 'foto', 'k') if d.get(k)}
         z['i'] = d['i'].split('\n')[0][:600]
         gem = d.get('g', '')
-        z['oproep'] = FOTO_FORMULIER + '?' + urllib.parse.urlencode(
-            {'cafe': f'{d["n"]}, {gem}' if gem else d['n'], 'slug': d['u']})
+        z['oproep'] = f'/{d["u"]}/#foto'
         if 'lat' in d and met_ligging:
             afst, buur = min(((km((d['lat'], d['lon']), (b['lat'], b['lon'])), b) for b in met_ligging),
                              key=lambda x: (x[0], x[1].get('s') != 'Geverifieerd'))

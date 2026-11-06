@@ -23,6 +23,8 @@
 .startkop h1{margin:0;font-family:var(--kop);font-weight:800;font-stretch:66%;
  font-size:clamp(34px,4.4vw,50px);line-height:.98;letter-spacing:-.005em;color:var(--creme)}
 .intro{margin:10px 0 0;max-width:68ch;font-size:18px;line-height:1.42;color:var(--creme)}
+.intro a{color:inherit;text-decoration-color:var(--roest-licht);text-underline-offset:4px;text-decoration-thickness:1.5px}
+.intro a:hover{color:var(--roest-licht)}
 .startkop .zoek{margin:16px 0 0;max-width:640px}
 
 /* de leuze boven de titel, ook op de gsm zichtbaar (de merkzin valt daar weg) */
