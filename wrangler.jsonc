@@ -11,5 +11,10 @@
   },
   // Meldingen gaan als mail naar het adres in het secret MELDING_AAN
   // (een geverifieerd bestemmingsadres in Cloudflare Email Routing).
-  "send_email": [{ "name": "MELDER" }]
+  "send_email": [{ "name": "MELDER" }],
+  // Tegen bestoken: per bezoeker 4 en voor iedereen samen 30 inzendingen per minuut.
+  "ratelimits": [
+    { "name": "PER_IP", "namespace_id": "1001", "simple": { "limit": 4, "period": 60 } },
+    { "name": "SAMEN", "namespace_id": "1002", "simple": { "limit": 30, "period": 60 } }
+  ]
 }
