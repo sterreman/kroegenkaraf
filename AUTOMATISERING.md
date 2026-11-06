@@ -125,5 +125,9 @@ Eenmalig instellen:
    `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`, `FOTO_TE_BEOORDELEN`.
 6. GitHub, Actions-variabele: `DRIVE_FOTO_GOEDGEKEURD_ID`.
 
+Tegen misbruik: per bezoeker 4 en voor iedereen samen 30 inzendingen per minuut
+(ratelimit-bindings in `wrangler.jsonc`), hoogstens 30 foto's per dag in Te beoordelen,
+en een foto moet aan de eerste bytes herkenbaar een jpg, png of webp zijn.
+
 Zolang iets ontbreekt, weigeren de formulieren netjes en verwijzen ze naar
 info@kroegenkaraf.be. De oude Tally-inzendingen (sheet) blijven werken.
