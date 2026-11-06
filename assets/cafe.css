@@ -111,6 +111,15 @@ a{color:inherit}
 .fotooproep .link svg{fill:none;stroke:currentColor}
 .correctie{margin:4px 0 0}
 .correctie .link svg{fill:none;stroke:currentColor}
+/* Weet je iets over ...: drie knoppen, elk een mail met het onderwerp al ingevuld */
+.melden{margin:14px 0 0}
+.meldkop{display:flex;align-items:center;gap:7px;margin:0;font-family:var(--kop);font-stretch:90%;
+ font-weight:600;font-size:15px;color:var(--inkt)}
+.meldkop svg{width:17px;height:17px;flex:0 0 auto}
+.meldknoppen{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.meldknoppen a{display:inline-block;padding:8px 13px;border:1.5px solid var(--lijn);color:var(--inkt);
+ text-decoration:none;font-family:var(--kop);font-stretch:90%;font-weight:600;font-size:14.5px}
+.meldknoppen a:hover{border-color:var(--roest-tekst);color:var(--roest-tekst)}
 .link svg.lijn{fill:none;stroke:currentColor;stroke-width:1.7}
 
 /* de voet van de kop: het verhaal links, het praktische rechts. Een lijn ertussen,
@@ -135,6 +144,13 @@ a{color:inherit}
  font-family:var(--kop);font-weight:800;font-stretch:80%;font-size:20px;letter-spacing:.01em;
  border:2px solid var(--roest)}
 .route:hover{background:#b93b1b;border-color:#b93b1b}
+/* meteen onder de route: waar je de openingsuren vindt */
+.uren{display:flex;align-items:center;justify-content:center;gap:9px;margin-top:8px;
+ padding:9px 18px;border:2px solid var(--creme2);color:var(--creme);text-decoration:none;
+ font-family:var(--kop);font-weight:700;font-stretch:85%;font-size:16.5px}
+.uren:hover{border-color:var(--roest-licht);color:var(--roest-licht)}
+.uren svg{width:18px;height:18px;flex:0 0 auto;fill:currentColor}
+.uren .pin{fill:currentColor}.uren .dot{fill:var(--marine)}
 .route svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.9;
  stroke-linejoin:round;stroke-linecap:round}
 .links{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:4px 20px}

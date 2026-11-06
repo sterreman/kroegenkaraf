@@ -468,7 +468,7 @@ ICOON_DEEL = ('<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5
               '<circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/>'
               '<path d="m8.3 13.3 7.4 4.4M15.7 6.3l-7.4 4.4"/></svg>')
 
-VERSIE = 'bijdrage-20261104'
+VERSIE = 'melden-20261106'
 
 ICOON_WEB = ('<svg class="lijn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/>'
              '<path d="M2.8 12h18.4M12 2.8c2.6 2.6 3.8 5.7 3.8 9.2s-1.2 6.6-3.8 9.2c-2.6-2.6-3.8-5.7-3.8-9.2'
@@ -490,6 +490,24 @@ ICOON_FOTO = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5h4l1.8
 # goedgekeurde rijen terug uit de gekoppelde sheet.
 FOTO_FORMULIER = 'https://tally.so/r/zxPWka'
 CONTACT = 'info@kroegenkaraf.be'   # voor correcties, zoals op de privacypagina
+# De knoppen onder Weet je iets over: (label, onderwerp van de mail, vraag in de mail).
+MELDINGEN_OPEN = (
+    ('Nog open', 'Nog open', 'Wanneer was je er? (Meer hoeft niet.)'),
+    ('Gesloten of verhuisd', 'Gesloten', 'Sinds wanneer, of waar zit de zaak nu?'),
+    ('Iets anders klopt niet', 'Correctie', 'Wat klopt er niet?'),
+)
+MELDINGEN_DICHT = (
+    ('Weer open', 'Heropend', 'Sinds wanneer, en onder welke naam?'),
+    ('Iets anders klopt niet', 'Correctie', 'Wat klopt er niet?'),
+)
+LIGGING_VRAAG = 'Plak hier een link van Google Maps of OpenStreetMap, of het juiste adres:'
+
+
+def meld_url(onderwerp, naam_gem, slug, vraag):
+    return (f'mailto:{CONTACT}?subject=' + urllib.parse.quote(f'{onderwerp}: {naam_gem}')
+            + '&body=' + urllib.parse.quote(f'Pagina: {ORIGIN}/{slug}/\n\n{vraag}\n'))
+
+
 ICOON_PEN = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z M13.5 6.5l4 4"'
              ' fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>')
 MAX_FOTOS = 5        # zoveel foto's toont een pagina hoogstens
@@ -754,12 +772,17 @@ def pagina(d, buren):
     # ---- praktisch: adres, route, delen, links, controle
     acties = []
     if not dicht:
+        # Openingsuren tonen we zelf niet (ze veranderen te vaak), maar de weg ernaartoe
+        # staat meteen onder de route, zodat niemand ze hoeft te zoeken.
         acties.append(f'<a class="route" href="{e(maps_route(d))}" target="_blank" rel="noopener">'
                       f'{ICOON_ROUTE}<span>Route</span></a>')
+        acties.append(f'<a class="uren" href="{e(maps_zoek(d))}" target="_blank" rel="noopener">'
+                      f'{SPELD}<span>Openingsuren op Google Maps</span></a>')
     links = [f'<li><button class="link" id="deel" type="button" aria-expanded="false" '
-             f'aria-controls="deelpaneel" data-tekst="{e(deeltekst)}">{ICOON_DEEL}Delen</button></li>',
-             f'<li><a class="link" href="{e(maps_zoek(d))}" target="_blank" rel="noopener">'
-             f'{SPELD}Google Maps</a></li>']
+             f'aria-controls="deelpaneel" data-tekst="{e(deeltekst)}">{ICOON_DEEL}Delen</button></li>']
+    if dicht:
+        links.append(f'<li><a class="link" href="{e(maps_zoek(d))}" target="_blank" rel="noopener">'
+                     f'{SPELD}Google Maps</a></li>')
     if d.get('w') and not dicht:
         links.append(f'<li><a class="link" href="{e(d["w"])}" target="_blank" rel="noopener">'
                      f'{ICOON_WEB}{e(domein(d["w"]))}</a></li>')
@@ -778,6 +801,9 @@ def pagina(d, buren):
     adresblok = (f'<p class="adres"><span class="etiket">Adres</span>{e(adres)}</p>' if d.get('a')
                  else '<p class="adres"><span class="etiket">Adres</span>'
                       '<span class="onbekend">Nog aan te vullen</span></p>')
+    eetcafe = ('<p class="controle">Een eetcafé: je bent er ook welkom om alleen iets te drinken. '
+               '<a href="/over#selectie">Wat komt er in de gids?</a></p>'
+               if d.get('t') == 'Eetcafé' and not dicht else '')
     archief = ('<p class="controle">Deze zaak is dicht en blijft als archief in de gids staan.</p>'
                if dicht else '')
     # de controle staat meteen bij het adres; wanneer de zaak in de gids kwam,
@@ -792,16 +818,19 @@ def pagina(d, buren):
               f'rel="noopener">{ICOON_FOTO}{oproep_tekst}</a>'
               f'<span class="fotohint">Het formulier koppelt je foto automatisch aan {e(d["n"])}'
               f'{", " + e(plaats(gem)) if gem else ""}.</span></p>')
-    # Een fout melden gaat gewoon per mail, met de zaak en de pagina al ingevuld.
+    # Melden gaat per mail, met de zaak, de pagina en de soort melding al ingevuld:
+    # een klik op de juiste knop en verzenden volstaat.
     naam_gem = f'{d["n"]}, {gem}' if gem else d['n']
-    correctie_url = (f'mailto:{CONTACT}?subject=' + urllib.parse.quote(f'Correctie: {naam_gem}')
-                     + '&body=' + urllib.parse.quote(f'Pagina: {ORIGIN}/{d["u"]}/\n\nWat klopt er niet?\n'))
-    oproep += (f'<p class="correctie"><a class="link" href="{e(correctie_url)}">{ICOON_PEN}'
-               f'Klopt er iets niet bij {e(d["n"])}? Laat het weten</a></p>')
+    meldingen = MELDINGEN_DICHT if dicht else MELDINGEN_OPEN
+    oproep += (f'<div class="melden"><p class="meldkop">{ICOON_PEN}<span>Weet je iets over '
+               f'{e(d["n"])}? Laat het weten</span></p><ul class="meldknoppen">'
+               + ''.join(f'<li><a href="{e(meld_url(onderwerp, naam_gem, d["u"], vraag))}">{e(label)}</a></li>'
+                         for label, onderwerp, vraag in meldingen)
+               + '</ul></div>')
     # De fotooproep en de correctie staan niet meer in het praktische blok maar onder
     # het verhaal: zo blijft het blok naast de opening kort en schuift het verhaal
     # (op de gsm staat het praktische blok erboven) niet ver naar onderen.
-    praktisch = (f'<div class="praktisch">{adresblok}{status_blok(d)}{archief}{"".join(acties)}'
+    praktisch = (f'<div class="praktisch">{adresblok}{status_blok(d)}{eetcafe}{archief}{"".join(acties)}'
                  f'<ul class="links">{"".join(links)}</ul>{deelpaneel}</div>')
     bijdrage = f'<aside class="bijdrage" aria-label="Help de gids">{oproep}</aside>'
     sinds = (f'<p class="sinds">In de gids sinds {e(datum(d["d"]))}.</p>' if d.get('d') else '')
@@ -837,7 +866,9 @@ def pagina(d, buren):
     else:
         kaart = ('<section class="ligging" aria-labelledby="liggingkop"><h2 id="liggingkop">Ligging</h2>'
                  '<p class="geenkaart">De exacte ligging is nog niet vastgelegd. '
-                 f'<a href="{e(maps_zoek(d))}" target="_blank" rel="noopener">Zoek op Google Maps</a></p></section>')
+                 f'<a href="{e(maps_zoek(d))}" target="_blank" rel="noopener">Zoek op Google Maps</a> of '
+                 f'<a href="{e(meld_url("Ligging", (d["n"] + ", " + gem) if gem else d["n"], d["u"], LIGGING_VRAAG))}">'
+                 'stuur ons de juiste plek</a>.</p></section>')
         leaflet = leaflet_js = ''
 
     tekstblok = f'<div class="tekst">{tekst}</div>' if tekst else ''
@@ -1412,6 +1443,8 @@ def schrijf_start(data):
     grens = datetime.date(j, m + 1, min(vandaag.day, 28))
     (SITE / 'data/start.json').write_text(json.dumps({
         'aantal': len(data), 'open': len(open_),
+        'gesloten': len(data) - len(open_),
+        'zonder_ligging': sum(1 for d in open_ if 'lat' not in d),
         'provincies': sorted(provincies.items(), key=lambda x: sleutel(x[0])),
         'zaken': zaken, 'ronde': ronde,
         'nieuw': pas_open(per_id),
