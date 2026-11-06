@@ -25,7 +25,13 @@
    de secrets GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN en
    FOTO_TE_BEOORDELEN (de map-ID).
 
-   Tegen spam: een verborgen veld dat mensen niet invullen, een minimale
+   Tegen misbruik:
+   - een limiet per bezoeker en een limiet voor iedereen samen, per minuut
+     (de ratelimit-bindings PER_IP en SAMEN in wrangler.jsonc);
+   - hoogstens FOTOS_PER_DAG foto's per dag in Te beoordelen;
+   - een foto moet echt een jpg, png of webp zijn (de eerste bytes tellen,
+     niet wat de browser zegt);
+   - een verborgen veld dat mensen niet invullen, een minimale
    invultijd, alleen meldingen vanaf de eigen site, en vaste lengtes. */
 import { EmailMessage } from 'cloudflare:email';
 
@@ -44,21 +50,54 @@ const MAX_FOTO_BYTES = 15 * 1024 * 1024;
 const FOTO_TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
 const SLUG = /^cafe\/[a-z0-9-]+\/[a-z0-9-]+$/;
 const MIN_SECONDEN = 3;
+const FOTOS_PER_DAG = 30;
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    if (url.pathname === '/api/melding') {
+    if (url.pathname === '/api/melding' || url.pathname === '/api/foto') {
       if (request.method !== 'POST') return antwoord(request, 405, 'Alleen versturen via het formulier.');
-      return melding(request, env);
-    }
-    if (url.pathname === '/api/foto') {
-      if (request.method !== 'POST') return antwoord(request, 405, 'Alleen versturen via het formulier.');
-      return foto(request, env);
+      if (!(await binnenLimiet(request, env))) {
+        return antwoord(request, 429, 'Even rustig: er kwamen net veel inzendingen binnen. Probeer het over een minuut opnieuw.');
+      }
+      return url.pathname === '/api/melding' ? melding(request, env) : foto(request, env);
     }
     return env.ASSETS.fetch(request);
   },
 };
+
+/* Per bezoeker (IP-adres) en voor iedereen samen een vast aantal per minuut.
+   Ontbreken de bindings (lokaal testen), dan geldt geen limiet. */
+async function binnenLimiet(request, env) {
+  const ip = request.headers.get('CF-Connecting-IP') || 'onbekend';
+  try {
+    if (env.PER_IP && !(await env.PER_IP.limit({ key: ip })).success) return false;
+    if (env.SAMEN && !(await env.SAMEN.limit({ key: 'alles' })).success) return false;
+  } catch (err) {
+    console.error('limiet niet te controleren', err);
+  }
+  return true;
+}
+
+/* Is dit bestand echt een foto van het opgegeven type? */
+async function echteFoto(b) {
+  const k = new Uint8Array(await b.slice(0, 12).arrayBuffer());
+  const tekst = (van, tot) => String.fromCharCode(...k.slice(van, tot));
+  if (b.type === 'image/jpeg') return k[0] === 0xff && k[1] === 0xd8 && k[2] === 0xff;
+  if (b.type === 'image/png') return k[0] === 0x89 && tekst(1, 4) === 'PNG';
+  if (b.type === 'image/webp') return tekst(0, 4) === 'RIFF' && tekst(8, 12) === 'WEBP';
+  return false;
+}
+
+/* Hoeveel foto's kwamen er vandaag (UTC) al binnen in Te beoordelen? */
+async function vandaagBinnen(token, map) {
+  const sinds = new Date().toISOString().slice(0, 10) + 'T00:00:00Z';
+  const q = `'${map}' in parents and createdTime >= '${sinds}' and trashed = false`;
+  const r = await fetch('https://www.googleapis.com/drive/v3/files?' + new URLSearchParams(
+    { q, pageSize: '100', fields: 'files(id)' }), { headers: { Authorization: `Bearer ${token}` } });
+  if (!r.ok) throw new Error(`telling ${r.status}: ${await r.text()}`);
+  return ((await r.json()).files || []).length;
+}
 
 async function melding(request, env) {
   const herkomst = request.headers.get('Origin');
@@ -155,6 +194,7 @@ async function foto(request, env) {
   for (const b of bestanden) {
     if (!FOTO_TYPES[b.type]) return antwoord(request, 400, 'Alleen foto\'s in jpg, png of webp.', slug);
     if (b.size > MAX_FOTO_BYTES) return antwoord(request, 400, 'Een foto mag hoogstens 15 MB zijn.', slug);
+    if (!(await echteFoto(b))) return antwoord(request, 400, 'Dit bestand is geen foto in jpg, png of webp.', slug);
   }
   if (!env.GOOGLE_REFRESH_TOKEN || !env.FOTO_TE_BEOORDELEN) {
     return antwoord(request, 503, `Foto's insturen lukt even niet. Mail ze naar ${CONTACT}.`, slug);
@@ -164,6 +204,9 @@ async function foto(request, env) {
   const links = [];
   try {
     const token = await googleToken(env);
+    if ((await vandaagBinnen(token, env.FOTO_TE_BEOORDELEN)) + bestanden.length > FOTOS_PER_DAG) {
+      return antwoord(request, 429, `Vandaag kwamen er al veel foto's binnen. Probeer het morgen opnieuw, of mail ze naar ${CONTACT}.`, slug);
+    }
     for (const [i, b] of bestanden.entries()) {
       const meta = {
         name: `${zaak} - ${datum} - ${crypto.randomUUID().slice(0, 6)}${bestanden.length > 1 ? '-' + (i + 1) : ''}.${FOTO_TYPES[b.type]}`,
