@@ -59,31 +59,24 @@
     toon();
   });
 
-  /* ---- melden --------------------------------------------------------------
-     Het formulier werkt ook zonder javascript (gewone post naar /api/melding).
-     Hiermee klapt het pas open na een keuze, verstuurt het zonder de pagina te
-     verlaten en zet de link bij Ligging meteen de juiste keuze aan. */
-  const form = document.querySelector('.meldform');
-  if (form) {
+  /* ---- melden en foto's insturen ---------------------------------------------
+     Beide formulieren werken ook zonder javascript (gewone post naar /api/...).
+     Hiermee versturen ze zonder de pagina te verlaten, klapt het meldformulier
+     pas open na een keuze en zet de link bij Ligging meteen de juiste keuze aan. */
+  document.querySelectorAll('.kkform').forEach(form => {
     const status = form.querySelector('.meldstatus');
-    const bericht = form.querySelector('textarea');
     form.classList.add('js');
     form.elements.t.value = String(Date.now());
-    const kies = r => {
-      form.classList.add('gekozen');
-      bericht.placeholder = r.dataset.vraag || '';
-    };
-    form.querySelectorAll('input[name=soort]').forEach(r => r.addEventListener('change', () => kies(r)));
-    document.querySelectorAll('a[data-meld]').forEach(a => a.addEventListener('click', () => {
-      const r = form.querySelector(`input[name=soort][value="${a.dataset.meld}"]`);
-      if (r) { r.checked = true; kies(r); setTimeout(() => bericht.focus(), 50); }
-    }));
     form.addEventListener('submit', async ev => {
       ev.preventDefault();
+      status.classList.remove('fout');
+      const fotos = form.elements.foto ? [...form.elements.foto.files] : [];
+      const fout = fotos.length > 3 ? 'Hoogstens 3 foto\'s per keer.'
+        : fotos.some(f => f.size > 15 * 1024 * 1024) ? 'Een foto mag hoogstens 15 MB zijn.' : '';
+      if (fout) { status.classList.add('fout'); status.textContent = fout; return; }
       const knop = form.querySelector('.meldknop');
       knop.disabled = true;
-      status.classList.remove('fout');
-      status.textContent = 'Even versturen…';
+      status.textContent = fotos.length ? 'Even uploaden…' : 'Even versturen…';
       try {
         const r = await fetch(form.action, {method: 'POST', body: new FormData(form),
                                             headers: {Accept: 'application/json'}});
@@ -97,7 +90,27 @@
       }
       knop.disabled = false;
     });
+  });
+
+  const meld = document.querySelector('.meldform');
+  if (meld) {
+    const bericht = meld.querySelector('textarea');
+    const kies = r => {
+      meld.classList.add('gekozen');
+      bericht.placeholder = r.dataset.vraag || '';
+    };
+    meld.querySelectorAll('input[name=soort]').forEach(r => r.addEventListener('change', () => kies(r)));
+    document.querySelectorAll('a[data-meld]').forEach(a => a.addEventListener('click', () => {
+      const r = meld.querySelector(`input[name=soort][value="${a.dataset.meld}"]`);
+      if (r) { r.checked = true; kies(r); setTimeout(() => bericht.focus(), 50); }
+    }));
   }
+
+  /* Wie via #foto binnenkomt (de tegel Laatste ronde), krijgt het fotoformulier open. */
+  const fotoform = document.getElementById('foto');
+  const opener = () => { if (fotoform && location.hash === '#foto') fotoform.open = true; };
+  opener();
+  addEventListener('hashchange', opener);
 
   /* ---- het kaartje ---------------------------------------------------------
      Scrollen met het wieltje zoomt niet, anders blijft wie de pagina afschuift

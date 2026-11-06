@@ -45,6 +45,7 @@ jobs:
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           FOTO_INZENDINGEN_SHEET_ID: ${{ vars.FOTO_INZENDINGEN_SHEET_ID }}
+          DRIVE_FOTO_GOEDGEKEURD_ID: ${{ vars.DRIVE_FOTO_GOEDGEKEURD_ID }}
         run: |
           set -o pipefail
           python ../scripts/inzendingen.py 2>&1 | tee inzendingen.log

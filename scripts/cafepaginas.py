@@ -468,7 +468,7 @@ ICOON_DEEL = ('<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5
               '<circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/>'
               '<path d="m8.3 13.3 7.4 4.4M15.7 6.3l-7.4 4.4"/></svg>')
 
-VERSIE = 'meldform-20261106'
+VERSIE = 'fotoform-20261106'
 
 ICOON_WEB = ('<svg class="lijn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/>'
              '<path d="M2.8 12h18.4M12 2.8c2.6 2.6 3.8 5.7 3.8 9.2s-1.2 6.6-3.8 9.2c-2.6-2.6-3.8-5.7-3.8-9.2'
@@ -485,10 +485,10 @@ ICOON_FOTO = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5h4l1.8
               ' fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>'
               '<circle cx="12" cy="13.3" r="3.3" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>')
 
-# Bezoekers sturen hun foto in via dit Tally-formulier. De knop vult de zaak en
-# de vaste url in (verborgen velden cafe en slug); inzendingen.py leest de
-# goedgekeurde rijen terug uit de gekoppelde sheet.
-FOTO_FORMULIER = 'https://tally.so/r/zxPWka'
+# Bezoekers sturen hun foto in via het eigen formulier op de pagina (worker/melding.js,
+# /api/foto). De foto's komen in de Drive-map Te beoordelen; inzendingen.py haalt
+# wat naar Goedgekeurd versleept is op. (Vroeger liep dit via Tally; die
+# goedgekeurde inzendingen haalt inzendingen.py nog steeds uit de sheet.)
 CONTACT = 'info@kroegenkaraf.be'   # voor correcties, zoals op de privacypagina
 # Het meldformulier onder elke zaak post naar het eigen meldpunt (worker/melding.js),
 # dat de melding als mail naar de redactie stuurt. Per keuze: (waarde, label, vraag).
@@ -504,6 +504,33 @@ MELD_DICHT = (
 MELD_LIGGING = ('ligging', 'Juiste plek', 'Plak een link van Google Maps of OpenStreetMap, of het juiste adres.')
 
 
+def fotoformulier(d, naam_gem, oproep_tekst, dicht):
+    """Opengeklapt via de knop of via #foto (de tegel Laatste ronde linkt zo)."""
+    return (
+        '<details class="fotoform" id="foto">'
+        f'<summary class="link">{ICOON_FOTO}<span>{oproep_tekst}</span></summary>'
+        '<form class="kkform" action="/api/foto" method="post" enctype="multipart/form-data">'
+        f'<p class="fotohint">{"Een oude foto van de zaak toen ze nog open was" if dicht else "Je eigen foto van de zaak, binnen of buiten"}: '
+        'jpg, png of webp, hoogstens drie per keer en 15 MB per foto. We bekijken elke foto voor hij online komt.</p>'
+        '<label class="veldlabel" for="ffoto">Foto</label>'
+        '<input id="ffoto" name="foto" type="file" accept="image/jpeg,image/png,image/webp" multiple required>'
+        '<label class="veldlabel" for="fnaam">Naam bij de foto <span>leeg is een bezoeker</span></label>'
+        '<input id="fnaam" name="naam" type="text" maxlength="80" autocomplete="name">'
+        '<label class="veldlabel" for="fmail">Je e-mailadres <span>alleen als je een antwoord wil</span></label>'
+        '<input id="fmail" name="mail" type="email" maxlength="200" autocomplete="email">'
+        '<label class="akkoord"><input type="checkbox" name="akkoord" value="ja" required>'
+        '<span>Ik maakte deze foto zelf, herkenbare mensen erop gaan akkoord, en Kroeg &amp; Karaf '
+        'mag hem kosteloos tonen op de site en in een latere app, met mijn naam als ik die invulde.</span></label>'
+        '<div class="hp" aria-hidden="true"><label>Laat dit leeg <input name="website" tabindex="-1" autocomplete="off"></label></div>'
+        f'<input type="hidden" name="slug" value="{e(d["u"])}">'
+        f'<input type="hidden" name="zaak" value="{e(naam_gem)}">'
+        '<input type="hidden" name="t" value="">'
+        '<button type="submit" class="meldknop">Verstuur</button>'
+        '<p class="meldstatus" role="status" aria-live="polite"></p>'
+        '<p class="meldnoot">Je blijft eigenaar van je foto. <a href="/privacy#fotos">Privacy</a></p>'
+        '</form></details>')
+
+
 def meldformulier(d, naam_gem, dicht):
     keuzes = list(MELD_DICHT if dicht else MELD_OPEN)
     if 'lat' not in d and not dicht:
@@ -514,7 +541,7 @@ def meldformulier(d, naam_gem, dicht):
     return (
         f'<section class="melden" id="melden" aria-labelledby="meldkop">'
         f'<h2 class="meldkop" id="meldkop">{ICOON_PEN}<span>Weet je iets over {e(d["n"])}?</span></h2>'
-        '<form class="meldform" action="/api/melding" method="post">'
+        '<form class="meldform kkform" action="/api/melding" method="post">'
         '<fieldset class="keuzes"><legend class="sr">Wat wil je melden?</legend>' + radios + '</fieldset>'
         '<div class="meldrest">'
         '<label class="veldlabel" for="mbericht">Toelichting</label>'
@@ -832,19 +859,13 @@ def pagina(d, buren):
                if dicht else '')
     # de controle staat meteen bij het adres; wanneer de zaak in de gids kwam,
     # staat onderaan de pagina
-    oproep_url = (FOTO_FORMULIER + '?' + urllib.parse.urlencode(
-        {'cafe': f'{d["n"]}, {gem}' if gem else d['n'], 'slug': d['u']}))
     # Bij een gesloten zaak vragen we een oude foto, zoals de tegel Laatste ronde
     # op de startpagina; een nieuwe foto van een dicht café heeft weinig zin.
     oproep_tekst = (f'Ken je {e(d["n"])}? Stuur je eigen oude foto' if dicht
                     else f'Upload jouw eigen foto van {e(d["n"])}')
-    oproep = (f'<p class="fotooproep"><a class="link" href="{e(oproep_url)}" target="_blank" '
-              f'rel="noopener">{ICOON_FOTO}{oproep_tekst}</a>'
-              f'<span class="fotohint">Het formulier koppelt je foto automatisch aan {e(d["n"])}'
-              f'{", " + e(plaats(gem)) if gem else ""}.</span></p>')
-    # Melden gaat via het eigen formulier (worker/melding.js), zonder externe dienst.
+    # Melden en foto's insturen gaan via eigen formulieren (worker/melding.js).
     naam_gem = f'{d["n"]}, {gem}' if gem else d['n']
-    oproep += meldformulier(d, naam_gem, dicht)
+    oproep = fotoformulier(d, naam_gem, oproep_tekst, dicht) + meldformulier(d, naam_gem, dicht)
     # De fotooproep en de correctie staan niet meer in het praktische blok maar onder
     # het verhaal: zo blijft het blok naast de opening kort en schuift het verhaal
     # (op de gsm staat het praktische blok erboven) niet ver naar onderen.
@@ -1531,8 +1552,7 @@ def laatste_ronde(data, per_id, open_):
         z = {k: d[k] for k in ('id', 'n', 'g', 'p', 't', 'u', 'z', 'foto', 'k') if d.get(k)}
         z['i'] = d['i'].split('\n')[0][:600]
         gem = d.get('g', '')
-        z['oproep'] = FOTO_FORMULIER + '?' + urllib.parse.urlencode(
-            {'cafe': f'{d["n"]}, {gem}' if gem else d['n'], 'slug': d['u']})
+        z['oproep'] = f'/{d["u"]}/#foto'
         if 'lat' in d and met_ligging:
             afst, buur = min(((km((d['lat'], d['lon']), (b['lat'], b['lon'])), b) for b in met_ligging),
                              key=lambda x: (x[0], x[1].get('s') != 'Geverifieerd'))
