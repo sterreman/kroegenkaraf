@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="assets/vendor/leaflet.css">
 <link rel="stylesheet" href="assets/vendor/MarkerCluster.css">
 <link rel="stylesheet" href="assets/lijst.css?v=balk-20261015">
-<link rel="stylesheet" href="assets/kaart.css?v=adres-20261007">
+<link rel="stylesheet" href="assets/kaart.css?v=buurt-20261106">
 </head>
 <body class="kaartpagina">
 <a class="naarinhoud" href="#resultaten">Naar de resultaten</a>
@@ -105,7 +105,14 @@
   </nav>
  </div>
  <div class="actief" id="actief" hidden></div>
- <form class="adreszoek" id="adreszoek" role="search">
+ <div class="waarben">
+  <button class="buurtgroot" id="buurt" type="button" data-buurt>
+   <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/>
+    <circle cx="12" cy="12" r="2.6"/><path d="M12 2.5v2.8M12 18.7v2.8M2.5 12h2.8M18.7 12h2.8"/></svg>
+   Cafés in mijn buurt</button>
+  <button class="adresopen" id="adresopen" type="button" aria-expanded="false" aria-controls="adreszoek">of zoek rond een adres</button>
+ </div>
+ <form class="adreszoek" id="adreszoek" role="search" hidden>
   <label for="adres">Cafés rond een adres</label>
   <div class="adresrij">
    <input type="search" id="adres" placeholder="Straat en huisnummer, gemeente" autocomplete="off"
@@ -116,10 +123,10 @@
  </form>
  <div class="kaartvak" id="kaartvak">
   <div class="kaartknoppen">
-   <button class="buurtknop" id="buurt" type="button">
+   <button class="buurtknop" id="buurtkaart" type="button" data-buurt title="Cafés in mijn buurt">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7"/>
      <circle cx="12" cy="12" r="2.6"/><path d="M12 2.5v2.8M12 18.7v2.8M2.5 12h2.8M18.7 12h2.8"/></svg>
-    In de buurt</button>
+    <span class="sr">Cafés in mijn buurt</span></button>
    <button class="heel" id="heel" type="button">Hele kaart</button>
   </div>
   <div id="kaart" role="region" aria-label="Kaart met de zaken"></div>
@@ -149,6 +156,6 @@
 <script src="assets/vendor/leaflet.markercluster.js"></script>
 <script src="assets/gemeen.js?v=20261019"></script>
 <script src="assets/filterbalk.js?v=volksspelen-20261017"></script>
-<script src="assets/kaart.js?v=adres-20261007"></script>
+<script src="assets/kaart.js?v=buurt-20261106"></script>
 </body>
 </html>
