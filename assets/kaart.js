@@ -144,24 +144,43 @@ function zetPlek(ll, naam, nauwkeurigheid) {
   toonBuurt();
 }
 
+/* Twee knoppen doen hetzelfde: de grote boven de kaart, die je op een gsm meteen
+   ziet, en de kleine op de kaart zelf, waar je ze zoekt als je al aan het
+   schuiven bent. */
+const buurtKnoppen = document.querySelectorAll('[data-buurt]');
+function bezig(aan) {
+  buurtKnoppen.forEach(k => aan ? k.setAttribute('aria-busy', 'true') : k.removeAttribute('aria-busy'));
+}
+
 function zoekMij() {
-  const knop = document.getElementById('buurt');
   if (!('geolocation' in navigator)) {
     meld('Deze browser kan je locatie niet doorgeven.');
     return;
   }
-  knop.setAttribute('aria-busy', 'true');
+  bezig(true);
   navigator.geolocation.getCurrentPosition(pos => {
-    knop.removeAttribute('aria-busy');
+    bezig(false);
     zetPlek([pos.coords.latitude, pos.coords.longitude], 'jou', pos.coords.accuracy);
+    /* Op een gsm staat de kaart onder de knop; schuif ze in beeld als ze dat nog niet is. */
+    const vak = $('kaartvak').getBoundingClientRect();
+    if (vak.top > innerHeight * 0.4) $('kaartvak').scrollIntoView({behavior: 'smooth', block: 'start'});
   }, err => {
-    knop.removeAttribute('aria-busy');
+    bezig(false);
     meld(err.code === 1
       ? 'Je locatie is niet gedeeld. Sta locatie toe voor deze site in je browser en probeer opnieuw.'
       : 'Je locatie kon niet bepaald worden. Probeer het straks nog eens, liefst buiten.');
   }, {enableHighAccuracy: true, timeout: 12000, maximumAge: 60000});
 }
-document.getElementById('buurt').addEventListener('click', zoekMij);
+buurtKnoppen.forEach(k => k.addEventListener('click', zoekMij));
+
+/* Het adresveld staat dicht tot iemand erom vraagt, zodat de buurtknop de
+   enige luide knop boven de kaart is. */
+$('adresopen').addEventListener('click', () => {
+  const open = $('adreszoek').hidden;
+  $('adreszoek').hidden = !open;
+  $('adresopen').setAttribute('aria-expanded', String(open));
+  if (open) $('adres').focus();
+});
 
 /* ---- rond een adres -------------------------------------------------------------
    Een gemeente of deelgemeente uit de gids zoeken we zelf op: dat blijft in de

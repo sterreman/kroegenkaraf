@@ -26,6 +26,9 @@
  background:var(--roest);color:#fff;cursor:pointer;font-family:var(--kop);font-stretch:85%;
  font-weight:800;font-size:16px}
 .buurtknop:hover{background:#b93b1b}
+/* op de kaart alleen het icoon: de grote knop met tekst staat erboven */
+#buurtkaart{width:42px;padding:0;justify-content:center}
+#buurtkaart svg{width:21px;height:21px}
 .buurtknop svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round}
 .buurtknop[aria-busy="true"]{opacity:.8;cursor:progress}
 .heel{height:42px;padding:0 14px;border:1.5px solid var(--inkt);background:var(--papier);color:var(--inkt);
@@ -96,8 +99,23 @@
 
 .kaartpagina .voet{margin-top:32px}
 
+/* De buurtknop is de luidste knop boven de kaart. Het adresveld klapt open
+   via de link ernaast. */
+.waarben{display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px;margin-top:14px}
+.buurtgroot{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:54px;padding:0 24px;
+ border:0;background:var(--roest);color:#fff;cursor:pointer;font-family:var(--kop);font-stretch:85%;
+ font-weight:800;font-size:19px}
+.buurtgroot:hover{background:#b93b1b}
+.buurtgroot svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round}
+.buurtgroot[aria-busy="true"]{opacity:.8;cursor:progress}
+.adresopen{padding:6px 0;border:0;background:none;color:var(--inkt2);cursor:pointer;font-family:var(--kop);
+ font-stretch:92%;font-weight:600;font-size:16px;text-decoration:underline;text-decoration-color:var(--lijn);
+ text-decoration-thickness:1.5px;text-underline-offset:5px}
+.adresopen:hover,.adresopen[aria-expanded="true"]{color:var(--roest-tekst);text-decoration-color:currentColor}
+
 /* rond een adres: boven de kaart, en de dichtste zaken eronder */
 .adreszoek{margin-top:14px;max-width:640px}
+.adreszoek[hidden]{display:none}
 .adreszoek label{display:block;margin-bottom:5px;font-family:var(--kop);font-weight:700;font-stretch:85%;
  font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--inkt2)}
 .adresrij{display:flex;gap:8px}
@@ -120,6 +138,9 @@
   #kaart{height:max(380px,calc(100vh - 190px))}
   .kaartknoppen{left:52px;top:10px;right:10px}
   .buurtknop{height:44px}
+  #buurtkaart{width:44px}
+  .waarben{gap:6px 16px}
+  .buurtgroot{width:100%}
   .heel{height:44px}
   .melding{top:64px;font-size:14.5px}
   .kaartvak{margin-left:calc(-1 * var(--sp));margin-right:calc(-1 * var(--sp))}
