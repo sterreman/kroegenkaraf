@@ -120,7 +120,9 @@ Eenmalig instellen:
 3. Lokaal: `pip install google-auth-oauthlib` en
    `python scripts/foto_drive_instellen.py client_secret.json`. Dat maakt de mappen
    (recht drive.file: de site ziet alleen wat ze zelf maakte) en drukt de waarden af.
-4. De map `Foto-inzendingen` in Drive naar `Volkscafés` slepen (leesrecht voor de bouw).
+4. De map `Foto-inzendingen` in Drive naar `Volkscafés` slepen, en de map `Goedgekeurd`
+   delen met de service-account `kroegenkaraf-publicatie@kroegenkaraf.iam.gserviceaccount.com`
+   als Lezer. Die heeft alleen recht op losse bestanden, niet op de map Volkscafés.
 5. Cloudflare, Worker kroegenkaraf, secrets: `MELDING_AAN`, `GOOGLE_CLIENT_ID`,
    `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`, `FOTO_TE_BEOORDELEN`.
 6. GitHub, Actions-variabele: `DRIVE_FOTO_GOEDGEKEURD_ID`.
