@@ -59,6 +59,46 @@
     toon();
   });
 
+  /* ---- melden --------------------------------------------------------------
+     Het formulier werkt ook zonder javascript (gewone post naar /api/melding).
+     Hiermee klapt het pas open na een keuze, verstuurt het zonder de pagina te
+     verlaten en zet de link bij Ligging meteen de juiste keuze aan. */
+  const form = document.querySelector('.meldform');
+  if (form) {
+    const status = form.querySelector('.meldstatus');
+    const bericht = form.querySelector('textarea');
+    form.classList.add('js');
+    form.elements.t.value = String(Date.now());
+    const kies = r => {
+      form.classList.add('gekozen');
+      bericht.placeholder = r.dataset.vraag || '';
+    };
+    form.querySelectorAll('input[name=soort]').forEach(r => r.addEventListener('change', () => kies(r)));
+    document.querySelectorAll('a[data-meld]').forEach(a => a.addEventListener('click', () => {
+      const r = form.querySelector(`input[name=soort][value="${a.dataset.meld}"]`);
+      if (r) { r.checked = true; kies(r); setTimeout(() => bericht.focus(), 50); }
+    }));
+    form.addEventListener('submit', async ev => {
+      ev.preventDefault();
+      const knop = form.querySelector('.meldknop');
+      knop.disabled = true;
+      status.classList.remove('fout');
+      status.textContent = 'Even versturen…';
+      try {
+        const r = await fetch(form.action, {method: 'POST', body: new FormData(form),
+                                            headers: {Accept: 'application/json'}});
+        const j = await r.json();
+        status.textContent = j.tekst;
+        if (j.ok) { form.classList.add('verstuurd'); return; }
+        status.classList.add('fout');
+      } catch (err) {
+        status.classList.add('fout');
+        status.textContent = 'Versturen lukte niet. Probeer later opnieuw of mail ons op info@kroegenkaraf.be.';
+      }
+      knop.disabled = false;
+    });
+  }
+
   /* ---- het kaartje ---------------------------------------------------------
      Scrollen met het wieltje zoomt niet, anders blijft wie de pagina afschuift
      in de kaart hangen. Op de gsm schuift de kaart ook niet mee met een vinger,
@@ -90,4 +130,5 @@
     radius: 10, weight: 3, color: '#ffffff', opacity: 1,
     fillColor: z.dicht ? '#8a939c' : '#cf4521', fillOpacity: 1
   }).bindTooltip(z.n, {direction: 'top', offset: [0, -10], permanent: true}).addTo(kaart);
+
 })();

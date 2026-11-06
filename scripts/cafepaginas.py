@@ -468,7 +468,7 @@ ICOON_DEEL = ('<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5
               '<circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/>'
               '<path d="m8.3 13.3 7.4 4.4M15.7 6.3l-7.4 4.4"/></svg>')
 
-VERSIE = 'melden-20261106'
+VERSIE = 'meldform-20261106'
 
 ICOON_WEB = ('<svg class="lijn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/>'
              '<path d="M2.8 12h18.4M12 2.8c2.6 2.6 3.8 5.7 3.8 9.2s-1.2 6.6-3.8 9.2c-2.6-2.6-3.8-5.7-3.8-9.2'
@@ -490,22 +490,46 @@ ICOON_FOTO = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5h4l1.8
 # goedgekeurde rijen terug uit de gekoppelde sheet.
 FOTO_FORMULIER = 'https://tally.so/r/zxPWka'
 CONTACT = 'info@kroegenkaraf.be'   # voor correcties, zoals op de privacypagina
-# De knoppen onder Weet je iets over: (label, onderwerp van de mail, vraag in de mail).
-MELDINGEN_OPEN = (
-    ('Nog open', 'Nog open', 'Wanneer was je er? (Meer hoeft niet.)'),
-    ('Gesloten of verhuisd', 'Gesloten', 'Sinds wanneer, of waar zit de zaak nu?'),
-    ('Iets anders klopt niet', 'Correctie', 'Wat klopt er niet?'),
+# Het meldformulier onder elke zaak post naar het eigen meldpunt (worker/melding.js),
+# dat de melding als mail naar de redactie stuurt. Per keuze: (waarde, label, vraag).
+MELD_OPEN = (
+    ('open', 'Nog open', 'Wanneer was je er? Meer hoeft niet.'),
+    ('gesloten', 'Gesloten of verhuisd', 'Sinds wanneer, of waar zit de zaak nu?'),
+    ('anders', 'Iets anders klopt niet', 'Wat klopt er niet?'),
 )
-MELDINGEN_DICHT = (
-    ('Weer open', 'Heropend', 'Sinds wanneer, en onder welke naam?'),
-    ('Iets anders klopt niet', 'Correctie', 'Wat klopt er niet?'),
+MELD_DICHT = (
+    ('heropend', 'Weer open', 'Sinds wanneer, en onder welke naam?'),
+    ('anders', 'Iets anders klopt niet', 'Wat klopt er niet?'),
 )
-LIGGING_VRAAG = 'Plak hier een link van Google Maps of OpenStreetMap, of het juiste adres:'
+MELD_LIGGING = ('ligging', 'Juiste plek', 'Plak een link van Google Maps of OpenStreetMap, of het juiste adres.')
 
 
-def meld_url(onderwerp, naam_gem, slug, vraag):
-    return (f'mailto:{CONTACT}?subject=' + urllib.parse.quote(f'{onderwerp}: {naam_gem}')
-            + '&body=' + urllib.parse.quote(f'Pagina: {ORIGIN}/{slug}/\n\n{vraag}\n'))
+def meldformulier(d, naam_gem, dicht):
+    keuzes = list(MELD_DICHT if dicht else MELD_OPEN)
+    if 'lat' not in d and not dicht:
+        keuzes.insert(2, MELD_LIGGING)
+    radios = ''.join(
+        f'<label class="keuze"><input type="radio" name="soort" value="{w}" data-vraag="{e(v)}" required>'
+        f'<span>{e(l)}</span></label>' for w, l, v in keuzes)
+    return (
+        f'<section class="melden" id="melden" aria-labelledby="meldkop">'
+        f'<h2 class="meldkop" id="meldkop">{ICOON_PEN}<span>Weet je iets over {e(d["n"])}?</span></h2>'
+        '<form class="meldform" action="/api/melding" method="post">'
+        '<fieldset class="keuzes"><legend class="sr">Wat wil je melden?</legend>' + radios + '</fieldset>'
+        '<div class="meldrest">'
+        '<label class="veldlabel" for="mbericht">Toelichting</label>'
+        '<textarea id="mbericht" name="bericht" rows="3" maxlength="3000"></textarea>'
+        '<label class="veldlabel" for="mmail">Je e-mailadres <span>alleen als je een antwoord wil</span></label>'
+        '<input id="mmail" name="mail" type="email" maxlength="200" autocomplete="email">'
+        '<div class="hp" aria-hidden="true"><label>Laat dit leeg <input name="website" tabindex="-1" autocomplete="off"></label></div>'
+        f'<input type="hidden" name="slug" value="{e(d["u"])}">'
+        f'<input type="hidden" name="zaak" value="{e(naam_gem)}">'
+        '<input type="hidden" name="t" value="">'
+        '<button type="submit" class="meldknop">Verstuur</button>'
+        '<p class="meldstatus" role="status" aria-live="polite"></p>'
+        '<p class="meldnoot">We krijgen alleen wat je hier invult en gebruiken het om de gids bij te werken. '
+        f'<a href="/privacy#melden">Privacy</a> · liever mailen? <a href="mailto:{CONTACT}">{CONTACT}</a></p>'
+        '</div></form></section>')
 
 
 ICOON_PEN = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z M13.5 6.5l4 4"'
@@ -818,15 +842,9 @@ def pagina(d, buren):
               f'rel="noopener">{ICOON_FOTO}{oproep_tekst}</a>'
               f'<span class="fotohint">Het formulier koppelt je foto automatisch aan {e(d["n"])}'
               f'{", " + e(plaats(gem)) if gem else ""}.</span></p>')
-    # Melden gaat per mail, met de zaak, de pagina en de soort melding al ingevuld:
-    # een klik op de juiste knop en verzenden volstaat.
+    # Melden gaat via het eigen formulier (worker/melding.js), zonder externe dienst.
     naam_gem = f'{d["n"]}, {gem}' if gem else d['n']
-    meldingen = MELDINGEN_DICHT if dicht else MELDINGEN_OPEN
-    oproep += (f'<div class="melden"><p class="meldkop">{ICOON_PEN}<span>Weet je iets over '
-               f'{e(d["n"])}? Laat het weten</span></p><ul class="meldknoppen">'
-               + ''.join(f'<li><a href="{e(meld_url(onderwerp, naam_gem, d["u"], vraag))}">{e(label)}</a></li>'
-                         for label, onderwerp, vraag in meldingen)
-               + '</ul></div>')
+    oproep += meldformulier(d, naam_gem, dicht)
     # De fotooproep en de correctie staan niet meer in het praktische blok maar onder
     # het verhaal: zo blijft het blok naast de opening kort en schuift het verhaal
     # (op de gsm staat het praktische blok erboven) niet ver naar onderen.
@@ -867,8 +885,7 @@ def pagina(d, buren):
         kaart = ('<section class="ligging" aria-labelledby="liggingkop"><h2 id="liggingkop">Ligging</h2>'
                  '<p class="geenkaart">De exacte ligging is nog niet vastgelegd. '
                  f'<a href="{e(maps_zoek(d))}" target="_blank" rel="noopener">Zoek op Google Maps</a> of '
-                 f'<a href="{e(meld_url("Ligging", (d["n"] + ", " + gem) if gem else d["n"], d["u"], LIGGING_VRAAG))}">'
-                 'stuur ons de juiste plek</a>.</p></section>')
+                 '<a href="#melden" data-meld="ligging">stuur ons de juiste plek</a>.</p></section>')
         leaflet = leaflet_js = ''
 
     tekstblok = f'<div class="tekst">{tekst}</div>' if tekst else ''
