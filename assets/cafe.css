@@ -120,16 +120,13 @@ a{color:inherit}
 .melden .meldkop{flex-direction:row;gap:8px;margin:0;font-weight:700;font-stretch:90%;font-size:17px}
 .melden .meldkop::before{content:none}
 .meldform{margin:10px 0 0;max-width:560px}
-.keuzes{border:0;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
-.keuze{position:relative;cursor:pointer}
-.keuze input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
-.keuze span{display:inline-block;padding:8px 13px;border:1.5px solid var(--lijn);color:var(--inkt);
- font-family:var(--kop);font-stretch:90%;font-weight:600;font-size:14.5px;background:var(--papier)}
-.keuze:hover span{border-color:var(--roest-tekst);color:var(--roest-tekst)}
-.keuze input:checked+span{background:var(--inkt);border-color:var(--inkt);color:var(--creme)}
-.keuze input:focus-visible+span{outline:2px solid var(--roest-tekst);outline-offset:2px}
+.meldopen{display:none;padding:8px 15px;border:1.5px solid var(--lijn);background:var(--papier);color:var(--inkt);cursor:pointer;
+ font-family:var(--kop);font-stretch:90%;font-weight:600;font-size:14.5px}
+.meldopen:hover{border-color:var(--roest-tekst);color:var(--roest-tekst)}
+.meldopen:focus-visible{outline:2px solid var(--roest-tekst);outline-offset:2px}
+.meldform.js:not(.gekozen) .meldopen{display:inline-block}
 .meldform.js:not(.gekozen) .meldrest{display:none}
-.meldrest{margin-top:14px}
+.meldrest{margin-top:4px}
 .veldlabel{display:block;margin:12px 0 5px;font-family:var(--kop);font-stretch:90%;font-weight:600;font-size:14.5px;color:var(--inkt)}
 .veldlabel span{font-weight:400;color:var(--inkt2)}
 .veldlabel span::before{content:"· "}
@@ -145,7 +142,7 @@ a{color:inherit}
 .meldstatus{margin:10px 0 0;font-size:15.5px;color:var(--inkt)}
 .meldstatus:empty{display:none}
 .meldstatus.fout{color:var(--roest-tekst)}
-.meldform.verstuurd .keuzes,.meldform.verstuurd .meldrest>*:not(.meldstatus){display:none}
+.meldform.verstuurd .meldopen,.meldform.verstuurd .meldrest>*:not(.meldstatus){display:none}
 .fotoform form.verstuurd>*:not(.meldstatus){display:none}
 .meldform.verstuurd .meldrest{display:block}
 .meldnoot{margin:10px 0 0;font-size:13.5px;line-height:1.45;color:var(--inkt2)}

@@ -62,7 +62,7 @@
   /* ---- melden en foto's insturen ---------------------------------------------
      Beide formulieren werken ook zonder javascript (gewone post naar /api/...).
      Hiermee versturen ze zonder de pagina te verlaten, klapt het meldformulier
-     pas open na een keuze en zet de link bij Ligging meteen de juiste keuze aan. */
+     pas open na een tik op Iets melden en zet de link bij Ligging het meteen open. */
   document.querySelectorAll('.kkform').forEach(form => {
     const status = form.querySelector('.meldstatus');
     form.classList.add('js');
@@ -95,15 +95,17 @@
   const meld = document.querySelector('.meldform');
   if (meld) {
     const bericht = meld.querySelector('textarea');
-    const kies = r => {
+    const soort = meld.elements.soort;
+    const knop = meld.querySelector('.meldopen');
+    const open = (ligging) => {
+      soort.value = ligging ? 'ligging' : 'melding';
+      bericht.placeholder = ligging ? soort.dataset.ligging : soort.dataset.vraag;
       meld.classList.add('gekozen');
-      bericht.placeholder = r.dataset.vraag || '';
+      knop.setAttribute('aria-expanded', 'true');
+      setTimeout(() => bericht.focus(), 50);
     };
-    meld.querySelectorAll('input[name=soort]').forEach(r => r.addEventListener('change', () => kies(r)));
-    document.querySelectorAll('a[data-meld]').forEach(a => a.addEventListener('click', () => {
-      const r = meld.querySelector(`input[name=soort][value="${a.dataset.meld}"]`);
-      if (r) { r.checked = true; kies(r); setTimeout(() => bericht.focus(), 50); }
-    }));
+    knop.addEventListener('click', () => open(false));
+    document.querySelectorAll('a[data-meld]').forEach(a => a.addEventListener('click', () => open(a.dataset.meld === 'ligging')));
   }
 
   /* Wie via #foto binnenkomt (de tegel Laatste ronde), krijgt het fotoformulier open. */
