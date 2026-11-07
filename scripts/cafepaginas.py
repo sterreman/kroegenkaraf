@@ -688,11 +688,23 @@ def voeg_inzendingen_toe(data):
     if not pad.exists():
         return
     per_url = {d['u']: d for d in data}
+    # Foto's die hun kenmerken verloren (zie inzendingen.py) koppelen we op
+    # "Naam, Gemeente", zoals het formulier de zaak doorgeeft. Komt die combinatie
+    # meer dan eens voor, dan koppelen we niets.
+    per_zaak = {}
+    for d in data:
+        per_zaak.setdefault(f'{d["n"]}, {d["g"]}' if d.get('g') else d['n'], []).append(d)
     gekoppeld = 0
     for it in json.loads(pad.read_text(encoding='utf-8')):
-        d = per_url.get(it['slug'].strip('/'))
+        slug = (it.get('slug') or '').strip('/')
+        if slug:
+            d = per_url.get(slug)
+        else:
+            treffers = per_zaak.get(it.get('zaak', ''), [])
+            d = treffers[0] if len(treffers) == 1 else None
+            slug = it.get('zaak', '')
         if d is None:
-            print(f'  LET OP: bezoekersfoto voor {it["slug"]} hoort bij geen enkele zaak')
+            print(f'  LET OP: bezoekersfoto voor {slug} hoort bij geen enkele zaak (of bij meer dan een)')
             continue
         fotos = d.setdefault('fotos', [{'f': d['foto']}] if d.get('foto') else [])
         if len(fotos) >= MAX_FOTOS:

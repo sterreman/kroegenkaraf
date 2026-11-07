@@ -35,6 +35,8 @@ from PIL import Image
 MAP = Path('inzendingen')
 MAX_BYTES = 15 * 1024 * 1024
 OK = {'goedgekeurd', 'ok', 'ja', 'akkoord'}
+# zo noemt worker/melding.js de foto's: "<zaak> - <datum> - <code>[-<nr>].<ext>"
+NAAM_FORMULIER = re.compile(r'^(.+) - (\d{4}-\d{2}-\d{2}) - [0-9a-f]{6}(?:-\d+)?\.[a-z]+$', re.I)
 
 
 def kolom(koppen, *zoek, niet=()):
@@ -99,10 +101,19 @@ def haal_drive_map(map_id, uit):
             continue
         prop = meta.get('appProperties') or {}
         slug = (prop.get('slug') or '').strip().strip('/')
+        zaak = ''
         if not slug:
-            print(f'  LET OP: {meta["name"]} in Goedgekeurd komt niet uit het fotoformulier '
-                  '(geen zaak gekoppeld), overgeslagen')
-            continue
+            # Wie een foto via de G-schijf in Verkenner versleept, krijgt in Drive een
+            # nieuw bestand zonder appProperties en beschrijving. De bestandsnaam van het
+            # formulier ("Naam, Gemeente - 2026-11-07 - 9159b2.jpg") draagt de zaak
+            # nog wel; cafepaginas.py koppelt die aan de juiste pagina.
+            m = NAAM_FORMULIER.match(meta.get('name', ''))
+            if not m:
+                print(f'  LET OP: {meta["name"]} in Goedgekeurd komt niet uit het fotoformulier '
+                      '(geen zaak gekoppeld), overgeslagen')
+                continue
+            zaak = m.group(1).strip()
+            prop = {'datum': m.group(2)}
         if int(meta.get('size', 0)) > MAX_BYTES:
             print(f'  LET OP: {meta["name"]} is groter dan 15 MB, overgeslagen')
             continue
@@ -117,7 +128,7 @@ def haal_drive_map(map_id, uit):
             print(f'  LET OP: {meta["name"]} niet binnengehaald: {exc}')
             doel.unlink(missing_ok=True)
             continue
-        uit.append({'slug': slug, 'bestand': str(doel), 'naam': prop.get('naam', ''),
+        uit.append({'slug': slug, 'zaak': zaak, 'bestand': str(doel), 'naam': prop.get('naam', ''),
                     'datum': prop.get('datum') or meta.get('createdTime', '')[:10]})
         n += 1
     print(f'Inzendingen: {n} goedgekeurde foto\'s uit het eigen formulier binnengehaald.')
