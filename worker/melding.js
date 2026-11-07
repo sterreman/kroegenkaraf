@@ -38,6 +38,7 @@ import { EmailMessage } from 'cloudflare:email';
 const VAN = 'meldingen@kroegenkaraf.be';
 const CONTACT = 'info@kroegenkaraf.be';
 const SOORTEN = {
+  melding: 'Melding',   // het formulier met één knop; de andere blijven voor oude pagina's
   open: 'Nog open',
   gesloten: 'Gesloten of verhuisd',
   heropend: 'Weer open',
@@ -128,8 +129,10 @@ async function melding(request, env) {
   if (!soort || !zaak || !SLUG.test(slug)) {
     return antwoord(request, 400, 'Kies wat je wil melden.', slug);
   }
-  if (!bericht && (soort === 'Correctie' || soort === 'Ligging')) {
-    return antwoord(request, 400, 'Schrijf in een paar woorden wat er niet klopt.', slug);
+  if (!bericht && (soort === 'Melding' || soort === 'Correctie' || soort === 'Ligging')) {
+    return antwoord(request, 400, soort === 'Melding'
+      ? 'Schrijf in een paar woorden wat je wil melden.'
+      : 'Schrijf in een paar woorden wat er niet klopt.', slug);
   }
   if (mail && !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(mail)) {
     return antwoord(request, 400, 'Dat e-mailadres lijkt niet te kloppen. Laat het leeg als je geen antwoord nodig hebt.', slug);

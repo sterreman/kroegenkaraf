@@ -491,17 +491,13 @@ ICOON_FOTO = ('<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8.5h4l1.8
 # goedgekeurde inzendingen haalt inzendingen.py nog steeds uit de sheet.)
 CONTACT = 'info@kroegenkaraf.be'   # voor correcties, zoals op de privacypagina
 # Het meldformulier onder elke zaak post naar het eigen meldpunt (worker/melding.js),
-# dat de melding als mail naar de redactie stuurt. Per keuze: (waarde, label, vraag).
-MELD_OPEN = (
-    ('open', 'Nog open', 'Wanneer was je er? Meer hoeft niet.'),
-    ('gesloten', 'Gesloten of verhuisd', 'Sinds wanneer, of waar zit de zaak nu?'),
-    ('anders', 'Iets anders klopt niet', 'Wat klopt er niet?'),
-)
-MELD_DICHT = (
-    ('heropend', 'Weer open', 'Sinds wanneer, en onder welke naam?'),
-    ('anders', 'Iets anders klopt niet', 'Wat klopt er niet?'),
-)
-MELD_LIGGING = ('ligging', 'Juiste plek', 'Plak een link van Google Maps of OpenStreetMap, of het juiste adres.')
+# dat de melding als mail naar de redactie stuurt. Eén knop, één tekstvak: wie iets
+# kwijt wil (een fout, een sluiting, een weetje of een anekdote) schrijft het gewoon.
+MELD_VRAAG_OPEN = ('Gesloten, verhuisd of klopt er iets anders niet? Of ken je een leuk weetje '
+                   'of een anekdote over de zaak? Schrijf het hier.')
+MELD_VRAAG_DICHT = ('Weer open, klopt er iets niet, of heb je een herinnering of anekdote over '
+                    'de zaak? Schrijf het hier.')
+MELD_VRAAG_LIGGING = 'Plak een link van Google Maps of OpenStreetMap, of het juiste adres.'
 
 
 def fotoformulier(d, naam_gem, oproep_tekst, dicht):
@@ -540,20 +536,16 @@ def fotoformulier(d, naam_gem, oproep_tekst, dicht):
 
 
 def meldformulier(d, naam_gem, dicht):
-    keuzes = list(MELD_DICHT if dicht else MELD_OPEN)
-    if 'lat' not in d and not dicht:
-        keuzes.insert(2, MELD_LIGGING)
-    radios = ''.join(
-        f'<label class="keuze"><input type="radio" name="soort" value="{w}" data-vraag="{e(v)}" required>'
-        f'<span>{e(l)}</span></label>' for w, l, v in keuzes)
+    vraag = MELD_VRAAG_DICHT if dicht else MELD_VRAAG_OPEN
     return (
         f'<section class="melden" id="melden" aria-labelledby="meldkop">'
-        f'<h2 class="meldkop" id="meldkop">{ICOON_PEN}<span>Weet je iets over {e(d["n"])}?</span></h2>'
+        f'<h2 class="meldkop" id="meldkop">{ICOON_PEN}<span>Iets verkeerd, een opmerking of een leuk weetje over {e(d["n"])}?</span></h2>'
         '<form class="meldform kkform" action="/api/melding" method="post">'
-        '<fieldset class="keuzes"><legend class="sr">Wat wil je melden?</legend>' + radios + '</fieldset>'
-        '<div class="meldrest">'
-        '<label class="veldlabel" for="mbericht">Toelichting</label>'
-        '<textarea id="mbericht" name="bericht" rows="3" maxlength="3000"></textarea>'
+        f'<input type="hidden" name="soort" value="melding" data-vraag="{e(vraag)}" data-ligging="{e(MELD_VRAAG_LIGGING)}">'
+        '<button type="button" class="meldopen" aria-expanded="false" aria-controls="meldrest">Iets melden</button>'
+        '<div class="meldrest" id="meldrest">'
+        '<label class="veldlabel" for="mbericht">Wat wil je ons laten weten?</label>'
+        f'<textarea id="mbericht" name="bericht" rows="4" maxlength="3000" required placeholder="{e(vraag)}"></textarea>'
         '<label class="veldlabel" for="mmail">Je e-mailadres <span>alleen als je een antwoord wil</span></label>'
         '<input id="mmail" name="mail" type="email" maxlength="200" autocomplete="email">'
         '<div class="hp" aria-hidden="true"><label>Laat dit leeg <input name="website" tabindex="-1" autocomplete="off"></label></div>'
