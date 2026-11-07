@@ -346,5 +346,17 @@ h2::before{content:"";width:34px;height:5px;background:var(--roest)}
  background:#fff;font-family:var(--kop);font-size:15px;color:var(--inkt)}
 .fotoform input[type=file]::file-selector-button{margin-right:12px;padding:7px 12px;border:1.5px solid var(--inkt);
  background:var(--inkt);color:var(--creme);font-family:var(--kop);font-weight:600;cursor:pointer}
+/* op de gsm: meteen een foto trekken (alleen met javascript, zie cafe.js) */
+.fotoform .camera{display:none;align-items:center;flex-wrap:wrap;gap:6px 12px;margin:10px 0 0}
+@media (pointer:coarse){.fotoform form.js .camera{display:flex}}
+.camknop{position:relative;display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:1.5px solid var(--inkt);
+ background:var(--papier);color:var(--inkt);font-family:var(--kop);font-stretch:90%;font-weight:600;font-size:15px;cursor:pointer}
+.camknop svg{width:18px;height:18px;flex:0 0 auto}
+.camknop input{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}
+.camknop:focus-within{outline:2px solid var(--roest-tekst);outline-offset:2px}
+.genomen{font-family:var(--kop);font-size:14.5px;color:var(--inkt)}
+.genomen:empty{display:none}
+.wisgenomen{padding:0;border:0;background:none;color:var(--inkt2);font:inherit;font-size:14px;text-decoration:underline;
+ text-underline-offset:3px;cursor:pointer}
 .akkoord{display:flex;gap:10px;align-items:flex-start;margin:14px 0 0;font-size:15px;line-height:1.45;color:var(--inkt)}
 .akkoord input{margin:4px 0 0;width:18px;height:18px;flex:0 0 auto;accent-color:var(--roest)}
