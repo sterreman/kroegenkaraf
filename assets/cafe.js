@@ -67,43 +67,18 @@
     const status = form.querySelector('.meldstatus');
     form.classList.add('js');
     form.elements.t.value = String(Date.now());
-
-    /* Foto's die met de camera getrokken zijn, apart bijgehouden: zo kan je er
-       een paar na elkaar trekken, en ze samen met gekozen foto's versturen. */
-    const genomen = [];
-    const camera = form.querySelector('.camknop input');
-    if (camera) {
-      const teller = form.querySelector('.genomen');
-      const wis = form.querySelector('.wisgenomen');
-      form.elements.foto.required = false;   // we controleren zelf of er een foto is
-      const toon = () => {
-        teller.textContent = genomen.length === 1 ? '1 foto getrokken'
-          : genomen.length ? `${genomen.length} foto's getrokken` : '';
-        wis.hidden = !genomen.length;
-      };
-      camera.addEventListener('change', () => {
-        genomen.push(...camera.files);
-        camera.value = '';
-        toon();
-      });
-      wis.addEventListener('click', () => { genomen.length = 0; toon(); });
-    }
-
     form.addEventListener('submit', async ev => {
       ev.preventDefault();
       status.classList.remove('fout');
-      const fotos = form.elements.foto ? [...form.elements.foto.files, ...genomen] : [];
-      const fout = camera && !fotos.length ? 'Kies of trek een foto.'
-        : fotos.length > 3 ? 'Hoogstens 3 foto\'s per keer.'
+      const fotos = form.elements.foto ? [...form.elements.foto.files] : [];
+      const fout = fotos.length > 3 ? 'Hoogstens 3 foto\'s per keer.'
         : fotos.some(f => f.size > 15 * 1024 * 1024) ? 'Een foto mag hoogstens 15 MB zijn.' : '';
       if (fout) { status.classList.add('fout'); status.textContent = fout; return; }
       const knop = form.querySelector('.meldknop');
       knop.disabled = true;
       status.textContent = fotos.length ? 'Even uploaden…' : 'Even versturen…';
-      const data = new FormData(form);
-      genomen.forEach(f => data.append('foto', f));
       try {
-        const r = await fetch(form.action, {method: 'POST', body: data,
+        const r = await fetch(form.action, {method: 'POST', body: new FormData(form),
                                             headers: {Accept: 'application/json'}});
         const j = await r.json();
         status.textContent = j.tekst;

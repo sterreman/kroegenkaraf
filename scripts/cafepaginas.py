@@ -513,15 +513,10 @@ def fotoformulier(d, naam_gem, oproep_tekst, dicht):
         f'<p class="fotohint">{"Een oude foto van de zaak toen ze nog open was" if dicht else "Je eigen foto van de zaak, binnen of buiten"}: '
         'jpg, png of webp, hoogstens drie per keer en 15 MB per foto. We bekijken elke foto voor hij online komt.</p>'
         '<label class="veldlabel" for="ffoto">Foto</label>'
-        '<input id="ffoto" name="foto" type="file" accept="image/jpeg,image/png,image/webp" multiple required>'
-        # Op de gsm: meteen een foto trekken met de camera. Het veld heeft geen naam;
-        # cafe.js voegt de genomen foto's bij het versturen toe. Zonder javascript
-        # blijft de knop verborgen en werkt alleen het gewone veld.
-        '<div class="camera">'
-        f'<label class="camknop">{ICOON_FOTO}<span>Of trek nu een foto</span>'
-        '<input type="file" accept="image/*" capture="environment"></label>'
-        '<span class="genomen" aria-live="polite"></span>'
-        '<button type="button" class="wisgenomen" hidden>wissen</button></div>'
+        # android/allowCamera is geen echt type: het zorgt ervoor dat Chrome op Android 14
+        # en later in hetzelfde veld ook de camera aanbiedt (met alleen beeldtypes toont het
+        # enkel de fotokiezer). Een iPhone biedt Foto nemen sowieso al aan.
+        '<input id="ffoto" name="foto" type="file" accept="image/jpeg,image/png,image/webp,android/allowCamera" multiple required>'
         '<label class="veldlabel" for="fnaam">Naam bij de foto <span>leeg is een bezoeker</span></label>'
         '<input id="fnaam" name="naam" type="text" maxlength="80" autocomplete="name">'
         '<label class="veldlabel" for="fmail">Je e-mailadres <span>alleen als je een antwoord wil</span></label>'
