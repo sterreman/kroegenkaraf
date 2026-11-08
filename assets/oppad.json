@@ -233,6 +233,25 @@
         "hoog": 450,
         "alt": "Een straatje met huizen van donkere leisteen in Gros-Fays, met een kerktoren achter de bomen"
       }
+    },
+    {
+      "id": "abdijbier-aan-de-bron",
+      "thema": "abdijbier",
+      "datum": "2026-11-08",
+      "url": "/abdijbier-aan-de-bron",
+      "rubriek": "Caféverhalen",
+      "titel": "Aan de bron",
+      "omschrijving": "Van In de Vrede in Westvleteren tot de koestallen van Val-Dieu: tien adressen waar je het abdijbier drinkt op de plek waar het vandaan komt.",
+      "feiten": ["10 haltes", "Met kaart", "Van Westvleteren tot Val-Dieu"],
+      "beeld": {
+        "bestanden": [
+          {"w": 800, "avif": "/assets/verhalen/abdijen/held-800.avif", "webp": "/assets/verhalen/abdijen/held-800.webp"},
+          {"w": 1600, "avif": "/assets/verhalen/abdijen/held-1600.avif", "webp": "/assets/verhalen/abdijen/held-1600.webp"}
+        ],
+        "breed": 800,
+        "hoog": 450,
+        "alt": "De ruïne van de oude abdijkerk van Orval met het roosvenster, tegen een avondlucht"
+      }
     }
   ]
 }

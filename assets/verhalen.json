@@ -564,6 +564,82 @@
           "label": "Als het dorp geen café meer heeft"
         }
       }
+    },
+    {
+      "url": "/abdijbier-aan-de-bron",
+      "titel": "Aan de bron",
+      "cafes": {
+        "KK02756": {
+          "anker": "vrede",
+          "label": "Halte 1: de officiële toog van Westvleteren",
+          "beeld": {
+            "bestand": "/assets/verhalen/abdijen/indevrede-720.webp"
+          }
+        },
+        "KK01856": {
+          "anker": "grimbergen",
+          "label": "Halte 2: na tweehonderd jaar weer bier in de abdij",
+          "beeld": {
+            "bestand": "/assets/verhalen/abdijen/fenikshof-720.webp"
+          }
+        },
+        "KK00635": {
+          "anker": "westmalle",
+          "label": "Halte 3: Dubbel, Tripel en Extra aan de overkant",
+          "beeld": {
+            "bestand": "/assets/verhalen/abdijen/westmalle-720.webp"
+          }
+        },
+        "KK01782": {
+          "anker": "averbode",
+          "label": "Halte 4: huisbieren die je alleen hier drinkt",
+          "beeld": {
+            "bestand": "/assets/verhalen/abdijen/moment-720.webp"
+          }
+        },
+        "KK00826": {
+          "anker": "achel",
+          "label": "Halte 5: geen monniken meer, wel nog de brouwerij",
+          "beeld": {
+            "bestand": "/assets/verhalen/abdijen/kluis-720.webp"
+          }
+        },
+        "KK03952": {
+          "anker": "villers",
+          "label": "Halte 6: een broederschap brouwt tussen de ruïnes",
+          "beeld": {
+            "bestand": "/assets/verhalen/abdijen/hostieux-720.webp"
+          }
+        },
+        "KK01165": {
+          "anker": "maredsous",
+          "label": "Halte 7: kaasboterham en een microbrouwerij",
+          "beeld": {
+            "bestand": "/assets/verhalen/abdijen/saintjoseph-720.webp"
+          }
+        },
+        "KK00790": {
+          "anker": "poteaupre",
+          "label": "Halte 8: de Dorée van het vat",
+          "beeld": {
+            "bestand": "/assets/verhalen/abdijen/poteaupre-720.webp"
+          }
+        },
+        "KK01158": {
+          "anker": "orval",
+          "label": "Halte 9: Orval Vert, nergens anders",
+          "beeld": {
+            "bestand": "/assets/verhalen/abdijen/orvalvert-279.webp"
+          }
+        },
+        "KK01089": {
+          "anker": "valdieu",
+          "label": "Halte 10: een glas in de oude koestallen",
+          "beeld": {
+            "bestand": "/assets/verhalen/abdijen/valdieu-720.webp"
+          }
+        }
+      }
     }
   ]
 }
