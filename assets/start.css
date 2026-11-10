@@ -84,7 +84,8 @@
 .cafekaart{border-top:1px solid var(--lijn)}
 .cafekaart a{display:block;height:100%;padding:14px 4px 16px 0;text-decoration:none;color:inherit}
 .cafefoto{float:right;margin:2px 0 8px 12px}
-.cafefoto img{display:block;width:88px;height:88px;object-fit:cover;background:var(--papier2)}
+.cafefoto img{display:block;width:88px;height:88px;object-fit:cover;background:var(--papier2);
+ filter:saturate(.7) sepia(.32) contrast(1.15) brightness(.92)}  /* kroeglicht, zoals cafe.css */
 .cafenaam{display:block;font-family:var(--kop);font-weight:800;font-stretch:72%;font-size:25px;line-height:1.04;overflow-wrap:break-word}
 .cafeplaats{display:block;margin-top:3px;font-family:var(--kop);font-stretch:92%;font-weight:600;font-size:14.5px;color:var(--roest-tekst)}
 .caferede{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;line-clamp:4;overflow:hidden;clear:both;
