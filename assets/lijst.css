@@ -239,6 +239,7 @@ a.rij:focus-visible{outline:2px solid var(--inkt);outline-offset:-2px;background
 .zstatus.dicht::before{border-radius:0;width:10px;height:0;border-width:1.5px 0 0}
 .zaak.dicht .znaam{color:var(--inkt2)}
 .zfoto{flex:0 0 auto;width:64px;height:64px;object-fit:cover;background:var(--papier2)}
+.zaak.dicht .zfoto{filter:grayscale(1) contrast(1.05)}
 .zaak.gevonden .rij{box-shadow:inset 3px 0 0 var(--roest);background:var(--papier2)}
 
 .laden{margin:28px 0 0;font-family:var(--kop);font-stretch:90%;font-size:17px;color:var(--inkt2)}

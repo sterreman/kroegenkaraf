@@ -74,6 +74,9 @@ a{color:inherit}
  color:var(--creme);font-family:var(--kop);font-weight:700;font-stretch:85%;font-size:14px;
  letter-spacing:.06em;text-transform:uppercase}
 .dicht .naam{color:var(--creme2)}
+/* een gesloten zaak toont haar foto in zwart-wit, zoals de tegel Laatste ronde;
+   het label Gesloten blijft het eigenlijke signaal */
+.dicht .kopfoto img{filter:grayscale(1) contrast(1.05)}
 
 /* met foto: de foto staat naast de naam, tot tegen de rand van het blok */
 .metfoto .kopraster{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr);
