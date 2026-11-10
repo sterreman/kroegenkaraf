@@ -48,7 +48,7 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont, ImageOps
+from PIL import Image, ImageDraw, ImageEnhance, ImageFont, ImageOps
 
 import artikels as A
 
@@ -400,6 +400,9 @@ class Kaartjes:
         links, tekstbreedte = 72, 660
         if foto:
             vak = ImageOps.fit(foto.convert('RGB'), (460, H), Image.LANCZOS)
+            if d.get('s') == 'Gesloten':
+                # zwart-wit, zoals de foto op de pagina zelf (cafe.css)
+                vak = ImageEnhance.Contrast(ImageOps.grayscale(vak).convert('RGB')).enhance(1.05)
             img.paste(vak, (W - 460, 0))
             tekstbreedte = W - 460 - links - 56
             logo = self.logo.copy()
