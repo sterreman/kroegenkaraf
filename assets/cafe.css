@@ -78,6 +78,17 @@ a{color:inherit}
    het label Gesloten blijft het eigenlijke signaal */
 .dicht .kopfoto img{filter:grayscale(1) contrast(1.05)}
 
+/* kroeglicht: elke foto van een open zaak krijgt dezelfde warme, ingetogen toon en
+   een donkere rand in marine, zodat gsm-foto's op elkaar gaan lijken. Dezelfde
+   filter staat in lijst.css en start.css, en in Kaartjes.maak (cafepaginas.py)
+   voor het deelkaartje. Wijzig ze samen. */
+.kopfoto img{filter:saturate(.7) sepia(.32) contrast(1.15) brightness(.92)}
+figure.kopfoto::after,.carrousel .dia::after{content:"";position:absolute;inset:0;pointer-events:none;
+ background:radial-gradient(ellipse farthest-corner at center,rgba(19,39,56,0) 45%,rgba(19,39,56,.12) 65%,
+ rgba(19,39,56,.29) 80%,rgba(19,39,56,.6) 100%)}
+.kopfoto figcaption{z-index:1}
+.dicht figure.kopfoto::after,.dicht .carrousel .dia::after{content:none}
+
 /* met foto: de foto staat naast de naam, tot tegen de rand van het blok */
 .metfoto .kopraster{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr);
  gap:clamp(24px,4vw,48px);align-items:end}

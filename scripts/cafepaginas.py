@@ -381,9 +381,65 @@ def breek(draw, tekst, font, breedte):
     return regels
 
 
+def _kleurmatrix():
+    """De css-filter saturate(.7) sepia(.32) contrast(1.15) brightness(.92) uit
+    cafe.css als een matrix voor Image.convert, met dezelfde formules als de browser."""
+    def sat(v):
+        return [[.213 + .787 * v, .715 - .715 * v, .072 - .072 * v],
+                [.213 - .213 * v, .715 + .285 * v, .072 - .072 * v],
+                [.213 - .213 * v, .715 - .715 * v, .072 + .928 * v]]
+
+    def sep(a):
+        i = 1 - a
+        return [[.393 + .607 * i, .769 - .769 * i, .189 - .189 * i],
+                [.349 - .349 * i, .686 + .314 * i, .168 - .168 * i],
+                [.272 - .272 * i, .534 - .534 * i, .131 + .869 * i]]
+
+    m = [[sum(sep(.32)[r][k] * sat(.7)[k][c] for k in range(3)) for c in range(3)] for r in range(3)]
+    con, bri = 1.15, .92
+    uit = []
+    for r in range(3):
+        uit += [m[r][0] * con * bri, m[r][1] * con * bri, m[r][2] * con * bri,
+                (.5 - .5 * con) * bri * 255]
+    return tuple(uit)
+
+
+KROEGLICHT = _kleurmatrix()
+
+
+def _randmasker(w, h):
+    """De donkere rand uit cafe.css (figure.kopfoto::after) als grijswaardenmasker:
+    0 in het midden, 0.6 in de hoeken, ellips naar de vorm van het beeld."""
+    stops = ((.45, 0), (.65, .12), (.80, .29), (1.0, .6))
+    data = []
+    for y in range(h):
+        ny = (y + .5 - h / 2) / (h / 2)
+        for x in range(w):
+            nx = (x + .5 - w / 2) / (w / 2)
+            r = math.sqrt(nx * nx + ny * ny) / math.sqrt(2)
+            a = 0.0
+            for (r0, a0), (r1, a1) in zip(stops, stops[1:]):
+                if r0 <= r <= r1:
+                    a = a0 + (a1 - a0) * (r - r0) / (r1 - r0)
+                    break
+            else:
+                a = .6 if r > 1 else 0.0
+            data.append(round(a * 255))
+    masker = Image.new('L', (w, h))
+    masker.putdata(data)
+    return masker
+
+
+def kroeglicht(beeld, masker):
+    """Dezelfde warme toon en marine rand als de foto op de pagina."""
+    beeld = beeld.convert('RGB').convert('RGB', KROEGLICHT)
+    return Image.composite(Image.new('RGB', beeld.size, MARINE), beeld, masker)
+
+
 class Kaartjes:
     def __init__(self):
         self.logo = Image.open(REPO / 'assets/logo.png').convert('RGBA')
+        self.rand = _randmasker(460, H)
 
     def maak(self, d, pad):
         img = Image.new('RGB', (W, H), MARINE)
@@ -403,6 +459,8 @@ class Kaartjes:
             if d.get('s') == 'Gesloten':
                 # zwart-wit, zoals de foto op de pagina zelf (cafe.css)
                 vak = ImageEnhance.Contrast(ImageOps.grayscale(vak).convert('RGB')).enhance(1.05)
+            else:
+                vak = kroeglicht(vak, self.rand)
             img.paste(vak, (W - 460, 0))
             tekstbreedte = W - 460 - links - 56
             logo = self.logo.copy()
@@ -471,7 +529,7 @@ ICOON_DEEL = ('<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5
               '<circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/>'
               '<path d="m8.3 13.3 7.4 4.4M15.7 6.3l-7.4 4.4"/></svg>')
 
-VERSIE = 'fotoform-20261106'
+VERSIE = 'kroeglicht-20261110'
 
 ICOON_WEB = ('<svg class="lijn" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/>'
              '<path d="M2.8 12h18.4M12 2.8c2.6 2.6 3.8 5.7 3.8 9.2s-1.2 6.6-3.8 9.2c-2.6-2.6-3.8-5.7-3.8-9.2'
