@@ -134,8 +134,22 @@
  color:var(--roest-tekst);font-variant-numeric:tabular-nums}
 .buurtvoet{margin:10px 0 0;font-family:var(--kop);font-stretch:92%;font-size:14px;color:var(--inkt3)}
 
+/* knop onderaan de kaart naar de buurtlijst; alleen op een gsm, zie onder */
+.naarlijst{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);z-index:600;display:none;
+ align-items:center;gap:8px;height:44px;padding:0 18px;border:1.5px solid var(--inkt);background:var(--papier);
+ color:var(--inkt);cursor:pointer;font-family:var(--kop);font-stretch:85%;font-weight:800;font-size:16px;
+ white-space:nowrap}
+.naarlijst svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+.naarlijst:hover{color:var(--roest-tekst)}
+.naarlijst:focus-visible{outline:2px solid var(--inkt);outline-offset:2px}
+.buurtlijst{scroll-margin-top:76px}
+
 @media(max-width:760px){
   #kaart{height:max(380px,calc(100vh - 190px))}
+  /* Op de kaartpagina laat de kaart onderaan een strook pagina vrij: daar kan je
+     met je duim verder naar onder vegen zonder de kaart te verschuiven. */
+  .kaartpagina #kaart{height:max(340px,62vh);height:max(340px,62svh)}
+  .naarlijst:not([hidden]){display:inline-flex}
   .kaartknoppen{left:52px;top:10px;right:10px}
   .buurtknop{height:44px}
   #buurtkaart{width:44px}
