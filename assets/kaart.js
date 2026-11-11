@@ -103,7 +103,7 @@ function toonBuurt() {
   const dichtst = lijst.slice(0, 8);
   /* bovenaan extra ruimte: daar liggen de knoppen en het label van de plek */
   kaart.fitBounds(L.latLngBounds([mijnPlek, ...dichtst.map(([, d]) => [d.lat, d.lon])]),
-                  {paddingTopLeft: [44, 96], paddingBottomRight: [44, 44], maxZoom: 16});
+                  {paddingTopLeft: [44, 96], paddingBottomRight: [44, 84], maxZoom: 16});
   if (lijst[0][0] > 40) meld(`Het dichtste café uit de gids ligt op ${km(lijst[0][0])}.`);
 }
 
@@ -111,9 +111,14 @@ function toonBuurt() {
    de filters, dus ook na een andere keuze in Soort zaak of Meer filters. */
 function tekenBuurtlijst() {
   const vak = $('buurtlijst');
-  if (!mijnPlek) { vak.hidden = true; return; }
+  if (!mijnPlek) { vak.hidden = true; $('naarlijst').hidden = true; return; }
   const lijst = dichtsteZaken().slice(0, 8);
   vak.hidden = false;
+  /* Op een gsm vult de kaart bijna het scherm en vangt ze elke veeg op. De knop
+     onderaan de kaart brengt je naar de lijst eronder. */
+  $('naarlijst').hidden = !lijst.length;
+  $('naarlijst-t').textContent = lijst.length === 1 ? 'Naar het dichtste café'
+    : `Naar de ${lijst.length} dichtste cafés`;
   vak.innerHTML = `<h2>Dichtst bij ${plekNaam === 'jou' ? 'jou' : esc(plekNaam)}</h2>`
     + (lijst.length ? '<ol class="zaken">' + lijst.map(([a, d]) => `<li class="zaak">`
       + `<a class="rij" href="/${esc(d.u)}/"><span class="ztekst"><span class="znaam">${esc(d.n)}</span>`
@@ -172,6 +177,8 @@ function zoekMij() {
   }, {enableHighAccuracy: true, timeout: 12000, maximumAge: 60000});
 }
 buurtKnoppen.forEach(k => k.addEventListener('click', zoekMij));
+$('naarlijst').addEventListener('click', () =>
+  $('buurtlijst').scrollIntoView({behavior: 'smooth', block: 'start'}));
 
 /* Het adresveld staat dicht tot iemand erom vraagt, zodat de buurtknop de
    enige luide knop boven de kaart is. */
