@@ -1,5 +1,5 @@
 {
-  "uitleg": "Zaken voor de tegel Pas open op de startpagina. Elke regel: de ID uit de csv, de maand van (her)opening als JJJJ-MM en 'nieuw' of 'heropend'. Alleen opnemen als de Info-tekst de maand van opening vermeldt. Geen seizoenszaken (zomerbars, winterbars, pop-ups). De tegel toont automatisch alleen zaken die nog geverifieerd zijn en de voorbije zes maanden (her)openden, de recentste eerst; oudere regels mogen blijven staan.",
+  "uitleg": "Zaken voor de tegel Pas open op de startpagina. Elke regel: de ID uit de csv, de maand van (her)opening als JJJJ-MM en 'nieuw' of 'heropend'. Alleen opnemen als de Info-tekst de maand van opening vermeldt. Geen seizoenszaken (zomerbars, winterbars, pop-ups). De tegel toont automatisch alleen zaken die nog geverifieerd zijn en de voorbije zes maanden (her)openden, de recentste eerst; oudere regels mogen blijven staan. Voorkeur sinds 12 november 2026: geen regel hier, maar 'Pas open: JJJJ-MM nieuw' of 'Pas open: JJJJ-MM heropend' in de Notitie van de zaak in de csv; de bouw leest die zelf.",
   "zaken": [
     {"id": "KK03796", "sinds": "2026-10", "soort": "heropend"},
     {"id": "KK02174", "sinds": "2026-10", "soort": "heropend"},
