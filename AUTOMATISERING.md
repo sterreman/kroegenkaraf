@@ -153,3 +153,16 @@ provincies al in `index.html`, tussen de markeringen `<!--start:ontdek-->` en
 `<!--start:provincies-->`. `assets/start.js` tekent Ontdek daarna opnieuw uit hetzelfde
 rooster en laat de provincies staan. Wie de kaart van een Ontdek-zaak aanpast, past
 `tekenOntdek()` in `start.js` en `start_statisch()` in `cafepaginas.py` samen aan.
+
+## Titels en structured data (12 november 2026)
+
+Een cafépagina heeft de deelgemeente en de hoofdgemeente in de titel (`Rosa, Ledeberg (Gent)`);
+bij een lange naam valt de sitenaam weg. Café-, gemeente- en provinciepagina's krijgen een
+`BreadcrumbList` met dezelfde stappen als het zichtbare kruimelpad, en zaken met provincie
+Nederland krijgen `addressCountry: NL`.
+
+`scripts/oppad_statisch.py` zet in elk artikel `Article`-data (titel, omschrijving en beeld uit
+de head, de datum uit `oppad.json`, de besproken cafés uit `verhalen.json`) en vult
+`og:site_name`, `og:locale` en `twitter:card` aan waar ze ontbreken. `/oppad` krijgt een
+`CollectionPage`, de startpagina `WebSite` en `Organization`. Alles staat vlak voor `</head>`
+tussen markeringen `<!--data:...-->`; in de bronbestanden hoeft daar niets voor te staan.
