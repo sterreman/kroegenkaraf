@@ -688,8 +688,12 @@ def json_ld(d, url, beeld):
         return ''
     x = {'@context': 'https://schema.org', '@type': 'BarOrPub', 'name': d['n'],
          'url': url, 'image': beeld}
-    adres = {'@type': 'PostalAddress', 'addressLocality': hoofdgemeente(d.get('g')),
-             'addressRegion': d.get('p', ''), 'addressCountry': 'BE'}
+    if d.get('p') == 'Nederland':
+        adres = {'@type': 'PostalAddress', 'addressLocality': hoofdgemeente(d.get('g')),
+                 'addressCountry': 'NL'}
+    else:
+        adres = {'@type': 'PostalAddress', 'addressLocality': hoofdgemeente(d.get('g')),
+                 'addressRegion': d.get('p', ''), 'addressCountry': 'BE'}
     if d.get('a'):
         adres['streetAddress'] = d['a']
     x['address'] = adres
@@ -700,6 +704,19 @@ def json_ld(d, url, beeld):
     zelf = [v for v in (d.get('w'), d.get('fb'), d.get('ig')) if v]
     if zelf:
         x['sameAs'] = zelf
+    blob = json.dumps(x, ensure_ascii=False).replace('</', '<\\/')
+    return f'<script type="application/ld+json">{blob}</script>\n'
+
+
+def kruimel_ld(stappen):
+    """BreadcrumbList uit [(naam, url), ...]; dezelfde stappen als het zichtbare kruimelpad,
+    met de pagina zelf als laatste. Stappen zonder eigen pagina (een zoekopdracht) blijven weg."""
+    rij = [(n, u) for n, u in stappen if n and u]
+    if len(rij) < 2:
+        return ''
+    x = {'@context': 'https://schema.org', '@type': 'BreadcrumbList', 'itemListElement': [
+        {'@type': 'ListItem', 'position': i + 1, 'name': n,
+         'item': u if u.startswith('http') else ORIGIN + u} for i, (n, u) in enumerate(rij)]}
     blob = json.dumps(x, ensure_ascii=False).replace('</', '<\\/')
     return f'<script type="application/ld+json">{blob}</script>\n'
 
@@ -835,7 +852,11 @@ def pagina(d, buren):
     dicht = d.get('s') == 'Gesloten'
     gem = d.get('g') or ''
     adres = ', '.join(x for x in (d.get('a'), gem) if x)
-    titel = f'{d["n"]}, {plaats(gem)}' if gem else d['n']
+    # Mensen zoeken op naam plus plaats, de ene keer de deelgemeente (rosa ledeberg),
+    # de andere keer de stad (poechenellekelder brussel): allebei in de titel.
+    titel = f'{d["n"]}, {gem}' if gem else d['n']
+    # Google kapt een titel af rond 60 tekens; bij een lange naam gaat de sitenaam eraf.
+    paginatitel = titel if len(titel) + 16 > 65 else f'{titel} | Kroeg & Karaf'
     omschrijving = kort(d.get('k') or d.get('i')) or kort(
         f'{d.get("t") or "Café"} in {gem or d.get("p", "")}'
         + (f', {d["a"]}' if d.get('a') else '') + '. Adres, ligging en cafés in de buurt.')
@@ -855,6 +876,11 @@ def pagina(d, buren):
             kruimel.append(f'<a href="{e(gem_url)}#{e(url_deel(plaats(gem)))}">{e(plaats(gem))}</a>')
     elif gem and sleutel(plaats(gem)) != sleutel(d.get('p')):
         kruimel.append(f'<a href="/lijst?q={q(plaats(gem))}">{e(plaats(gem))}</a>')
+
+    kruimel_data = kruimel_ld([('Alle cafés', '/lijst'),
+                               (d.get('p'), PROVINCIE_URL.get(sleutel(d.get('p')))),
+                               (hoofdgemeente(gem), gem_url if gem else None),
+                               (d['n'], url)])
 
     # ---- de kop: naam, soort, plaats en de eerste zin
     lengte = len(d['n'])
@@ -992,7 +1018,7 @@ def pagina(d, buren):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#132738">
-<title>{e(titel)} | Kroeg &amp; Karaf</title>
+<title>{e(paginatitel)}</title>
 <meta name="description" content="{e(omschrijving)}">
 <link rel="canonical" href="{e(url)}">{robots}
 <meta property="og:type" content="place">
@@ -1011,7 +1037,7 @@ def pagina(d, buren):
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="stylesheet" href="/assets/fonts/fonts.css">
 {leaflet}<link rel="stylesheet" href="/assets/cafe.css?v={VERSIE}">
-{json_ld(d, url, beeld)}</head>
+{json_ld(d, url, beeld)}{kruimel_data}</head>
 <body class="cafepagina">
 <a class="naarinhoud" href="#inhoud">Naar de inhoud</a>
 <header class="balk">
@@ -1246,6 +1272,8 @@ def gemeente_pagina(g):
               {'@type': 'ListItem', 'position': i + 1, 'url': f'{ORIGIN}/{d["u"]}/', 'name': d['n']}
               for i, d in enumerate(actueel)]}}
     blob = json.dumps(ld, ensure_ascii=False).replace('</', '<\\/')
+    kruimel_data = kruimel_ld([('Alle cafés', '/lijst'), (prov, PROVINCIE_URL.get(sleutel(prov))),
+                               (titel, url)])
     return f'''<!doctype html>
 <html lang="nl">
 <head>
@@ -1273,7 +1301,7 @@ def gemeente_pagina(g):
 <link rel="stylesheet" href="/assets/cafe.css?v={VERSIE}">
 <link rel="stylesheet" href="/assets/gemeente.css?v={VERSIE}">
 <script type="application/ld+json">{blob}</script>
-</head>
+{kruimel_data}</head>
 <body class="cafepagina tekstpagina gemeentepagina">
 <a class="naarinhoud" href="#inhoud">Naar de inhoud</a>
 <header class="balk">
@@ -1489,6 +1517,7 @@ def provincie_pagina(pv, provincies):
     q = urllib.parse.quote
     ld = {'@context': 'https://schema.org', '@type': 'CollectionPage', 'name': titel, 'url': url}
     blob = json.dumps(ld, ensure_ascii=False).replace('</', '<\\/')
+    kruimel_data = kruimel_ld([('Alle cafés', '/lijst'), ('Gemeenten', '/gemeenten'), (titel, url)])
     return f'''<!doctype html>
 <html lang="nl">
 <head>
@@ -1516,7 +1545,7 @@ def provincie_pagina(pv, provincies):
 <link rel="stylesheet" href="/assets/cafe.css?v={VERSIE}">
 <link rel="stylesheet" href="/assets/gemeente.css?v={VERSIE}">
 <script type="application/ld+json">{blob}</script>
-</head>
+{kruimel_data}</head>
 <body class="cafepagina tekstpagina gemeentepagina">
 <a class="naarinhoud" href="#inhoud">Naar de inhoud</a>
 <header class="balk">
