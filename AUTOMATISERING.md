@@ -138,3 +138,18 @@ en een foto moet aan de eerste bytes herkenbaar een jpg, png of webp zijn.
 
 Zolang iets ontbreekt, weigeren de formulieren netjes en verwijzen ze naar
 info@kroegenkaraf.be. De oude Tally-inzendingen (sheet) blijven werken.
+
+## Provinciepagina's en de startpagina in de html (12 november 2026)
+
+`scripts/cafepaginas.py` bouwt per provincie een pagina op `/provincie/<naam>/`. Gemeenten
+met een eigen pagina krijgen er een link, de cafés uit kleinere gemeenten staan er zelf.
+Samen met de gemeentepagina's heeft zo elke cafépagina een gewone link in de html, ook
+voor een zoekmachine die de lijst en de kaart niet uitvoert. De kruimelpaden van café-
+en gemeentepagina's en het blok Per provincie op de startpagina verwijzen ernaar; de
+url's staan in `sitemap-gemeenten.xml`.
+
+Dezelfde stap zet op de startpagina de zes zaken van Ontdek Belgische cafés en de
+provincies al in `index.html`, tussen de markeringen `<!--start:ontdek-->` en
+`<!--start:provincies-->`. `assets/start.js` tekent Ontdek daarna opnieuw uit hetzelfde
+rooster en laat de provincies staan. Wie de kaart van een Ontdek-zaak aanpast, past
+`tekenOntdek()` in `start.js` en `start_statisch()` in `cafepaginas.py` samen aan.

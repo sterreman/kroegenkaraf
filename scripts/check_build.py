@@ -119,6 +119,43 @@ def main():
             raise SystemExit(f'STOP: /gemeenten linkt niet naar precies de gebouwde gemeentepagina\'s '
                              f'({len(gelinkt)} links, {len(gebouwd)} pagina\'s).')
     print(f"{gemeenten} gemeentepagina's gecontroleerd.")
+    # Provinciepagina's: canonical, deelkaartje, elke link klopt, en samen met de
+    # gemeentepagina's geven ze elke cafepagina een gewone link in de html.
+    gelinkt_cafe, provincies = set(), 0
+    for map_ in sorted(Path('site/gemeente').glob('*/')):
+        gelinkt_cafe |= set(re.findall(r'href="/(cafe/[^"#?]+?)/"', (map_ / 'index.html').read_text(encoding='utf-8')))
+    for map_ in sorted(Path('site/provincie').glob('*/')):
+        pagina = (map_ / 'index.html').read_text(encoding='utf-8')
+        if f'<link rel="canonical" href="https://kroegenkaraf.be/provincie/{map_.name}/">' not in pagina:
+            raise SystemExit(f'STOP: canonical klopt niet op provincie {map_.name}')
+        if not (map_ / 'deel.jpg').is_file():
+            raise SystemExit(f'STOP: deelkaartje ontbreekt voor provincie {map_.name}')
+        for link in set(re.findall(r'href="/((?:cafe|gemeente|provincie)/[^"#?]+?)/"', pagina)):
+            if not Path('site', link, 'index.html').is_file():
+                raise SystemExit(f'STOP: provincie {map_.name} linkt naar een pagina die niet bestaat: /{link}/')
+        gelinkt_cafe |= set(re.findall(r'href="/(cafe/[^"#?]+?)/"', pagina))
+        provincies += 1
+    if not provincies:
+        raise SystemExit("STOP: er zijn geen provinciepagina's gebouwd.")
+    los = sorted(set(urls) - gelinkt_cafe)
+    if los:
+        print(f"  LET OP: {len(los)} cafepagina's zonder link op een gemeente- of provinciepagina, "
+              f"bijvoorbeeld /{los[0]}/.")
+    print(f"{provincies} provinciepagina's gecontroleerd; {len(urls) - len(los)} van {len(urls)} "
+          "cafepagina's hebben een link op een gemeente- of provinciepagina.")
+    # De startpagina: Ontdek en Per provincie staan in de html zelf (start_statisch).
+    start_html = Path('site/index.html').read_text(encoding='utf-8')
+    blok = re.search(r'<!--start:provincies-->(.*?)<!--/start:provincies-->', start_html, re.S)
+    if not blok or len(re.findall(r'href="/provincie/[^"/]+/"', blok.group(1))) != provincies:
+        raise SystemExit('STOP: de startpagina linkt in de html niet naar elke provinciepagina.')
+    blok = re.search(r'<!--start:ontdek-->(.*?)<!--/start:ontdek-->', start_html, re.S)
+    n_ontdek = len(re.findall(r'href="/cafe/', blok.group(1))) if blok else 0
+    if not n_ontdek:
+        print('  LET OP: Ontdek Belgische cafés staat niet in de html van de startpagina; '
+              'alleen de browser tekent het blok.')
+    for link in set(re.findall(r'href="/(cafe/[^"#?]+?)/"', start_html)):
+        if not Path('site', link, 'index.html').is_file():
+            raise SystemExit(f'STOP: de startpagina linkt naar een cafepagina die niet bestaat: /{link}/')
     # Het blok Ontdek deze cafés: verwijst alleen naar ID's uit de CSV.
     pool = json.loads(Path('site/assets/ontdek.json').read_text(encoding='utf-8')).get('ids', [])
     per_id = {row.get('id'): row for row in data if row.get('id')}
