@@ -323,6 +323,40 @@ os.makedirs(f'{SITE}/data', exist_ok=True)
 with open(f'{SITE}/data/zaken.json', 'w', encoding='utf-8') as fp:
     json.dump(data, fp, ensure_ascii=False, separators=(',', ':'))
 
+# ---- Pas open uit de Notitie --------------------------------------------------
+# Een zaak komt in de tegel Pas open met een regel in haar Notitie, bv.
+# "Pas open: 2026-10 heropend" of "Pas open: 2026-05 nieuw". Zo kunnen de runs die
+# alleen in de csv werken de tegel vullen. assets/nieuwopen.json blijft gelden voor
+# wat er al met de hand in stond; bij dezelfde ID wint de Notitie. Alleen de kopie
+# in site/ wordt aangepast, de repo blijft onaangeroerd.
+PAS_OPEN = re.compile(r'pas open\s*:\s*(\d{4})-(\d{1,2})\s+(nieuw|heropend)\b', re.I)
+uit_notitie = {}
+for number, r in enumerate(rows, 2):
+    notitie = r.get('Notitie') or ''
+    if 'pas open' not in notitie.lower():
+        continue
+    m = PAS_OPEN.search(notitie)
+    zid = (r.get('ID') or '').strip()
+    if not m or not zid:
+        print(f'  LET OP: csv-rij {number} noemt Pas open in de Notitie, maar niet als '
+              f'"Pas open: JJJJ-MM nieuw|heropend" of zonder ID; niet meegenomen.')
+        continue
+    jaar, maand, soort = m[1], int(m[2]), m[3].lower()
+    if not 1 <= maand <= 12:
+        print(f'  LET OP: csv-rij {number} heeft een ongeldige maand bij Pas open.')
+        continue
+    uit_notitie[zid] = {'id': zid, 'sinds': f'{jaar}-{maand:02d}', 'soort': soort}
+pad_no = f'{SITE}/assets/nieuwopen.json'
+try:
+    nieuwopen = json.load(open(pad_no, encoding='utf-8'))
+except (OSError, ValueError):
+    nieuwopen = {}
+hand = [z for z in nieuwopen.get('zaken', []) if z.get('id') not in uit_notitie]
+nieuwopen['zaken'] = list(uit_notitie.values()) + hand
+with open(pad_no, 'w', encoding='utf-8') as fp:
+    json.dump(nieuwopen, fp, ensure_ascii=False, indent=1)
+print(f'Pas open: {len(uit_notitie)} zaken uit de Notitie, {len(hand)} uit assets/nieuwopen.json.')
+
 # ---- datum en aantal in de pagina's ------------------------------------------
 open_zaken = sum(1 for d in data if d.get('s') != 'Gesloten')
 for pagina in ('index.html', 'lijst.html', 'kaart.html'):
