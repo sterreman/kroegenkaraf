@@ -846,7 +846,7 @@ def pagina(d, buren):
 
     kruimel = ['<a href="/lijst">Alle cafés</a>']
     if d.get('p'):
-        kruimel.append(f'<a href="/lijst?p={q(d["p"])}">{e(d["p"])}</a>')
+        kruimel.append(f'<a href="{e(PROVINCIE_URL.get(sleutel(d["p"])) or "/lijst?p=" + q(d["p"]))}">{e(d["p"])}</a>')
     gem_url = GEMEENTE_URL.get(sleutel(hoofdgemeente(gem)))
     if gem and gem_url:
         # de gemeente heeft een eigen pagina; een deelgemeente verwijst naar haar kopje daarop
@@ -1060,6 +1060,7 @@ def pagina(d, buren):
 # ---- gemeentepagina's ------------------------------------------------------------
 
 GEMEENTE_URL = {}     # sleutel(hoofdgemeente) -> '/gemeente/aalst/', gevuld in main()
+PROVINCIE_URL = {}    # sleutel(provincie) -> '/provincie/antwerpen/', gevuld in main()
 VERHALEN = {}         # ID -> lijst met {url, titel, anker, label}, gevuld in main()
 
 
@@ -1163,9 +1164,11 @@ def laad_gemeenten(data):
     return dict(sorted(uit.items(), key=lambda kv: (sleutel(kv[1]['p']), kv[0])))
 
 
-def lijst_regel(d):
+def lijst_regel(d, met_plaats=''):
+    """met_plaats: de deelgemeente, voor lijsten waar het kopje de hoofdgemeente is."""
     tekst = d.get('k') or lead_en_rest(d.get('i'))[0]
-    meta = ' · '.join(x for x in (d.get('t'), d.get('a')) if x)
+    adres = ', '.join(x for x in (d.get('a'), met_plaats) if x)
+    meta = ' · '.join(x for x in (d.get('t'), adres) if x)
     todo = '<span class="gstatus">Status nog te bevestigen</span>' if d.get('s') == 'Te checken' else ''
     dicht = (f'<span class="gstatus">Gesloten{" sinds " + e(datum(d["z"])) if d.get("z") else ""}</span>'
              if d.get('s') == 'Gesloten' else '')
@@ -1284,7 +1287,7 @@ def gemeente_pagina(g):
 <main id="inhoud">
  <div class="kop">
   <div class="wrap">
-   <nav class="kruimel" aria-label="Kruimelpad"><a href="/lijst">Alle cafés</a> <span aria-hidden="true">/</span> <a href="/gemeenten#{e(url_deel(prov))}">{e(prov)}</a></nav>
+   <nav class="kruimel" aria-label="Kruimelpad"><a href="/lijst">Alle cafés</a> <span aria-hidden="true">/</span> <a href="{e(PROVINCIE_URL.get(sleutel(prov)) or '/gemeenten#' + url_deel(prov))}">{e(prov)}</a></nav>
    <h1>{e(titel)}</h1>
    <p class="ondertitel">{e(prov)}</p>
   </div>
@@ -1327,8 +1330,11 @@ def gemeenten_overzicht(gemeenten):
             items += f'<li><a class="gnaam" href="/{e(g["u"])}/">{e(g["naam"])}</a><span class="gmeta">{e(tel)}</span></li>'
         anker = url_deel(prov)
         inhoud.append(f'<a href="#{e(anker)}">{e(prov)}</a>')
+        pu = PROVINCIE_URL.get(sleutel(prov))
+        alle = (f'<p><a href="{e(pu)}">Alle cafés in {e(provincie_zin(prov))}</a>, ook uit de kleinere gemeenten.</p>'
+                if pu else '')
         blokken += (f'<section aria-labelledby="{e(anker)}"><h2 id="{e(anker)}">{e(prov)}</h2>'
-                    f'<ul class="glijst govz">{items}</ul></section>')
+                    f'<ul class="glijst govz">{items}</ul>{alle}</section>')
     titel = 'Cafés per gemeente'
     omschrijving = kort(f'{len(gemeenten)} Belgische gemeenten met hun cafés, volkscafés en verdwenen kroegen, '
                         'per provincie. Met adres, soort en ligging op de kaart.', 158)
@@ -1377,7 +1383,7 @@ def gemeenten_overzicht(gemeenten):
   </div>
  </div>
  <div class="wrap leeskolom">
-  <p class="aanhef">Elke gemeente met minstens drie zaken in de gids heeft een eigen pagina, met de deelgemeenten onder een eigen kopje en de gesloten cafés als archief onderaan. Kleinere gemeenten vind je via de lijst of de kaart.</p>
+  <p class="aanhef">Elke gemeente met minstens drie zaken in de gids heeft een eigen pagina, met de deelgemeenten onder een eigen kopje en de gesloten cafés als archief onderaan. De cafés uit kleinere gemeenten staan op de pagina van hun provincie.</p>
   <nav class="gprov" aria-label="Provincies">{' '.join(inhoud)}</nav>
   {blokken}
  </div>
@@ -1392,6 +1398,238 @@ def gemeenten_overzicht(gemeenten):
 </body>
 </html>
 '''
+
+
+# ---- provinciepagina's ---------------------------------------------------------
+# /provincie/<naam>/: elke gemeente van de provincie. Gemeenten met een eigen pagina
+# krijgen een link; de cafés uit kleinere gemeenten staan er zelf, met hun link. Zo
+# heeft elke cafépagina minstens één gewone link in de html (gemeente of provincie)
+# en hangt ze niet alleen aan de sitemap en aan lijsten die de browser tekent.
+
+def provincie_zin(p):
+    return {'Brussel': 'het Brussels Gewest',
+            'Nederland': 'Nederland, net over de grens'}.get(p, f'de provincie {p}')
+
+
+def provincie_titel(p):
+    return {'Brussel': 'Cafés in het Brussels Gewest',
+            'Nederland': 'Cafés net over de grens in Nederland'}.get(p, f'Cafés in de provincie {p}')
+
+
+def laad_provincies(data):
+    per = {}
+    for d in data:
+        if d.get('p'):
+            per.setdefault(d['p'], []).append(d)
+    uit, urls = {}, {}
+    for p in sorted(per, key=sleutel):
+        u = f'provincie/{url_deel(p)}'
+        if u in urls:
+            print(f'  LET OP: {p} en {urls[u]} krijgen dezelfde url {u}; {p} overgeslagen.')
+            continue
+        urls[u] = p
+        uit[p] = {'naam': p, 'u': u, 'leden': per[p]}
+    return uit
+
+
+def provincie_pagina(pv, provincies):
+    naam, leden = pv['naam'], pv['leden']
+    url = f'{ORIGIN}/{pv["u"]}/'
+    beeld = f'{url}deel.jpg'
+    titel = provincie_titel(naam)
+    n_open = sum(d.get('s') != 'Gesloten' for d in leden)
+    n_dicht = len(leden) - n_open
+
+    per = {}
+    for d in leden:
+        per.setdefault(sleutel(hoofdgemeente(d.get('g'))), []).append(d)
+    groot, klein = [], []
+    for k, rij in per.items():
+        gnaam = hoofdgemeente(rij[0].get('g')) or 'Zonder gemeente'
+        (groot if k in GEMEENTE_URL else klein).append((gnaam, k, rij))
+    groot.sort(key=lambda x: sleutel(x[0]))
+    klein.sort(key=lambda x: sleutel(x[0]))
+
+    def tel(rij):
+        o = sum(d.get('s') != 'Gesloten' for d in rij)
+        return f'{o} {"café" if o == 1 else "cafés"}' + (f', {len(rij) - o} gesloten' if len(rij) - o else '')
+
+    groot_html = ''
+    if groot:
+        items = ''.join(f'<li><a class="gnaam" href="{e(GEMEENTE_URL[k])}">{e(g)}</a>'
+                        f'<span class="gmeta">{e(tel(rij))}</span></li>' for g, k, rij in groot)
+        groot_html = (f'<section aria-labelledby="gemeenten"><h2 id="gemeenten">Gemeenten</h2>'
+                      f'<ul class="glijst govz">{items}</ul></section>')
+    klein_html = ''
+    if klein:
+        blokken = ''
+        for g, k, rij in klein:
+            rij = sorted(rij, key=lambda d: (d.get('s') == 'Gesloten', sleutel(d['n'])))
+            blokken += (f'<h3 id="{e(url_deel(g))}">{e(g)}</h3><ul class="glijst">'
+                        + ''.join(lijst_regel(d, plaats(d.get('g')) if sleutel(plaats(d.get('g'))) != k else '')
+                                  for d in rij) + '</ul>')
+        klein_html = (f'<section aria-labelledby="kleiner"><h2 id="kleiner">'
+                      f'{"Kleinere gemeenten" if groot else "Cafés per gemeente"}</h2>{blokken}</section>')
+    andere = ''.join(f'<li><a class="gnaam" href="/{e(o["u"])}/">{e(o["naam"])}</a></li>'
+                     for o in provincies.values() if o['naam'] != naam)
+    andere_html = (f'<section aria-labelledby="andere"><h2 id="andere">Andere provincies</h2>'
+                   f'<ul class="glijst govz">{andere}</ul></section>') if andere else ''
+
+    intro = (f'In {provincie_zin(naam)} {"staat" if n_open == 1 else "staan"} {n_open} '
+             f'{"café" if n_open == 1 else "cafés"} in de gids, verspreid over {len(per)} '
+             f'{"gemeente" if len(per) == 1 else "gemeenten"}.')
+    if n_dicht:
+        intro += (f' Daarnaast {"blijft" if n_dicht == 1 else "blijven"} {n_dicht} gesloten '
+                  f'{"zaak" if n_dicht == 1 else "zaken"} als archief bewaard.')
+    if groot and klein:
+        intro += (' Gemeenten met minstens drie zaken hebben een eigen pagina; de cafés uit '
+                  'kleinere gemeenten staan eronder.')
+    omschrijving = kort(f'{n_open} {"café" if n_open == 1 else "cafés"} in {provincie_zin(naam)}, '
+                        f'per gemeente: volkscafés, bruine kroegen en biercafés, met adres en soort.', 158)
+    q = urllib.parse.quote
+    ld = {'@context': 'https://schema.org', '@type': 'CollectionPage', 'name': titel, 'url': url}
+    blob = json.dumps(ld, ensure_ascii=False).replace('</', '<\\/')
+    return f'''<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#132738">
+<title>{e(titel)} | Kroeg &amp; Karaf</title>
+<meta name="description" content="{e(omschrijving)}">
+<link rel="canonical" href="{e(url)}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Kroeg &amp; Karaf">
+<meta property="og:locale" content="nl_BE">
+<meta property="og:title" content="{e(titel)}">
+<meta property="og:description" content="{e(omschrijving)}">
+<meta property="og:url" content="{e(url)}">
+<meta property="og:image" content="{e(beeld)}">
+<meta property="og:image:width" content="{W}">
+<meta property="og:image:height" content="{H}">
+<meta property="og:image:alt" content="{e(titel)}, Kroeg &amp; Karaf">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/assets/fonts/fonts.css">
+<link rel="stylesheet" href="/assets/cafe.css?v={VERSIE}">
+<link rel="stylesheet" href="/assets/gemeente.css?v={VERSIE}">
+<script type="application/ld+json">{blob}</script>
+</head>
+<body class="cafepagina tekstpagina gemeentepagina">
+<a class="naarinhoud" href="#inhoud">Naar de inhoud</a>
+<header class="balk">
+ <div class="wrap">
+  <a class="merk" href="/"><img src="/assets/logo.png" alt="Kroeg &amp; Karaf, naar de startpagina" width="760" height="575"></a>
+  <p class="merkzin">Voor schoon volk en dorstige zielen</p>
+  <nav class="hoofdnav" aria-label="Kroeg &amp; Karaf"><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/gemeenten">Gemeenten</a><a href="/afspreken">Afspreken</a></nav>
+ </div>
+</header>
+
+<main id="inhoud">
+ <div class="kop">
+  <div class="wrap">
+   <nav class="kruimel" aria-label="Kruimelpad"><a href="/lijst">Alle cafés</a> <span aria-hidden="true">/</span> <a href="/gemeenten">Gemeenten</a></nav>
+   <h1>{e(titel)}</h1>
+   <p class="ondertitel">{n_open} {"café" if n_open == 1 else "cafés"}</p>
+  </div>
+ </div>
+ <div class="wrap leeskolom">
+  <p class="aanhef">{e(intro)}</p>
+  <p class="gknoppen"><a class="gknop" href="/kaart?p={q(naam)}">Bekijk {e(naam)} op de kaart</a><a class="gknop stil" href="/lijst?p={q(naam)}">Zoek in de lijst</a></p>
+  {groot_html}
+  {klein_html}
+  {andere_html}
+ </div>
+</main>
+
+<footer class="voet">
+ <div class="wrap">
+  <nav aria-label="Onderaan"><a href="/">Start</a><a href="/oppad">Op pad</a><a href="/lijst">Alle cafés</a><a href="/kaart">Kaart</a><a href="/afspreken">Afspreken</a><a href="/gemeenten">Gemeenten</a><a href="/over">Over</a><a href="/privacy">Privacy</a></nav>
+  <p>Kroeg &amp; Karaf, de gids voor schoon volk en dorstige zielen</p>
+ </div>
+</footer>
+</body>
+</html>
+'''
+
+
+# ---- de startpagina in de html ---------------------------------------------------
+# Ontdek Belgische cafés en Per provincie werden alleen door start.js getekend. De
+# bouw zet nu de zes zaken van vandaag en de provincies al in index.html, tussen de
+# markeringen <!--start:...-->. start.js tekent Ontdek daarna gewoon opnieuw (zelfde
+# rooster, dus zelfde zes) en laat de provincies staan als ze er al zijn.
+
+def eerste_zin(info):
+    # zoals eersteZin() in assets/start.js
+    t = (info or '').split('\n')[0].strip()
+    m = re.match(r"^(.+?[a-zà-ÿ0-9)]{2}[.!?])\s+[A-ZÀ-Ý'‘]", t)
+    zin = (m.group(1) if m else t).strip()
+    if len(zin) > 160:
+        zin = re.sub(r'[,;:.]$', '', re.sub(r'\s+\S*$', '', zin[:160])) + '…'
+    return zin
+
+
+def kies_rooster(rooster, per_id, vandaag, per=None):
+    # zoals kiesRooster() in assets/start.js, zonder de knop Toon zes andere
+    per = per or ONTDEK_PER_DAG
+    rij = [i for r in rooster.get('rondes', []) for i in r]
+    n = len(rij)
+    if not n:
+        return []
+    p = max(0, (vandaag - datetime.date.fromisoformat(rooster['start'])).days * per
+            - int(rooster.get('offset', 0)))
+    keuze = []
+    for k in range(n):
+        if len(keuze) >= min(n, per):
+            break
+        d = per_id.get(rij[(p + k) % n])
+        if d and d not in keuze:
+            keuze.append(d)
+    return keuze
+
+
+def start_statisch(start, provincies):
+    pad = SITE / 'index.html'
+    if not pad.exists():
+        return
+    t = pad.read_text(encoding='utf-8')
+
+    def vul(naam, inhoud):
+        nonlocal t
+        patroon = re.compile(rf'<!--start:{naam}-->.*?<!--/start:{naam}-->', re.S)
+        t, n = patroon.subn(lambda m: f'<!--start:{naam}-->{inhoud}<!--/start:{naam}-->', t)
+        if n != 1:
+            sys.exit(f'STOP: de markering start:{naam} staat {n} keer in index.html, verwacht: 1.')
+
+    pool = {z['id']: z for z in start.get('zaken', [])
+            if z.get('id') and z.get('s') == 'Geverifieerd' and z.get('u') and z.get('i')}
+    keuze = kies_rooster(start.get('rooster') or {}, pool, vandaag_be())
+    kaarten = ''.join(
+        f'<li class="cafekaart{" metfoto" if d.get("foto") else ""}"><a href="/{e(d["u"])}/">'
+        + (f'<span class="cafefoto"><img src="fotos/{e(d["foto"])}-klein.avif" alt="" width="92" height="92" '
+           'loading="lazy" decoding="async"></span>' if d.get('foto') else '')
+        + f'<span class="cafenaam">{e(d["n"])}</span>'
+        + f'<span class="cafeplaats">{e(d.get("g") or d.get("p"))}</span>'
+        + f'<span class="caferede">{e(d.get("k") or eerste_zin(d.get("i")))}</span></a></li>'
+        for d in keuze)
+    bezig = '' if keuze else ' aria-busy="true"'
+    vul('ontdek', f'<ol class="cafelijst" id="ontdeklijst"{bezig}>{kaarten}</ol>')
+
+    def nl(n):
+        return f'{n:,}'.replace(',', '.')
+    rijen = ''.join(
+        f'<li><a href="/{e(provincies[p]["u"])}/"><span>{e(p)}</span><span class="n">{nl(n)}</span></a></li>'
+        for p, n in start.get('provincies', []) if p in provincies)
+    vul('provincies',
+        f'<section class="provincies" id="provincies" aria-labelledby="provkop"{"" if rijen else " hidden"}>\n'
+        '  <h2 id="provkop">Per provincie</h2>\n'
+        f'  <ul class="provlijst" id="provlijst">{rijen}</ul>\n'
+        '  <p class="provvoet"><a href="/gemeenten">Alle gemeenten per provincie</a></p>\n'
+        ' </section>')
+    pad.write_text(t, encoding='utf-8')
+    print(f'startpagina in de html: {len(keuze)} zaken in Ontdek, {rijen.count("<li>")} provincies')
 
 
 # ---- de startpagina ------------------------------------------------------------
@@ -1547,7 +1785,7 @@ def schrijf_start(data):
     # minstens drie maanden dicht, zoals de pagina het telt
     j, m = divmod(vandaag.year * 12 + vandaag.month - 1 - 3, 12)
     grens = datetime.date(j, m + 1, min(vandaag.day, 28))
-    (SITE / 'data/start.json').write_text(json.dumps({
+    start = {
         'aantal': len(data), 'open': len(open_),
         'gesloten': len(data) - len(open_),
         'zonder_ligging': sum(1 for d in open_ if 'lat' not in d),
@@ -1557,8 +1795,10 @@ def schrijf_start(data):
         'rooster': ontdek_rooster([z['id'] for z in zaken if z.get('s') == 'Geverifieerd' and z.get('u') and z.get('i')],
                                   (vorig or {}).get('rooster'), vandaag),
         'ronderooster': ontdek_rooster([z['id'] for z in ronde if z.get('u') and sluiting_einde(z.get('z')) <= grens],
-                                       (vorig or {}).get('ronderooster'), vandaag, per=1, naam='ronde')},
-        ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+                                       (vorig or {}).get('ronderooster'), vandaag, per=1, naam='ronde')}
+    (SITE / 'data/start.json').write_text(
+        json.dumps(start, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    return start
 
 
 def pas_open(per_id):
@@ -1655,9 +1895,12 @@ def main():
     VERHALEN.update(laad_verhalen())
     gemeenten = laad_gemeenten(data)
     GEMEENTE_URL.update({k: f'/{g["u"]}/' for k, g in gemeenten.items()})
+    provincies = laad_provincies(data)
+    PROVINCIE_URL.update({sleutel(p): f'/{pv["u"]}/' for p, pv in provincies.items()})
 
     shutil.rmtree(SITE / 'cafe', ignore_errors=True)
     shutil.rmtree(SITE / 'gemeente', ignore_errors=True)
+    shutil.rmtree(SITE / 'provincie', ignore_errors=True)
     buren = zoek_buren(data)
     kaartjes = Kaartjes()
     for d in data:
@@ -1676,6 +1919,14 @@ def main():
         kaartjes.maak({'n': 'Cafés per gemeente', 't': 'Gemeenten', 'g': f'{len(gemeenten)} gemeenten'},
                       SITE / 'gemeente' / 'deel.jpg')
     print(f"gemeentepagina's: {len(gemeenten)} plus het overzicht /gemeenten")
+    for pv in provincies.values():
+        map_ = SITE / pv['u']
+        map_.mkdir(parents=True, exist_ok=True)
+        (map_ / 'index.html').write_text(provincie_pagina(pv, provincies), encoding='utf-8')
+        n_open = sum(d.get('s') != 'Gesloten' for d in pv['leden'])
+        kaartjes.maak({'n': provincie_titel(pv['naam']), 't': 'Provincie',
+                       'g': f'{n_open} {"café" if n_open == 1 else "cafés"}'}, map_ / 'deel.jpg')
+    print(f"provinciepagina's: {len(provincies)}")
     # De lijst wordt in de browser getekend. Wie geen script uitvoert (of een crawler
     # die niet wacht) ziet in de oorspronkelijke html toch rechtstreekse links.
     pad_lijst = SITE / 'lijst.html'
@@ -1702,7 +1953,7 @@ def main():
         json.dump(data, fp, ensure_ascii=False, separators=(',', ':'))
     (SITE / REGISTER).write_text(json.dumps(nieuw_register(data, weg), ensure_ascii=False,
                                             separators=(',', ':')), encoding='utf-8')
-    schrijf_start(data)
+    start_statisch(schrijf_start(data), provincies)
     # Sitemap-index met drie delen, zodat Search Console per soort pagina toont wat
     # geindexeerd raakt. Cafepagina's alleen als ze open zijn en een echte Info hebben;
     # gesloten zaken blijven als archief bereikbaar via de gemeentepagina's.
@@ -1711,6 +1962,8 @@ def main():
     paginas = [(u, '') for u in vast] + ([(f'{ORIGIN}/gemeenten', '')] if gemeenten else [])
     gem = [(f'{ORIGIN}/{g["u"]}/', max((laatst_gewijzigd(d) for d in g['leden']), default=''))
            for g in gemeenten.values()]
+    gem += [(f'{ORIGIN}/{pv["u"]}/', max((laatst_gewijzigd(d) for d in pv['leden']), default=''))
+            for pv in provincies.values()]
     cafes = [(f'{ORIGIN}/{d["u"]}/', laatst_gewijzigd(d)) for d in data
              if d.get('s') != 'Gesloten' and not dun(d)]
     delen = [('sitemap-paginas.xml', paginas), ('sitemap-gemeenten.xml', gem), ('sitemap-cafes.xml', cafes)]
@@ -1725,7 +1978,7 @@ def main():
         + '</sitemapindex>\n', encoding='utf-8')
     n_dun = sum(dun(d) for d in data)
     print(f'sitemap: {len(paginas)} vaste pagina\'s, {len(gem)} gemeenten, {len(cafes)} cafes; '
-          f'{n_dun} dunne cafepagina\'s met noindex (Info onder {DUN_WOORDEN} woorden)')
+          f'({len(provincies)} provincies inbegrepen); {n_dun} dunne cafepagina\'s met noindex (Info onder {DUN_WOORDEN} woorden)')
     (SITE / 'robots.txt').write_text(f'User-agent: *\nAllow: /\n\nSitemap: {ORIGIN}/sitemap.xml\n',
                                      encoding='utf-8')
     regels = doorverwijzingen(data, weg)

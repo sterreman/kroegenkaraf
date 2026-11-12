@@ -284,7 +284,9 @@ function toon(start) {
     }
   }
   const prov = start.provincies || [];
-  if (prov.length) {
+  /* De publicatie zet de provincies al in de html, met een link naar hun eigen
+     pagina (start_statisch in cafepaginas.py); dan blijft het daarbij. */
+  if (prov.length && !$('provlijst').children.length) {
     $('provlijst').innerHTML = prov.map(([p, n]) =>
       `<li><a href="/lijst?p=${encodeURIComponent(p)}"><span>${esc(p)}</span>`
       + `<span class="n">${n.toLocaleString('nl-BE')}</span></a></li>`).join('');
