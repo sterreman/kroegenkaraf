@@ -84,6 +84,13 @@ maand vermeldt, en nooit seizoenszaken (zomerbars, winterbars, pop-ups). `cafepa
 de pagina toont zelf alleen wat de voorbije zes maanden opende, de recentste eerst. Oude
 regels mogen blijven staan, ze vallen vanzelf weg.
 
+Sinds 12 november 2026 kan het ook zonder de repo: zet in de Notitie van de zaak een regel
+`Pas open: JJJJ-MM nieuw` of `Pas open: JJJJ-MM heropend`. `publiceer.py` leest die bij de
+nachtelijke bouw en voegt ze toe aan de kopie van `nieuwopen.json` in de bouwmap; bij
+dezelfde ID wint de Notitie. Een Notitie die Pas open noemt in een andere vorm geeft een
+waarschuwing in het verslag. Zelfde voorwaarden: de Info noemt de maand, geen seizoenszaken,
+en een nieuwe uitbater zonder sluiting telt niet als heropening.
+
 ## Rooster van Ontdek Belgische cafes (22 oktober 2026)
 
 De zes cafes van de dag komen uit een rooster in `data/start.json` (`rooster`). `cafepaginas.py`
