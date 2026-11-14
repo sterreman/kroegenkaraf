@@ -32,3 +32,6 @@
 .gemeentepagina .govz li{padding:6px 2px 7px}
 .gemeentepagina .govz .gnaam{font-size:20px;padding:4px 0 0}
 .gemeentepagina .govz .gmeta{display:inline;margin-left:10px}
+/* Onderaan: een zaak die ontbreekt, doorgeven via het tipformulier onder de lijst. */
+.tiplink{margin:36px 0 0;padding-top:18px;border-top:1px dashed var(--lijn);font-family:var(--kop);font-stretch:90%;font-weight:600;font-size:17px}
+.gemeentepagina .leeskolom .tiplink a{color:var(--roest-tekst);text-underline-offset:4px}

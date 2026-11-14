@@ -253,6 +253,41 @@ a.rij:focus-visible{outline:2px solid var(--inkt);outline-offset:-2px;background
  font-family:var(--kop);font-stretch:85%;font-weight:700;font-size:16px;color:var(--inkt)}
 .knop:hover{background:var(--marine);color:var(--creme)}
 
+/* Staat uw stamcafé er niet in? Het tipformulier onder de lijst. Post naar
+   het eigen meldpunt (worker/melding.js, soort ontbreekt). De velden volgen het
+   meldformulier van de cafepagina's (cafe.css). */
+.tip{margin:48px 0 0;padding:26px 0 0;border-top:2px solid var(--inkt)}
+.tip>*{max-width:60ch}
+.tipkop{margin:0;font-family:var(--kop);font-weight:800;font-stretch:70%;font-size:30px;line-height:1.05;color:var(--inkt)}
+.tipzin{margin:8px 0 0;font-size:17.5px;color:var(--inkt2)}
+.tipform{margin:14px 0 0;max-width:560px}
+.tipopen{display:none;height:44px;padding:0 18px;border:0;background:var(--roest);color:#fff;cursor:pointer;
+ font-family:var(--kop);font-stretch:85%;font-weight:800;font-size:17px}
+.tipopen:hover{background:#b93b1b}
+.tipform.js:not(.gekozen) .tipopen{display:inline-block}
+.tipform.js:not(.gekozen) .tiprest{display:none}
+.tipform.verstuurd .tipopen,.tipform.verstuurd .tiprest>*:not(.meldstatus){display:none}
+.tipform.verstuurd .tiprest{display:block}
+.veldlabel{display:block;margin:12px 0 5px;font-family:var(--kop);font-stretch:90%;font-weight:600;font-size:14.5px;color:var(--inkt)}
+.veldlabel span{font-weight:400;color:var(--inkt2)}
+.veldlabel span::before{content:"· "}
+.kkform textarea,.kkform input[type=email],.kkform input[type=text]{display:block;width:100%;box-sizing:border-box;padding:10px 12px;
+ border:1.5px solid var(--lijn);background:#fff;color:var(--inkt);font:inherit;font-size:16px;line-height:1.4;border-radius:0}
+.kkform textarea{min-height:4.5em;resize:vertical}
+.kkform textarea:focus,.kkform input[type=email]:focus,.kkform input[type=text]:focus{outline:2px solid var(--roest-tekst);outline-offset:0;border-color:var(--roest-tekst)}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.meldknop{margin-top:14px;padding:10px 22px;border:2px solid var(--roest);background:var(--roest);color:#fff;cursor:pointer;
+ font-family:var(--kop);font-weight:800;font-stretch:80%;font-size:18px}
+.meldknop:hover{background:#b93b1b;border-color:#b93b1b}
+.meldknop:disabled{opacity:.6;cursor:default}
+.meldstatus{margin:10px 0 0;font-size:17px;color:var(--inkt)}
+.meldstatus:empty{display:none}
+.meldstatus.fout{color:var(--roest-tekst)}
+.meldnoot{margin:10px 0 0;font-size:13.5px;line-height:1.45;color:var(--inkt2)}
+.meldnoot a{color:inherit;text-underline-offset:3px}
+/* Bij nul resultaten staat het formulier meteen open, vlak onder Niets gevonden. */
+.tip.direct{margin-top:8px;padding-top:22px;border-top:1px solid var(--lijn)}
+
 /* ---- voet ---- */
 .voet{margin-top:56px;background:var(--marine);color:var(--creme2)}
 .voet .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 24px;

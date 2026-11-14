@@ -11,7 +11,7 @@
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="stylesheet" href="/assets/fonts/fonts.css">
-<link rel="stylesheet" href="assets/lijst.css?v=kroeglicht-20261110">
+<link rel="stylesheet" href="assets/lijst.css?v=tip-20261114">
 </head>
 <body class="lijstpagina">
 <a class="naarinhoud" href="#resultaten">Naar de resultaten</a>
@@ -105,6 +105,33 @@
  <div id="list" aria-busy="true">
   <p class="laden">De zaken worden geladen.</p><!--gemeentelinks-->
  </div>
+
+ <section class="tip" id="tip" aria-labelledby="tipkop">
+  <h2 class="tipkop" id="tipkop">Staat uw stamcafé er niet in?</h2>
+  <p class="tipzin">Geef het door. We checken het en zetten het op de kaart als het erin thuishoort.</p>
+  <form class="tipform kkform" action="/api/melding" method="post">
+   <input type="hidden" name="soort" value="ontbreekt">
+   <button type="button" class="tipopen" aria-expanded="false" aria-controls="tiprest">Geef een café door</button>
+   <div class="tiprest" id="tiprest">
+    <label class="veldlabel" for="tnaam">Naam van de zaak</label>
+    <input id="tnaam" name="zaak" type="text" maxlength="200" required autocomplete="off">
+    <label class="veldlabel" for="tgemeente">Gemeente</label>
+    <input id="tgemeente" name="gemeente" type="text" maxlength="200" required autocomplete="off">
+    <label class="veldlabel" for="tlink">Link <span>Google Maps, Facebook of website, mag leeg</span></label>
+    <input id="tlink" name="link" type="text" maxlength="500" inputmode="url" autocomplete="off">
+    <label class="veldlabel" for="tbericht">Waarom hoort deze zaak erin? <span>mag leeg</span></label>
+    <textarea id="tbericht" name="bericht" rows="3" maxlength="3000"></textarea>
+    <label class="veldlabel" for="tmail">Je e-mailadres <span>alleen als je een antwoord wil</span></label>
+    <input id="tmail" name="mail" type="email" maxlength="200" autocomplete="email">
+    <div class="hp" aria-hidden="true"><label>Laat dit leeg <input name="website" tabindex="-1" autocomplete="off"></label></div>
+    <input type="hidden" name="zoekterm" value="">
+    <input type="hidden" name="t" value="">
+    <button type="submit" class="meldknop">Verstuur</button>
+    <p class="meldstatus" role="status" aria-live="polite"></p>
+    <p class="meldnoot">We bekijken elke tip zelf, en niet elke zaak komt in de gids. Kroeg &amp; Karaf is onafhankelijk: ook een uitbater mag zijn zaak doorgeven, maar beheert daarna niets. <a href="/privacy#melden">Privacy</a></p>
+   </div>
+  </form>
+ </section>
 </main>
 
 <footer class="voet">
@@ -118,6 +145,6 @@
 <script>const GEMEENTEPAGINAS = {};</script>
 <script src="assets/gemeen.js?v=20261019"></script>
 <script src="assets/filterbalk.js?v=volksspelen-20261017"></script>
-<script src="assets/gids.js?v=20261019"></script>
+<script src="assets/gids.js?v=tip-20261114"></script>
 </body>
 </html>
