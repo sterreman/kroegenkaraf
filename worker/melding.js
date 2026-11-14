@@ -4,7 +4,9 @@
    eerst hier langs (run_worker_first in wrangler.jsonc); al de rest serveert
    Cloudflare rechtstreeks uit de bestanden.
 
-   POST /api/melding komt van het formulier onderaan elke cafepagina. De melding
+   POST /api/melding komt van het formulier onderaan elke cafepagina, en met
+   soort=ontbreekt van het tipformulier onder de lijst (een zaak die nog niet in
+   de gids staat; zonder slug, wel met naam en gemeente). De melding
    gaat als mail naar de redactie, via de send_email-binding van Cloudflare Email
    Routing. Er wordt niets bewaard: geen database, geen log van de inhoud.
 
@@ -44,6 +46,7 @@ const SOORTEN = {
   heropend: 'Weer open',
   ligging: 'Ligging',
   anders: 'Correctie',
+  ontbreekt: 'Ontbrekende zaak',  // het tipformulier onder de lijst
 };
 const MAX_BERICHT = 3000;
 const MAX_FOTOS = 3;
@@ -122,6 +125,8 @@ async function melding(request, env) {
     return antwoord(request, 429, 'Dat ging wel heel snel. Probeer het over enkele seconden opnieuw.', slug);
   }
 
+  if (veld('soort', 20) === 'ontbreekt') return tip(request, env, veld);
+
   const soort = SOORTEN[veld('soort', 20)];
   const zaak = veld('zaak', 200);
   const bericht = veld('bericht', MAX_BERICHT);
@@ -161,6 +166,49 @@ async function melding(request, env) {
     return antwoord(request, 502, `Versturen lukte niet. Probeer later opnieuw of mail ons op ${CONTACT}.`, slug);
   }
   return antwoord(request, 200, 'Bedankt! We kijken het na.', slug);
+}
+
+/* Een zaak die nog niet in de gids staat. Naam en gemeente zijn nodig, de rest
+   mag leeg. Er hoort geen cafepagina bij, dus ook geen slug: wie zonder
+   javascript verstuurt, gaat terug naar de lijst. */
+async function tip(request, env, veld) {
+  const naam = veld('zaak', 200);
+  const gemeente = veld('gemeente', 200);
+  const link = veld('link', 500);
+  const bericht = veld('bericht', MAX_BERICHT);
+  const zoekterm = veld('zoekterm', 200);
+  const mail = veld('mail', 200);
+  if (!naam || !gemeente) {
+    return antwoord(request, 400, 'Vul de naam van de zaak en de gemeente in.', '', '/lijst');
+  }
+  if (mail && !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(mail)) {
+    return antwoord(request, 400, 'Dat e-mailadres lijkt niet te kloppen. Laat het leeg als je geen antwoord nodig hebt.', '', '/lijst');
+  }
+  if (!env.MELDING_AAN || !env.MELDER) {
+    return antwoord(request, 503, `Het meldpunt is even niet bereikbaar. Mail ons op ${CONTACT}.`, '', '/lijst');
+  }
+  const kort = s => s.replace(/\s+/g, ' ');
+  const tekst = [
+    `Ontbrekende zaak: ${kort(naam)}, ${kort(gemeente)}`,
+    '',
+    `Naam: ${kort(naam)}`,
+    `Gemeente: ${kort(gemeente)}`,
+    `Link: ${kort(link) || '(geen)'}`,
+    zoekterm ? `Gezocht op: ${kort(zoekterm)}` : '',
+    '',
+    bericht || '(geen toelichting)',
+    '',
+    mail ? `Antwoorden kan: ${mail}` : 'Geen e-mailadres opgegeven.',
+  ].filter((r, i, a) => r !== '' || a[i - 1] !== '').join('\n');
+  const onderwerp = `Ontbrekende zaak: ${kort(naam)}, ${kort(gemeente)}`;
+  try {
+    await env.MELDER.send(new EmailMessage(VAN, env.MELDING_AAN,
+      mime({ van: VAN, aan: env.MELDING_AAN, antwoordAan: mail, onderwerp, tekst })));
+  } catch (err) {
+    console.error('tip niet verstuurd', err);
+    return antwoord(request, 502, `Versturen lukte niet. Probeer later opnieuw of mail ons op ${CONTACT}.`, '', '/lijst');
+  }
+  return antwoord(request, 200, 'Bedankt voor de tip! We zoeken het uit.', '', '/lijst');
 }
 
 async function foto(request, env) {
@@ -299,14 +347,14 @@ function mime({ van, aan, antwoordAan, onderwerp, tekst }) {
 /* Het formulier verstuurt met fetch en krijgt json terug. Zonder javascript
    post de browser het formulier gewoon; dan krijgt hij een kleine pagina met de
    uitkomst en een link terug naar de zaak. */
-function antwoord(request, status, tekst, slug) {
+function antwoord(request, status, tekst, slug, naar) {
   const wil = request.headers.get('Accept') || '';
   if (wil.includes('application/json')) {
     return new Response(JSON.stringify({ ok: status === 200, tekst }), {
       status, headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' },
     });
   }
-  const terug = slug && SLUG.test(slug) ? `/${slug}/` : '/';
+  const terug = slug && SLUG.test(slug) ? `/${slug}/` : (naar || '/');
   const esc = x => x.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const html = `<!doctype html><html lang="nl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
@@ -314,7 +362,7 @@ function antwoord(request, status, tekst, slug) {
 <style>body{margin:0;background:#fbf7f0;color:#132738;font:18px/1.5 Georgia,serif}
 main{max-width:560px;margin:12vh auto;padding:0 24px}h1{font-size:28px;line-height:1.15}
 a{color:#b0391a;text-underline-offset:4px}</style></head><body><main>
-<h1>${esc(tekst)}</h1><p><a href="${terug}">Terug naar de pagina</a></p></main></body></html>`;
+<h1>${esc(tekst)}</h1><p><a href="${terug}">${terug === '/lijst' ? 'Terug naar de lijst' : 'Terug naar de pagina'}</a></p></main></body></html>`;
   return new Response(html, {
     status, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' },
   });

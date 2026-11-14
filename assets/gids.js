@@ -76,6 +76,66 @@ function plaatsNaam(g) {
     : `<span class="pnaam">${esc(g)}</span>`;
 }
 
+/* ---- Staat uw stamcafé er niet in? --------------------------------------
+   Het tipformulier onder de lijst (lijst.html, post naar worker/melding.js).
+   Zonder javascript staat het gewoon open en post het de pagina. Hier klapt het
+   pas open na een tik, of vanzelf als een zoekopdracht niets oplevert: dan staat
+   de zoekterm al in het naamveld. Een gemeentepagina linkt naar
+   /lijst?q=Haacht&gemeente=Haacht#tip; die gemeente lezen we meteen, want
+   filterbalk.js herschrijft de url zonder parameters die het niet kent. */
+const TIPGEMEENTE = new URLSearchParams(location.search).get('gemeente') || '';
+const TIP = {form: document.querySelector('.tipform'), auto: ''};
+
+function tipOpen(veld) {
+  const form = TIP.form;
+  if (!form || form.classList.contains('verstuurd')) return;
+  form.classList.add('gekozen');
+  form.querySelector('.tipopen').setAttribute('aria-expanded', 'true');
+  if (veld) setTimeout(() => form.elements[veld].focus(), 50);
+}
+
+function tipBijResultaat(leeg, zoek) {
+  const form = TIP.form;
+  if (!form) return;
+  const direct = leeg && !!zoek;
+  $('tip').classList.toggle('direct', direct);
+  form.elements.zoekterm.value = direct ? zoek : '';
+  if (!direct) return;
+  const naam = form.elements.zaak;
+  if (!naam.value || naam.value === TIP.auto) { naam.value = zoek; TIP.auto = zoek; }
+  tipOpen();
+}
+
+function startTip() {
+  const form = TIP.form;
+  if (!form) return;
+  const status = form.querySelector('.meldstatus');
+  form.classList.add('js');
+  form.elements.t.value = String(Date.now());
+  if (TIPGEMEENTE) form.elements.gemeente.value = TIPGEMEENTE;
+  form.querySelector('.tipopen').addEventListener('click', () => tipOpen('zaak'));
+  form.addEventListener('submit', async ev => {
+    ev.preventDefault();
+    status.classList.remove('fout');
+    const knop = form.querySelector('.meldknop');
+    knop.disabled = true;
+    status.textContent = 'Even versturen…';
+    try {
+      const r = await fetch(form.action, {method: 'POST', body: new FormData(form),
+                                          headers: {Accept: 'application/json'}});
+      const j = await r.json();
+      status.textContent = j.tekst;
+      if (j.ok) { form.classList.add('verstuurd'); return; }
+      status.classList.add('fout');
+    } catch (err) {
+      status.classList.add('fout');
+      status.textContent = 'Versturen lukte niet. Probeer later opnieuw of mail ons op info@kroegenkaraf.be.';
+    }
+    knop.disabled = false;
+  });
+}
+startTip();
+
 function render() {
   const res = selectie();
   const dicht = geslotenTreffers();
@@ -93,11 +153,13 @@ function render() {
     L.innerHTML = '<div class="leeg"><p class="leegkop">Niets gevonden.</p><p>'
       + (dicht ? geslotenMelding(dicht)
         : zoek && filtersActief() ? 'Geen zaak past bij deze zoekopdracht en deze filters samen.'
-        : zoek ? 'Controleer de schrijfwijze of zoek op een gemeente.'
+        : zoek ? 'Controleer de schrijfwijze of zoek op een gemeente. Staat de zaak er echt niet in? Geef ze hieronder door.'
         : 'Geen zaak past bij deze filters.')
       + '</p>' + (knoppen.length ? `<p class="leegknoppen">${knoppen.join('')}</p>` : '') + '</div>';
+    tipBijResultaat(!dicht && !filtersActief(), zoek);
     return;
   }
+  tipBijResultaat(false, zoek);
   let html = dicht ? `<p class="melding">${geslotenMelding(dicht)}</p>` : '';
   let groep = null, items = '';
   const perGroep = {};
@@ -182,7 +244,10 @@ function gereed() {
   FB.naZoeken = () => scrollTo({top: 0});
   startFilterbalk();
   render();
-  if (location.hash) naarAnker();
+  if (location.hash === '#tip') {
+    tipOpen(TIPGEMEENTE ? 'zaak' : '');
+    $('tip').scrollIntoView({block: 'start'});
+  } else if (location.hash) naarAnker();
   else herstelPlek();
 }
 
