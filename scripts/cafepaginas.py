@@ -1263,10 +1263,19 @@ def gemeente_pagina(g):
         return (d.get('t') == 'Eetcafé', d.get('s') != 'Geverifieerd',
                 -len((d.get('i') or '').split()), sleutel(d['n']))
     namen = [d['n'] for d in sorted(actueel, key=voorbeeld)[:3]]
+    # Mensen zoeken ook op "cafe <deelgemeente>" (cafe belsele, cafe langdorp): de
+    # deelgemeenten met een open café staan daarom mee in de omschrijving.
+    deel_open = [p for p in deel if any(plaats(d['g']) == p for d in actueel)]
     omschrijving = kort(f'{len(actueel)} {"café" if len(actueel) == 1 else "cafés"} in {naam}'
+                        + (f' en {", ".join(deel_open[:-1])}{" en " if len(deel_open) > 1 else ""}{deel_open[-1]}'
+                           if deel_open else '')
                         + (f', onder meer {", ".join(namen[:-1])}{" en " if len(namen) > 1 else ""}{namen[-1]}.' if namen else '.')
                         + ' Met adres, soort en ligging op de kaart.', 158)
     titel = f'Cafés in {naam}'
+    # In de zoekresultaten ook "volkscafés en kroegen", zoals mensen zoeken; de sitenaam
+    # valt weg als Google de titel anders zou afkappen (rond 60 tekens).
+    paginatitel = f'{titel}: volkscafés en kroegen'
+    paginatitel = paginatitel if len(paginatitel) + 16 > 65 else f'{paginatitel} | Kroeg & Karaf'
     ld = {'@context': 'https://schema.org', '@type': 'CollectionPage', 'name': titel, 'url': url,
           'mainEntity': {'@type': 'ItemList', 'itemListElement': [
               {'@type': 'ListItem', 'position': i + 1, 'url': f'{ORIGIN}/{d["u"]}/', 'name': d['n']}
@@ -1280,7 +1289,7 @@ def gemeente_pagina(g):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#132738">
-<title>{e(titel)} | Kroeg &amp; Karaf</title>
+<title>{e(paginatitel)}</title>
 <meta name="description" content="{e(omschrijving)}">
 <link rel="canonical" href="{e(url)}">
 <meta property="og:type" content="website">
